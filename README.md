@@ -1,4 +1,4 @@
-# phantasma-link-wallet
+## ecto
 
 To test enable developer mode in chrome://extensions and "Load unpacked" dist folder.
 
