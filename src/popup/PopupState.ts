@@ -108,7 +108,7 @@ export class PopupState {
         this._accounts = items.accounts ? items.accounts : [];
         this._authorizations = items.authorizations ? items.authorizations : [];
         this._currency = items.currency ? items.currency : "USD";
-        this.nfts = items.nfts ? items.nfts : [];
+        this.nfts = items.nfts ? items.nfts : {};
         resolve();
       });
     });
