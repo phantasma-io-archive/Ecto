@@ -1,0 +1,45 @@
+{
+  "name": "ecto",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "build-watch": "vue-cli-service build-watch"
+  },
+  "dependencies": {
+    "bs58": "^4.0.1",
+    "core-js": "^3.6.4",
+    "cross-fetch": "^3.0.4",
+    "crypto-js": "^4.0.0",
+    "qrcode-generator-ts": "0.0.4",
+    "vue": "^2.6.11",
+    "vue-class-component": "^7.2.3",
+    "vue-property-decorator": "^8.4.2",
+    "vue-router": "^3.1.6",
+    "vuetify": "^2.3.4",
+    "wif": "^2.0.6"
+  },
+  "devDependencies": {
+    "@types/bs58": "^4.0.1",
+    "@types/chrome": "^0.0.75",
+    "@types/crypto-js": "^3.1.47",
+    "@types/elliptic": "^6.4.12",
+    "@types/node": "^14.0.5",
+    "@types/wif": "^2.0.1",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "@vue/cli-plugin-babel": "~4.3.0",
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-plugin-router": "^4.3.1",
+    "@vue/cli-plugin-typescript": "~4.3.0",
+    "@vue/cli-service": "~4.3.0",
+    "@vue/eslint-config-typescript": "^5.0.2",
+    "copy-webpack-plugin": "^4.6.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "typescript": "~3.8.3",
+    "vue-cli-plugin-chrome-ext": "0.0.5",
+    "vue-template-compiler": "^2.6.11"
+  }
+}
