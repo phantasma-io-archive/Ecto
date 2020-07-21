@@ -166,7 +166,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
                 tabid: msg.tabid,
                 sid: msg.sid,
                 data: {
-                  wallet: "Phantasma Link",
+                  wallet: "Ecto",
                   dapp,
                   token: authToken,
                   id,
