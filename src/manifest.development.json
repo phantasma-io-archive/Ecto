@@ -25,7 +25,6 @@
   },
 
   "permissions": [
-    "activeTab",
     "storage",
     "unlimitedStorage",
     "<all_urls>",
