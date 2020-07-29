@@ -128,13 +128,19 @@
                     </td>
                   </tr>
                   <tr v-for="item in txs" :key="item.hash">
-                    <td style="font-size:11px">
+                    <td style="font-size:11px; padding:6px" class="pl-3">
                       {{ getTime(item.timestamp) }}<br /><strong>{{
                         getDate(item.timestamp)
                       }}</strong>
                     </td>
-                    <td style="font-size:11px">{{ formatHash(item.hash) }}</td>
-                    <td style="font-size:11px">
+                    <td style="font-size:11px; padding: 6px">
+                      <TransactionComponent
+                        :tx="item"
+                        :address="account.address"
+                      />
+                    </td>
+                    <!-- <td style="font-size:11px">{{ formatHash(item.hash) }}</td> -->
+                    <td style="font-size:11px; padding: 5px">
                       <a
                         :href="getExplorerLink(item.hash)"
                         target="_blank"
@@ -460,6 +466,7 @@
           <v-spacer />
 
           <v-form
+            class="mt-3"
             v-if="needsWif"
             @keyup.native.enter="doSignTx"
             @submit.prevent
@@ -535,8 +542,11 @@ import {
 import { state, TxArgsData, PopupState } from "@/popup/PopupState";
 import { Script } from "vm";
 import ErrorDialogVue from "@/components/ErrorDialog.vue";
+import TransactionComponent from "@/components/TransactionComponent.vue";
 
-@Component({ components: { ErrorDialog: ErrorDialogVue } })
+@Component({
+  components: { ErrorDialog: ErrorDialogVue, TransactionComponent },
+})
 export default class extends Vue {
   requestInProcess = false;
   isLoading = true;
@@ -807,7 +817,7 @@ export default class extends Vue {
   }
 
   askUnstakeSoul() {
-    this.stakeDialog = false;
+    this.unstakeDialog = false;
     this.signTxDialog = true;
     this.signTxCallback = this.unstakeSoul;
   }
@@ -1096,34 +1106,8 @@ export default class extends Vue {
     const res = await state.getAccountTransactions(this.account.address);
     this.txs = res.result.txs;
     this.loadingTxs = [];
-    console.log(res.result);
-    console.log(JSON.stringify(this.txs));
     this.isLoading = false;
   }
-
-  //    async function getNFTIds(arrayids) {
-  //       let myPromise = new Promise((resolve, reject) => {
-  //       $.ajax({
-  //           xhrFields: {
-  //               withCredentials: !1
-  //           },
-  //           cache: !1,
-  //           crossDomain: !0,
-  //           type: 'POST',
-  //           dataType: 'json',
-  //           data: JSON.stringify({ids: arrayids}),
-  //           url: 'https://www.22series.com/api/store/nft',
-  //           success: function(returnedDataTX) {
-  //             var dataNFT = returnedDataTX;
-  //             resolve(dataNFT);
-  //           }
-  //         })
-  //       });
-  //       let dataNFTdetail = await myPromise;
-  //       return dataNFTdetail;
-  //     }
-  //   }
-  // }
 }
 </script>
 
