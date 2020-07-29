@@ -2,14 +2,15 @@
   "manifest_version": 2,
   "name": "Ecto Wallet",
   "description": "Lightweight Chrome Extension Wallet for Phantasma.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "browser_action": {
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
 
   "icons": {
-    "48": "icon.png"
+    "48": "icon-48.png",
+    "128": "icon.png"
   },
 
   "content_scripts": [
@@ -23,12 +24,7 @@
     "scripts": ["js/background.js"]
   },
 
-  "permissions": [
-    "storage",
-    "unlimitedStorage",
-    "<all_urls>",
-    "tabs"
-  ],
+  "permissions": ["storage", "unlimitedStorage", "<all_urls>", "tabs"],
 
   "web_accessible_resources": ["js/inpage.js"]
 }

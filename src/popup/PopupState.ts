@@ -393,6 +393,42 @@ export class PopupState {
     if (allNftsToQuery.length > 0)
       chrome.storage.local.set({ nfts: this.nfts }, () => {});
   }
+
+  async queryNft(ids: string[], token: string) {
+    const host = "https://www.22series.com/api/store/nft";
+
+    const allNftsToQuery = [];
+
+    for (let k = 0; k < ids.length; ++k) {
+      const id = ids[k];
+      const nft = this.nfts[id];
+      if (!nft) {
+        // search for it
+        allNftsToQuery.push(id);
+      }
+    }
+
+    for (let i = 0; i < allNftsToQuery.length; i += 100) {
+      const nftsToQuery = allNftsToQuery.slice(i, i + 100);
+
+      console.log("querying", nftsToQuery);
+
+      const res = await fetch(host, {
+        method: "POST",
+        mode: "cors",
+        body: JSON.stringify({ ids: nftsToQuery }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+      console.log("Result of queryNft", nftsToQuery, res);
+      let nftDict = await res.json();
+      Object.assign(this.nfts, nftDict);
+    }
+
+    this.nfts = Object.assign({}, this.nfts);
+
+    if (allNftsToQuery.length > 0)
+      chrome.storage.local.set({ nfts: this.nfts }, () => {});
+  }
 }
 
 export const state = new PopupState();
