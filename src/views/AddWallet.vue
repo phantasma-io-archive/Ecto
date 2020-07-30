@@ -69,7 +69,7 @@
               />
 
               <v-text-field
-                tabindex="2"
+                tabindex="3"
                 label="Password"
                 v-model="password"
                 autocorrect="off"
