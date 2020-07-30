@@ -15,7 +15,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content style="width:320px; max-height:500px">
+    <v-main style="width:320px; max-height:500px">
       <v-progress-linear
         v-if="isLoading"
         color="#17b1e8"
@@ -130,7 +130,7 @@
           </v-virtual-scroll>
         </v-row>
       </div>
-    </v-content>
+    </v-main>
 
     <v-dialog v-model="sendWhereDialog" max-width="290">
       <v-card>

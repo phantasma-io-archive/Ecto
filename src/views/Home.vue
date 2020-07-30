@@ -15,7 +15,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content style="width:320px; max-height:500px">
+    <v-main style="width:320px; max-height:500px">
       <v-progress-linear
         v-if="isLoading"
         color="#17b1e8"
@@ -116,17 +116,6 @@
             <v-simple-table>
               <template v-slot:default>
                 <tbody>
-                  <tr v-for="item in loadingTxs" :key="item">
-                    <td class="pa-0" style="width:50px">
-                      <v-skeleton-loader type="list-item"></v-skeleton-loader>
-                    </td>
-                    <td class="pa-0" style="width:110px">
-                      <v-skeleton-loader type="list-item"></v-skeleton-loader>
-                    </td>
-                    <td class="pa-0" style="width:30px">
-                      <v-skeleton-loader type="list-item"></v-skeleton-loader>
-                    </td>
-                  </tr>
                   <tr v-for="item in txs" :key="item.hash">
                     <td style="font-size:11px; padding:6px" class="pl-3">
                       {{ getTime(item.timestamp) }}<br /><strong>{{
@@ -149,14 +138,36 @@
                       >
                     </td>
                   </tr>
+                  <tr v-for="item in loadingTxs" :key="item">
+                    <td class="pa-0" style="width:50px">
+                      <v-skeleton-loader type="list-item"></v-skeleton-loader>
+                    </td>
+                    <td class="pa-0" style="width:110px">
+                      <v-skeleton-loader type="list-item"></v-skeleton-loader>
+                    </td>
+                    <td class="pa-0" style="width:30px">
+                      <v-skeleton-loader type="list-item"></v-skeleton-loader>
+                    </td>
+                  </tr>
                 </tbody>
               </template>
             </v-simple-table>
-            <div class="pa-4"></div>
+            <div style="text-align:center">
+              <v-btn
+                v-if="loadingTxs.length === 0 && showLoadMore"
+                dense
+                text
+                class="ma-1"
+                color="blue darken-1"
+                @click="loadMoreTxs"
+                >Load more</v-btn
+              >
+            </div>
           </div>
+          <div class="pa-3"></div>
         </v-tab-item>
       </v-tabs>
-    </v-content>
+    </v-main>
 
     <v-dialog v-if="claimDialog" v-model="claimDialog" max-width="290">
       <v-card>
@@ -551,8 +562,10 @@ export default class extends Vue {
   requestInProcess = false;
   isLoading = true;
   panel = [];
+  offsetTxPage = 0;
   txs: TransactionData[] = [];
   loadingTxs = [0, 1, 2, 3, 4, 5, 6, 7];
+  showLoadMore = false;
 
   claimDialog = false;
   stakeDialog = false;
@@ -1104,7 +1117,25 @@ export default class extends Vue {
 
     this.isLoading = true;
     const res = await state.getAccountTransactions(this.account.address);
+    this.offsetTxPage = 0;
+    this.showLoadMore = res.result.txs.length === 15;
     this.txs = res.result.txs;
+    this.loadingTxs = [];
+    this.isLoading = false;
+  }
+
+  async loadMoreTxs() {
+    if (!this.account) return;
+
+    this.loadingTxs = [0, 1, 2, 3, 4];
+    this.isLoading = true;
+    ++this.offsetTxPage;
+    const res = await state.getAccountTransactions(
+      this.account.address,
+      this.offsetTxPage
+    );
+    this.showLoadMore = res.result.txs.length === 15;
+    this.txs.push(...res.result.txs);
     this.loadingTxs = [];
     this.isLoading = false;
   }

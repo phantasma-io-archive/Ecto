@@ -105,10 +105,22 @@ export class PopupState {
         this._currentAccountIndex = items.currentAccountIndex
           ? items.currentAccountIndex
           : 0;
-        this._accounts = items.accounts ? items.accounts : [];
+        this._accounts = items.accounts
+          ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
+          : [];
         this._authorizations = items.authorizations ? items.authorizations : [];
         this._currency = items.currency ? items.currency : "USD";
         this.nfts = items.nfts ? items.nfts : {};
+
+        this._accounts = items.accounts
+          ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
+          : [];
+
+        const numAccounts = items.accounts ? items.accounts.length : 0;
+
+        if (this._accounts.length !== numAccounts)
+          chrome.storage.local.set({ accounts: this._accounts });
+
         resolve();
       });
     });
@@ -340,9 +352,10 @@ export class PopupState {
   }
 
   async getAccountTransactions(
-    address: string
+    address: string,
+    offsetPage: number = 0
   ): Promise<Paginated<AccountTransactions>> {
-    return await this.api.getAddressTransactions(address, 1, 20);
+    return await this.api.getAddressTransactions(address, offsetPage + 1, 15);
   }
 
   async fetchNftData(balance: Balance) {

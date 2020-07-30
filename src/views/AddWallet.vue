@@ -19,7 +19,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content style="width:320px; max-height:500px">
+    <v-main style="width:320px; max-height:500px">
       <v-overlay :value="isLoading">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
@@ -34,8 +34,8 @@
             style="max-height:500px"
           >
             <div style="padding: 20px">
-              Import a wallet with its address or name (read only), or its
-              WIF. When using WIF you must protect it using a password.
+              Import a wallet with its address or name (read only), or its WIF.
+              When using WIF you must protect it using a password.
             </div>
 
             <v-form
@@ -119,7 +119,7 @@
         style="position:fixed; width:100%; bottom:0; padding:2px 5px; background:linear-gradient(45deg, #28cec6, #17b1e8); background-color:#17b1e8"
         >Mainnet
       </v-footer>
-    </v-content>
+    </v-main>
 
     <ErrorDialog
       :show="errorDialog"
@@ -155,7 +155,7 @@ export default class extends Vue {
 
   async importWallet() {
     console.log("Going to import wallet");
-    if (this.wif.length == 52) {
+    if (this.wif.length == 52 && this.password.length >= 6) {
       try {
         this.isLoading = true;
         let account = await state.addAccountWithWif(this.wif, this.password);
