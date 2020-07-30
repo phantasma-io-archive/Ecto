@@ -12,7 +12,7 @@
       <v-spacer />
     </v-app-bar>
 
-    <v-content style="width:320px; max-height:500px">
+    <v-main style="width:320px; max-height:500px">
       <v-list>
         <v-list-item
           v-for="acc in state.accounts"
@@ -46,7 +46,7 @@
       <div style="padding: 20px">
         <v-btn block @click="$router.push('/addwallet')">Add Wallet</v-btn>
       </div>
-    </v-content>
+    </v-main>
   </div>
 </template>
 

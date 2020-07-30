@@ -15,7 +15,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content style="width:320px; max-height:500px">
+    <v-main style="width:320px; max-height:500px">
       <v-container
         class="overflow-y-auto overflow-x-hidden pa-0"
         style="max-height:400px; font-size:10px; text-align:center"
@@ -36,7 +36,7 @@
           >copy to clipboard</a
         >
       </v-container>
-    </v-content>
+    </v-main>
   </div>
 </template>
 

@@ -12,7 +12,7 @@
       <v-spacer />
     </v-app-bar>
 
-    <v-content style="width:300px; max-height:500px">
+    <v-main style="width:300px; max-height:500px">
       <div style="padding: 20px">
         <v-row
           justify="space-around"
@@ -85,7 +85,7 @@
         style="position:fixed; width:100%; bottom:0; padding:2px 5px; background:linear-gradient(45deg, #28cec6, #17b1e8); background-color:#17b1e8"
         >Mainnet
       </v-footer>
-    </v-content>
+    </v-main>
   </div>
 </template>
 
