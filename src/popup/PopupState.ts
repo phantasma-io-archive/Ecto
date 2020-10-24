@@ -67,10 +67,6 @@ export class PopupState {
     return this._accounts.length != 0;
   }
 
-  get currenciesRate() {
-    return this._currenciesRate;
-  }
-
   get currency() {
     return this._currency;
   }
@@ -96,6 +92,29 @@ export class PopupState {
       default:
         return "?";
     }
+  }
+
+  getRate(symbol: string) : number {
+    var curSym = this._currency.toLowerCase();
+    try {
+      switch (symbol.toLowerCase()) {
+        case "soul":
+          return this._currenciesRate["phantasma"][curSym];
+        case "kcal":
+          return this._currenciesRate["phantasma-energy"][curSym];
+        case "neo":
+          return this._currenciesRate["neo"][curSym];
+        case "gas":
+          return this._currenciesRate["gas"][curSym];                        
+        case "usdt":
+          return this._currenciesRate["tether"][curSym];
+        case "dai":
+          return this._currenciesRate["dai"][curSym];
+        case "eth":
+          return this._currenciesRate["ethereum"][curSym];
+      }
+    } catch { console.log('Error getting rates for '+symbol+' in '+curSym)  }
+    return -1;
   }
 
   async check(): Promise<void> {
@@ -147,11 +166,10 @@ export class PopupState {
   }
 
   async fetchRates() {
-    const res = await fetch(
-      "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=SOUL,NEO,GAS&tsyms=USD,EUR,GBP,JPY,CAD,AUD,CNY"
-    );
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny')
     const resJson = await res.json();
-    this._currenciesRate = resJson.RAW;
+    this._currenciesRate = resJson;
+    console.log("%c"+JSON.stringify(this._currenciesRate, null, 2), "font-size:18px")
   }
 
   async getAccountData(address: string): Promise<Account> {
@@ -194,6 +212,14 @@ export class PopupState {
         () => resolve()
       );
     });
+  }
+
+  isWifValidForAccount(wif: string): boolean {
+    try {
+      return this.currentAccount?.address === getAddressFromWif(wif);
+    } catch {
+      return false;
+    }
   }
 
   async addAccountWithWif(wif: string, password: string): Promise<Account> {
