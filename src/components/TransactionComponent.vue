@@ -73,7 +73,7 @@ import {
 import { state } from "@/popup/PopupState";
 
 function isFungible(symbol: string) {
-  return symbol !== "TTRS";
+  return symbol !== "TTRS" && symbol !== "GHOST" && symbol !== "CROWN";
 }
 
 function decimals(symbol: string) {
@@ -90,6 +90,8 @@ function decimals(symbol: string) {
       return 3;
     case "ETH":
       return 18;
+    case "MKNI":
+      return 0;
     default:
       return 0;
   }
@@ -209,6 +211,32 @@ export default class extends Vue {
               nftId,
               url: "https://www.22series.com/part_info?id=" + nftId,
               image: "https://22series.b-cdn.net/cdn/part_img/412_128.png",
+            });
+
+            if (!allNfts.includes(nftId)) allNfts.push(nftId);
+          } else if (data.symbol == "GHOST") {
+            const nftId = data.value;
+            res.push({
+              icon: "mdi-plus-circle-outline",
+              text: "Claimed NFT (" + data.symbol + ")",
+              postIcon: "mdi-eye-outline",
+              postIconColor: "gray",
+              nftId,
+              url: "https://ghostmarket.io/asset/pha/S3d8xzyuUC3QChNDdj3KUxT2oqxkVTKFDbbgJ9yLUY7HLas/" + nftId,
+              image: "https://ghostmarket.io/asset/pha/S3d8xzyuUC3QChNDdj3KUxT2oqxkVTKFDbbgJ9yLUY7HLas/", // to update
+            });
+
+            if (!allNfts.includes(nftId)) allNfts.push(nftId);
+          } else if (data.symbol == "CROWN") {
+            const nftId = data.value;
+            res.push({
+              icon: "mdi-plus-circle-outline",
+              text: "Claimed NFT (" + data.symbol + ")",
+              postIcon: "mdi-eye-outline",
+              postIconColor: "gray",
+              nftId,
+              url: "https://ghostmarket.io/asset/pha/0/" + nftId,
+              image: "https://phantasma.io/img/crown.png",  // to update
             });
 
             if (!allNfts.includes(nftId)) allNfts.push(nftId);

@@ -100,6 +100,22 @@
                     <v-btn
                       small
                       text
+                      v-if="item.symbol == 'CROWN'"
+                      @click="goto('/nfts/' + item.symbol + '/view')"
+                      :disabled="item.amount == 0"
+                      ><v-icon>mdi-eye</v-icon> view</v-btn
+                    >
+                    <v-btn
+                      small
+                      text
+                      v-if="item.symbol == 'GHOST'"
+                      @click="goto('/nfts/' + item.symbol + '/view')"
+                      :disabled="item.amount == 0"
+                      ><v-icon>mdi-eye</v-icon> view</v-btn
+                    >
+                    <v-btn
+                      small
+                      text
                       @click="transferAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-export</v-icon> Send</v-btn
