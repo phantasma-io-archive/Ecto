@@ -600,6 +600,8 @@ export default class extends Vue {
     ]);
     this.isLoading = false;
 
+    console.log('all loaded with '+JSON.stringify(this.account))
+
     this.$root.$on("loading", (value: boolean) => {
       this.isLoading = value;
     });
@@ -713,23 +715,9 @@ export default class extends Vue {
     const val = parseFloat(
       this.formatBalance(balance.amount, balance.decimals)
     );
-    const rates = state.currenciesRate;
-    if (balance.symbol == "KCAL") {
-      if (rates && rates["SOUL"] != undefined) {
-        return (
-          (0.2 * val * rates["SOUL"][state.currency].PRICE).toFixed(1) +
-          " " +
-          state.currencySymbol
-        );
-      }
-    }
-
-    if (rates && rates[balance.symbol] != undefined) {
-      return (
-        (val * rates[balance.symbol][state.currency].PRICE).toFixed(1) +
-        " " +
-        state.currencySymbol
-      );
+    const rate = state.getRate(balance.symbol);
+    if (rate >= 0) {
+      return (val * rate).toFixed(1) + " " + state.currencySymbol;
     }
     return "";
   }
@@ -779,23 +767,9 @@ export default class extends Vue {
         ? this.account.data.stake
         : this.account.data.unclaimed;
     const val = parseFloat(this.formatBalance(amount, balance.decimals));
-    const rates = state.currenciesRate;
-    if (balance.symbol == "KCAL") {
-      if (rates && rates["SOUL"] != undefined) {
-        return (
-          (0.2 * val * rates["SOUL"][state.currency].PRICE).toFixed(1) +
-          " " +
-          state.currencySymbol
-        );
-      }
-    }
-
-    if (rates && rates[balance.symbol] != undefined) {
-      return (
-        (val * rates[balance.symbol][state.currency].PRICE).toFixed(1) +
-        " " +
-        state.currencySymbol
-      );
+    const rate = state.getRate(balance.symbol);
+    if (rate >= 0) {
+      return (val * rate).toFixed(1) + " " + state.currencySymbol;
     }
     return "";
   }
@@ -884,7 +858,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",
@@ -939,7 +913,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",
@@ -992,7 +966,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",
@@ -1077,7 +1051,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",

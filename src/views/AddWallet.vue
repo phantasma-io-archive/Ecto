@@ -103,22 +103,6 @@
           </div>
         </v-tab-item>
       </v-tabs>
-      <v-footer
-        color="#17b1e8"
-        tile
-        elevation="0"
-        dark
-        style="padding:2px 5px; background-color:transparent"
-        >Mainnet</v-footer
-      >
-      <v-footer
-        color="#17b1e8"
-        tile
-        elevation="0"
-        dark
-        style="position:fixed; width:100%; bottom:0; padding:2px 5px; background:linear-gradient(45deg, #28cec6, #17b1e8); background-color:#17b1e8"
-        >Mainnet
-      </v-footer>
     </v-main>
 
     <ErrorDialog

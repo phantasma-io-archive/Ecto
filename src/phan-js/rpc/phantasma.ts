@@ -260,6 +260,9 @@ export interface Swap {
 
 export class PhantasmaAPI {
   host: string;
+  rpcName: string;
+  nexus: string;
+  availableHosts: any[];
 
   pingAsync(host: string): Promise<number> {
     return new Promise((resolve, reject) => {
@@ -284,16 +287,24 @@ export class PhantasmaAPI {
   }
 
   constructor(defHost: string, peersUrlJson: string) {
+    this.rpcName = "Auto";
+    this.nexus = "mainnet";
     this.host = defHost;
+    this.availableHosts = [];
 
     fetch(peersUrlJson + "?_=" + new Date().getTime()).then(async (res) => {
       const data = await res.json();
       for (var i = 0; i < data.length; i++) {
         const msecs = await this.pingAsync(data[i].url);
+        data[i].info = data[i].location + " • " + msecs + " ms";
+        data[i].msecs = msecs;
         console.log(
-          data[i].location + " • " + msecs + " msec • " + data[i].url + "/rpc"
+          data[i].location + " • " + msecs + " ms • " + data[i].url + "/rpc"
         );
+        this.availableHosts.push(data[i]);
       }
+      this.availableHosts.sort((a, b) => a.msecs - b.msecs);
+      this.updateRpc();
     });
   }
 
@@ -311,6 +322,33 @@ export class PhantasmaAPI {
     });
     let resJson = await res.json();
     return await resJson.result;
+  }
+
+  setRpcHost(rpcHost: string) {
+    this.host = rpcHost;
+  }
+
+  setRpcByName(rpcName: string) {
+    this.rpcName = rpcName;
+    if (this.nexus === "mainnet") this.updateRpc();
+  }
+
+  setNexus(nexus: string) {
+    this.nexus = nexus.toLowerCase();
+  }
+
+  updateRpc() {
+    if (this.nexus === "mainnet" && this.availableHosts.length > 0) {
+      console.log("%cUpdate RPC with name " + this.rpcName, "font-size: 20px");
+      if (this.rpcName == "Auto") {
+        this.host = this.availableHosts[0].url + "/rpc";
+      } else {
+        const rpc = this.availableHosts.find((h) => h.location == this.rpcName);
+        if (rpc) this.host = rpc.url + "/rpc";
+        else this.host = this.availableHosts[0].url + "/rpc";
+      }
+      console.log("%cSet RPC api to " + this.host, "font-size: 20px");
+    }
   }
 
   convertDecimals(amount: number, decimals: number): number {
