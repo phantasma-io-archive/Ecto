@@ -45,8 +45,11 @@ export class PopupState {
   private _accounts: WalletAccount[] = [];
   private _authorizations: IAuthorization[] = [];
   private _currency: string = "USD";
-
   private _currenciesRate: any;
+  private _nexus: string = "MainNet";
+  private _simnetRpc = "http://localhost:7077/rpc";
+  private _testnetRpc = "http://testnet.phantasma.io:7077/rpc";
+  private _mainnetRpc = "Auto";
 
   accountNfts: any[] = [];
   nfts: any = {};
@@ -69,6 +72,87 @@ export class PopupState {
 
   get currency() {
     return this._currency;
+  }
+
+  get nexus() {
+    return this._nexus.toLowerCase();
+  }
+
+  get simnetRpc() {
+    return this._simnetRpc;
+  }
+
+  get testnetRpc() {
+    return this._testnetRpc;
+  }
+
+  get mainnetRpc() {
+    return this._mainnetRpc;
+  }
+
+  async setNexus(value: string) {
+    this._nexus = value;
+    this.api.setNexus(value);
+    if (this._nexus == "MainNet") this.api.setRpcByName(this._mainnetRpc);
+    if (this._nexus == "SimNet") this.api.setRpcHost(this._simnetRpc);
+    if (this._nexus == "TestNet") this.api.setRpcHost(this._testnetRpc);
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          nexus: this._nexus,
+        },
+        () => resolve()
+      );
+    });
+  }
+
+  async setSimnetRpc(value: string) {
+    this._simnetRpc = value;
+    if (this._nexus == "SimNet") this.api.setRpcHost(this._simnetRpc);
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          simnetRpc: this._simnetRpc,
+        },
+        () => resolve()
+      );
+    });
+  }
+
+  async setTestnetRpc(value: string) {
+    this._testnetRpc = value;
+    if (this._nexus == "TestNet") this.api.setRpcHost(this._testnetRpc);
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          testnetRpc: this._testnetRpc,
+        },
+        () => resolve()
+      );
+    });
+  }
+
+  async setMainnetRpc(value: string) {
+    console.log("Saving to storage mainnet rpc", this._mainnetRpc);
+    this._mainnetRpc = value;
+    this.api.setRpcByName(this._mainnetRpc);
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          mainnetRpc: this._mainnetRpc,
+        },
+        () => resolve()
+      );
+    });
+  }
+
+  get nexusName() {
+    return this._nexus;
+  }
+
+  get mainnetRpcList() {
+    return this.api.availableHosts;
   }
 
   get currencySymbol() {
@@ -94,7 +178,7 @@ export class PopupState {
     }
   }
 
-  getRate(symbol: string) : number {
+  getRate(symbol: string): number {
     var curSym = this._currency.toLowerCase();
     try {
       switch (symbol.toLowerCase()) {
@@ -105,7 +189,7 @@ export class PopupState {
         case "neo":
           return this._currenciesRate["neo"][curSym];
         case "gas":
-          return this._currenciesRate["gas"][curSym];                        
+          return this._currenciesRate["gas"][curSym];
         case "usdt":
           return this._currenciesRate["tether"][curSym];
         case "dai":
@@ -113,7 +197,9 @@ export class PopupState {
         case "eth":
           return this._currenciesRate["ethereum"][curSym];
       }
-    } catch { console.log('Error getting rates for '+symbol+' in '+curSym)  }
+    } catch {
+      console.log("Error getting rates for " + symbol + " in " + curSym);
+    }
     return -1;
   }
 
@@ -136,6 +222,16 @@ export class PopupState {
           : [];
 
         const numAccounts = items.accounts ? items.accounts.length : 0;
+
+        if (items.simnetRpc) this._simnetRpc = items.simnetRpc;
+        if (items.testnetRpc) this._testnetRpc = items.testnetRpc;
+        if (items.mainnetRpc) this._mainnetRpc = items.mainnetRpc;
+        if (items.nexus) this._nexus = items.nexus;
+
+        this.api.setRpcByName(this._mainnetRpc);
+        this.api.setNexus(this._nexus);
+        if (this._nexus == "SimNet") this.api.setRpcHost(this._simnetRpc);
+        if (this._nexus == "TestNet") this.api.setRpcHost(this._testnetRpc);
 
         if (this._accounts.length !== numAccounts)
           chrome.storage.local.set({ accounts: this._accounts });
@@ -166,10 +262,11 @@ export class PopupState {
   }
 
   async fetchRates() {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny')
+    const res = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny"
+    );
     const resJson = await res.json();
     this._currenciesRate = resJson;
-    console.log("%c"+JSON.stringify(this._currenciesRate, null, 2), "font-size:18px")
   }
 
   async getAccountData(address: string): Promise<Account> {
@@ -283,11 +380,23 @@ export class PopupState {
     const account = this.currentAccount;
     if (!account) return;
 
-    console.log("Refreshing account " + account.address);
-    account.data = await this.getAccountData(account.address);
+    console.log(
+      "Refreshing account " + account.address + " on " + this.api.host
+    );
+
+    this._accounts[this._currentAccountIndex].data = await this.getAccountData(
+      account.address
+    );
 
     await this.fetchNftData(
-      account.data.balances.find((b) => b.symbol == "TTRS")!
+      this._accounts[this._currentAccountIndex].data.balances.find(
+        (b) => b.symbol == "TTRS"
+      )!
+    );
+
+    console.log(
+      "Refreshed account " +
+        JSON.stringify(this._accounts[this._currentAccountIndex])
     );
 
     return new Promise((resolve, reject) => {

@@ -600,6 +600,8 @@ export default class extends Vue {
     ]);
     this.isLoading = false;
 
+    console.log('all loaded with '+JSON.stringify(this.account))
+
     this.$root.$on("loading", (value: boolean) => {
       this.isLoading = value;
     });
@@ -856,7 +858,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",
@@ -911,7 +913,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",
@@ -964,7 +966,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",
@@ -1049,7 +1051,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",

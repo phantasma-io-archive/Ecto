@@ -119,23 +119,6 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-
-      <v-footer
-        color="#17b1e8"
-        tile
-        elevation="0"
-        dark
-        style="padding:2px 5px; background-color:transparent"
-        >Mainnet</v-footer
-      >
-      <v-footer
-        color="#17b1e8"
-        tile
-        elevation="0"
-        dark
-        style="position:fixed; width:100%; bottom:0; padding:2px 5px; background:linear-gradient(45deg, #28cec6, #17b1e8); background-color:#17b1e8"
-        >Mainnet
-      </v-footer>
     </v-main>
   </div>
 </template>
@@ -151,7 +134,7 @@ export default class extends Vue {
   isLoading = false;
 
   errorDialog = false;
-  errorMessage = null;
+  errorMessage: string | null = null;
   wif = "";
   password = "";
 
@@ -233,7 +216,14 @@ export default class extends Vue {
     let hash = null;
 
     try {
-      if (this.needsWif) hash = await state.signTx(txdata, this.wif);
+      if (this.needsWif) {
+        if (state.isWifValidForAccount(this.wif))
+          hash = await state.signTx(txdata, this.wif);
+        else {
+          this.errorDialog = true;
+          this.errorMessage = "WIF is not valid for address "+ state.currentAccount?.address;
+        }
+      }
       else
         hash = await state.signTxWithPassword(
           txdata,

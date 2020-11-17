@@ -719,7 +719,7 @@ export default class extends Vue {
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
-      nexus: "mainnet",
+      nexus: state.nexus,
       chain: "main",
       script,
       payload: "4543542d30",
