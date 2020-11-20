@@ -616,7 +616,7 @@ export default class extends Vue {
     ]);
     this.isLoading = false;
 
-    console.log('all loaded with '+JSON.stringify(this.account))
+    console.log("all loaded with " + JSON.stringify(this.account));
 
     this.$root.$on("loading", (value: boolean) => {
       this.isLoading = value;
@@ -922,7 +922,7 @@ export default class extends Vue {
     sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
     sb.callContract("stake", "Stake", [
       address,
-      this.stakeSoulAmount * 10 ** 8,
+      Math.floor(this.stakeSoulAmount * 10 ** 8),
     ]);
 
     sb.spendGas(address);
@@ -975,7 +975,7 @@ export default class extends Vue {
     sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
     sb.callContract("stake", "Unstake", [
       address,
-      this.unstakeSoulAmount * 10 ** 8,
+      Math.floor(this.unstakeSoulAmount * 10 ** 8),
     ]);
 
     sb.spendGas(address);
@@ -1042,7 +1042,7 @@ export default class extends Vue {
 
     console.log(
       "sending",
-      this.sendAmount * 10 ** this.sendDecimals,
+      Math.floor(this.sendAmount * 10 ** this.sendDecimals),
       "of",
       this.sendSymbol,
       "to",
@@ -1061,7 +1061,7 @@ export default class extends Vue {
       address,
       this.sendDestination,
       this.sendSymbol,
-      this.sendAmount * 10 ** this.sendDecimals,
+      Math.floor(this.sendAmount * 10 ** this.sendDecimals),
     ]);
     sb.spendGas(address);
     const script = sb.endScript();
