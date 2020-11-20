@@ -212,6 +212,8 @@ export default class extends Vue {
   async selectNet(item: string) {
     console.log("selectNet", item);
     state.setNexus(item);
+    if (state.nexus != item)
+      await this.refreshAccount();
   }
 
   async acceptSimnetRpc() {
