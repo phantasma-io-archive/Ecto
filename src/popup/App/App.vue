@@ -255,4 +255,12 @@ header {
 .v-text-field input {
   font-size: 10px;
 }
+
+.v-list-item__title {
+  flex: 1 1 70% !important;
+}
+
+.v-menu__content {
+  max-width: 92%;
+}
 </style>
