@@ -34,7 +34,7 @@
             style="max-height:500px"
           >
             <div style="padding: 20px">
-              Import a wallet with its address or name (read only), or its WIF.
+              Import a wallet with its address or name (read only), or its WIF (read write).
               When using WIF you must protect it using a password.
             </div>
 
