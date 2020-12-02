@@ -41,13 +41,13 @@
               <v-btn icon small class="mr-1" @click="sortDialog = true"
                 ><v-icon>mdi-sort</v-icon></v-btn
               >
-              <v-btn icon small @click="filtersDialog = true"
+              <v-btn disabled="sendSymbol!=='TTRS'" icon small @click="filtersDialog = true"
                 ><v-icon>mdi-filter-menu</v-icon></v-btn
               >
             </v-col>
           </v-row>
           <p class="pa-0 ma-0" style="margin-top:-20px !important">
-            {{ nftArray.length }} NFTs
+            {{ nftArray.length }} {{sendSymbol}} NFTs
             <span v-if="viewModeSend"
               >- {{ selectedNum }} selected
               <v-btn
@@ -75,7 +75,7 @@
                 @click="toggle(item)"
               >
                 <div class="d-flex flex-no-wrap justify-space-between">
-                  <div>
+                  <div style="text-overflow:hidden; overflow:hidden">
                     <v-card-text
                       class="pr-1 pl-2 pt-0"
                       style="border:1px solid #aaa0"
@@ -90,7 +90,7 @@
                         class="text--primary"
                         style="font-size:12px;line-height: 1.0275rem"
                       >
-                        {{ item.item_info.name_english }}
+                        {{ item.name }}
                       </p>
                       <p></p>
                       <v-spacer />
@@ -110,8 +110,8 @@
                   >
                     <v-img
                       contain
-                      :src="item.item_info.image_url + '?width=128'"
-                      :lazy-src="item.item_info.image_url + '?width=128'"
+                      :src="item.img"
+                      :lazy-src="item.img"
                       height="84px"
                     ></v-img>
                   </v-avatar>
@@ -426,7 +426,7 @@ export default class extends Vue {
 
     const search = (k: any[]) =>
       k.filter((n) =>
-        n.item_info.name_english.toLowerCase().includes(searchText)
+        n.name.toLowerCase().includes(searchText)
       );
 
     const filterType = (k: any[]) =>
@@ -434,7 +434,7 @@ export default class extends Vue {
 
     const filterRarity = (k: any[]) =>
       k.filter((n: any) => {
-        const rarity = n.item_info.rarity;
+        const rarity = n.rarity;
         switch (this.filterRarity) {
           case "Consumer":
             return rarity === 1;
@@ -452,7 +452,7 @@ export default class extends Vue {
         return true;
       });
 
-    let list = this.state.accountNfts;
+    let list = Object.keys(this.state.nfts).filter(k => k.startsWith(this.sendSymbol+"@")).map(k => this.state.nfts[k]);
 
     if (this.filterType !== "All") list = filterType(list);
     if (this.filterRarity !== "All") list = filterRarity(list);
@@ -553,101 +553,10 @@ export default class extends Vue {
       "Collector",
       "Unique",
     ];
-    const rarity = item.item_info.rarity;
+    const rarity = item.rarity;
     if (rarity) return rarities[rarity];
 
-    return "NFT";
-  }
-
-  getAssetIcon(item: Balance) {
-    return `assets/${item.symbol}.png`;
-  }
-
-  getAmount(balance: Balance) {
-    return this.formatBalance(balance.amount, balance.decimals);
-  }
-
-  getCurrencyValue(balance: Balance) {
-    if (!balance) return "";
-
-    const val = parseFloat(
-      this.formatBalance(balance.amount, balance.decimals)
-    );
-    const rate = state.getRate(balance.symbol);
-    if (rate >= 0) {
-      return (val * rate).toFixed(1) + " " + state.currencySymbol;
-    }
-    return "";
-  }
-
-  isSecondLineVisible(item: Balance) {
-    return item.symbol == "SOUL" || item.symbol == "KCAL";
-  }
-
-  getKcalUnclaimed() {
-    return this.formatBalance(this.account!.data.unclaimed, 10);
-  }
-
-  getStackedSoul() {
-    if (!this.account) return "0";
-    return this.formatBalance(this.account.data.stake, 8);
-  }
-
-  getUnstackedSoul() {
-    if (!this.account) return "0";
-    const soulBalance = this.account.data.balances.find(
-      (b) => b.symbol == "SOUL"
-    );
-    if (!soulBalance) return "0";
-    return this.formatBalance(soulBalance!.amount, 8);
-  }
-
-  getSecondLine(item: Balance) {
-    if (!this.account) return "";
-
-    if (item.symbol == "SOUL")
-      return (
-        "Staked " + this.formatBalance(this.account.data.stake, 8) + " SOUL"
-      );
-    if (item.symbol == "KCAL")
-      return (
-        "Unclaimed " +
-        this.formatBalance(this.account.data.unclaimed, 10) +
-        " KCAL"
-      );
-  }
-
-  getSecondLineValue(balance: Balance) {
-    if (!this.account || !this.account.data || !balance) return "";
-
-    const amount =
-      balance.symbol == "SOUL"
-        ? this.account.data.stake
-        : this.account.data.unclaimed;
-    const val = parseFloat(this.formatBalance(amount, balance.decimals));
-
-    const rate = state.getRate(balance.symbol);
-    if (rate >= 0) {
-      return (val * rate).toFixed(1) + " " + state.currencySymbol;
-    }
-    return "";
-  }
-
-  formatBalance(amount: string, decimals: number): string {
-    if (decimals == 0) return amount;
-    while (amount.length < decimals + 1) amount = "0" + amount;
-
-    const intPart = amount.substring(0, amount.length - decimals);
-    const decimalPart = amount.substring(
-      amount.length - decimals,
-      amount.length
-    );
-    if (parseInt(decimalPart) == 0) return intPart;
-    return (
-      intPart +
-      "." +
-      (decimalPart.length >= 2 ? decimalPart.substring(0, 2) : decimalPart)
-    );
+    return this.sendSymbol + " NFT";
   }
 
   askSendWhere() {

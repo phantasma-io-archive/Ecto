@@ -213,6 +213,18 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           console.log("getting account " + address);
           let account = await phantasmaAPI.getAccount(address);
 
+          if (!account.balances) {
+            account.balances = [];
+          }
+
+          if (!account.balances.find((b) => b.symbol == "SOUL"))
+            account.balances.unshift({
+              chain: "main",
+              symbol: "SOUL",
+              amount: "0",
+              decimals: 8,
+            });
+
           console.log("got account: " + JSON.stringify(account));
           let response: IGetAccountResponse = {
             name: account.name,

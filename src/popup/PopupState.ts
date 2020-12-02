@@ -455,14 +455,19 @@ export class PopupState {
         wif += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     }
 
+    if (!this.isWifValidForAccount(wif))
+      throw new Error("Password does not match");
+
     return await this.signTx(txdata, wif);
   }
 
   async signTx(txdata: TxArgsData, wif: string): Promise<string> {
     const account = this.currentAccount;
-    if (!account) {
-      throw new Error("Account not valid");
-    }
+    if (!account) throw new Error("Account not valid");
+
+    if (!this.isWifValidForAccount(wif))
+      throw new Error("Account does not match");
+
     const address = account.address;
 
     const dt = new Date();
@@ -497,78 +502,82 @@ export class PopupState {
     if (!balance) return;
     const token = balance.symbol;
     const ids = balance.ids;
-
-    if (token != "TTRS" && !ids) return;
-
-    const host = "https://www.22series.com/api/store/nft";
-
     if (!ids) return;
 
-    const allNftsToQuery = [];
-    this.accountNfts = [];
-
-    for (let k = 0; k < ids.length; ++k) {
-      const id = ids[k];
-      const nft = this.nfts[id];
-      if (nft) {
-        // add to array
-        this.accountNfts.push(Object.assign({ id }, nft));
-      } else {
-        // search for it
-        allNftsToQuery.push(id);
-      }
-    }
-
-    for (let i = 0; i < allNftsToQuery.length; i += 100) {
-      const nftsToQuery = allNftsToQuery.slice(i, i + 100);
-
-      console.log("querying", nftsToQuery);
-
-      const res = await fetch(host, {
-        method: "POST",
-        mode: "cors",
-        body: JSON.stringify({ ids: nftsToQuery }),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
-      let nftDict = await res.json();
-      Object.assign(this.nfts, nftDict);
-
-      const nftKeys = Object.keys(nftDict);
-      for (let k = 0; k < nftKeys.length; ++k)
-        this.accountNfts.push(nftDict[nftKeys[k]]);
-    }
-
-    if (allNftsToQuery.length > 0)
-      chrome.storage.local.set({ nfts: this.nfts }, () => {});
+    await this.queryNfts(ids, token);
   }
 
-  async queryNft(ids: string[], token: string) {
-    const host = "https://www.22series.com/api/store/nft";
-
+  async queryNfts(ids: string[], token: string) {
     const allNftsToQuery = [];
 
     for (let k = 0; k < ids.length; ++k) {
       const id = ids[k];
-      const nft = this.nfts[id];
+      const lookupId = token + "@" + id;
+      const nft = this.nfts[lookupId];
       if (!nft) {
         // search for it
         allNftsToQuery.push(id);
       }
     }
 
-    for (let i = 0; i < allNftsToQuery.length; i += 100) {
-      const nftsToQuery = allNftsToQuery.slice(i, i + 100);
+    if (token == "TTRS") {
+      const host = "https://www.22series.com/api/store/nft";
 
-      console.log("querying", nftsToQuery);
+      // batch query TTRS tokens
+      for (let i = 0; i < allNftsToQuery.length; i += 100) {
+        const nftsToQuery = allNftsToQuery.slice(i, i + 100);
 
-      const res = await fetch(host, {
-        method: "POST",
-        mode: "cors",
-        body: JSON.stringify({ ids: nftsToQuery }),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
-      console.log("Result of queryNft", nftsToQuery, res);
-      let nftDict = await res.json();
+        console.log("querying", nftsToQuery);
+
+        const res = await fetch(host, {
+          method: "POST",
+          mode: "cors",
+          body: JSON.stringify({ ids: nftsToQuery }),
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        });
+        let nftsTtrs = await res.json();
+        console.log("Result of queryNft", nftsToQuery, nftsTtrs);
+        let nftDict: any = {};
+
+        Object.keys(nftsTtrs).forEach((key) => {
+          const ttrs = nftsTtrs[key];
+          let nftDef = {
+            id: key,
+            mint: ttrs.mint,
+            img: ttrs.img + "?width=128",
+            type: ttrs.type,
+            name: ttrs.item_info.name_english,
+            rarity: ttrs.item_info.rarity,
+          };
+          nftDict[token + "@" + key] = nftDef;
+        });
+        Object.assign(this.nfts, nftDict);
+      }
+    } else {
+      // query nfts individually
+      let nftDict: any = {};
+
+      for (let i = 0; i < allNftsToQuery.length; ++i) {
+        const nftId = allNftsToQuery[i];
+        const nft = await this.api.getNFT(token, nftId);
+        console.log("Got nft", nft);
+
+        const imgUrl = nft.properties
+          .find((kv) => kv.Key == "ImageURL")
+          ?.Value.replace("ipfs://", "https://gateway.ipfs.io/ipfs/");
+
+        console.log("ImageURL", imgUrl);
+
+        let nftDef = {
+          id: nftId,
+          mint: nft.mint,
+          img: imgUrl,
+          type: nft.properties.find((kv) => kv.Key == "Type")?.Value,
+          name: nft.properties.find((kv) => kv.Key == "Name")?.Value,
+          infusion: nft.infusion,
+        };
+        nftDict[token + "@" + nftId] = nftDef;
+      }
       Object.assign(this.nfts, nftDict);
     }
 
