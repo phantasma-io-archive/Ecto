@@ -168,6 +168,7 @@ export default class extends Vue {
 
   @Watch("state.mainnetRpcList", { deep: true, immediate: true })
   onRpcListUpdate(old: any, newList: any) {
+    if (!state.mainnetRpcList || state.mainnetRpcList.length == 0) return;
     const first = state.mainnetRpcList[0];
     this.rpcList = [
       { location: "Auto", url: first.url, info: "Auto", msecs: first.msecs },
@@ -212,8 +213,7 @@ export default class extends Vue {
   async selectNet(item: string) {
     console.log("selectNet", item);
     state.setNexus(item);
-    if (state.nexus != item)
-      await this.refreshAccount();
+    if (state.nexus != item) await this.refreshAccount();
   }
 
   async acceptSimnetRpc() {
@@ -246,7 +246,8 @@ export default class extends Vue {
 header {
   background: linear-gradient(45deg, #28ceaf, #17b1e8);
 }
-
+</style>
+<style scoped>
 .v-input .v-label {
   font-size: 10px;
 }

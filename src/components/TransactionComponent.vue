@@ -29,21 +29,21 @@
             >{{ item.postIcon }}</v-icon
           >
         </template>
-        <div style="width: 240px; max-width:240px">
+        <div style="width: 240px; max-width:240px; overflow: hidden">
           <div
             class="overline"
             style="color:#17b1e8; font-size: 11px !important;text-shadow: 1px 1px 20px #000000, 1px 1px 2px #000000;"
           >
-            {{ getNftInfo(item.nftId).category }}
+            {{ getNftInfo(item.nftId, item.symbol).category }}
           </div>
           <div style="text-shadow: 1px 1px 10px #000000, 1px 1px 2px #000000;">
-            {{ getNftInfo(item.nftId).title }}
+            {{ getNftInfo(item.nftId, item.symbol).title }}
           </div>
           <div>
             <v-img
               class="mx-auto"
               contain
-              :src="getNftInfo(item.nftId).image"
+              :src="getNftInfo(item.nftId, item.symbol).image"
               width="177px"
               height="126px"
             ></v-img>
@@ -51,7 +51,7 @@
           <div
             style="position:absolute; bottom:5px; right:10px; color: #eee; text-shadow: 1px 1px 20px #000000, 1px 1px 2px #000000;"
           >
-            {{ getNftInfo(item.nftId).mint }}
+            {{ getNftInfo(item.nftId, item.symbol).mint }}
           </div>
         </div>
       </v-tooltip>
@@ -132,7 +132,6 @@ export default class extends Vue {
 
   get getDescriptions() {
     let res: any[] = [];
-    let allNfts: string[] = [];
 
     if (this.tx == null || this.tx.events == null) {
       console.log("TX undefined or no events");
@@ -168,11 +167,8 @@ export default class extends Vue {
                 postIcon: "mdi-eye-outline",
                 postIconColor: "gray",
                 nftId,
-                url: "https://www.22series.com/part_info?id=" + nftId,
-                image: "https://22series.b-cdn.net/cdn/part_img/412_128.png",
+                symbol: data.symbol,
               });
-
-              if (!allNfts.includes(nftId)) allNfts.push(nftId);
             }
           }
           break;
@@ -201,7 +197,7 @@ export default class extends Vue {
               icon: "mdi-star-outline",
               text: "Claimed " + formatSymbol(amount, data.symbol),
             });
-          } else if (data.symbol == "TTRS") {
+          } else if (!isFungible(data.symbol)) {
             const nftId = data.value;
             res.push({
               icon: "mdi-plus-circle-outline",
@@ -209,37 +205,8 @@ export default class extends Vue {
               postIcon: "mdi-eye-outline",
               postIconColor: "gray",
               nftId,
-              url: "https://www.22series.com/part_info?id=" + nftId,
-              image: "https://22series.b-cdn.net/cdn/part_img/412_128.png",
+              symbol: data.symbol,
             });
-
-            if (!allNfts.includes(nftId)) allNfts.push(nftId);
-          } else if (data.symbol == "GHOST") {
-            const nftId = data.value;
-            res.push({
-              icon: "mdi-plus-circle-outline",
-              text: "Claimed NFT (" + data.symbol + ")",
-              postIcon: "mdi-eye-outline",
-              postIconColor: "gray",
-              nftId,
-              url: "https://ghostmarket.io/asset/pha/S3d8xzyuUC3QChNDdj3KUxT2oqxkVTKFDbbgJ9yLUY7HLas/" + nftId,
-              image: "https://ghostmarket.io/asset/pha/S3d8xzyuUC3QChNDdj3KUxT2oqxkVTKFDbbgJ9yLUY7HLas/", // to update
-            });
-
-            if (!allNfts.includes(nftId)) allNfts.push(nftId);
-          } else if (data.symbol == "CROWN") {
-            const nftId = data.value;
-            res.push({
-              icon: "mdi-plus-circle-outline",
-              text: "Claimed NFT (" + data.symbol + ")",
-              postIcon: "mdi-eye-outline",
-              postIconColor: "gray",
-              nftId,
-              url: "https://ghostmarket.io/asset/pha/0/" + nftId,
-              image: "https://phantasma.io/img/crown.png",  // to update
-            });
-
-            if (!allNfts.includes(nftId)) allNfts.push(nftId);
           }
           break;
         }
@@ -296,7 +263,6 @@ export default class extends Vue {
               if (i + 1 < events.length && ev.data == events[i + 1].data) {
                 to = "Sent to " + formatAddress(events[i + 1].address);
               }
-
               res.push({
                 icon: "mdi-arrow-right-bold-outline",
                 iconColor: "red",
@@ -304,10 +270,9 @@ export default class extends Vue {
                 postIconColor: "gray",
                 text: "Sent NFT (" + data.symbol + ") ",
                 nftId,
-                url: "https://www.22series.com/part_info?id=" + nftId,
+                symbol: data.symbol,
                 tooltip: to,
               });
-              if (!allNfts.includes(nftId)) allNfts.push(nftId);
             }
           }
           break;
@@ -338,10 +303,9 @@ export default class extends Vue {
                 postIconColor: "gray",
                 text: "Received NFT (" + data.symbol + ")",
                 nftId,
-                url: "https://www.22series.com/part_info?id=" + nftId,
+                symbol: data.symbol,
                 tooltip: from,
               });
-              if (!allNfts.includes(nftId)) allNfts.push(nftId);
             }
           }
           break;
@@ -360,9 +324,8 @@ export default class extends Vue {
                 tooltip:
                   "For " + formatSymbol("" + data.amount, data.quoteSymbol),
                 nftId,
-                url: "https://www.22series.com/part_info?id=" + nftId,
+                symbol: data.baseSymbol,
               });
-              if (!allNfts.includes(nftId)) allNfts.push(nftId);
             }
           }
           break;
@@ -381,9 +344,8 @@ export default class extends Vue {
               tooltip:
                 "For " + formatSymbol("" + data.amount, data.quoteSymbol),
               nftId,
-              url: "https://www.22series.com/part_info?id=" + nftId,
+              symbol: data.baseSymbol,
             });
-            if (!allNfts.includes(nftId)) allNfts.push(nftId);
           }
           // }
           break;
@@ -391,9 +353,19 @@ export default class extends Vue {
       }
     }
 
+    // Query NFT Data that might be missing
     if (!this.hasQueriedNfts) {
       this.hasQueriedNfts = true;
-      this.state.queryNft(allNfts, "TTRS");
+      const allNfts = res.filter((i) => i.nftId != undefined);
+      const allSymbols = [...new Set(allNfts.map((i) => i.symbol))];
+      for (let k = 0; k < allSymbols.length; ++k) {
+        const symbol = allSymbols[k];
+        const allNftOfSymbol = allNfts
+          .filter((i) => i.symbol == symbol)
+          .map((i) => i.nftId);
+        console.log("Going to query ", symbol, allNftOfSymbol);
+        this.state.queryNfts(allNftOfSymbol, symbol);
+      }
     }
 
     return res;
@@ -409,21 +381,20 @@ export default class extends Vue {
       "Collector",
       "Unique",
     ];
-    const rarity = item.item_info.rarity;
+    const rarity = item.rarity;
     if (rarity) return rarities[rarity];
 
     return "NFT";
   }
 
   getNftInfo(nftId: string, symbol: string) {
-    //let nftInfo = state.getNftInfo(nftId);
     console.log(nftId, symbol);
     const nfts = this.state.nfts;
-    const item = nfts[nftId];
+    const item = nfts[symbol + "@" + nftId];
     if (item) {
       const info = {
-        image: item.item_info.image_url + "?width=128",
-        title: item.item_info.name_english,
+        image: item.img,
+        title: item.name,
         mint: "#" + item.mint,
         category: this.getOverline(item),
       };
@@ -431,14 +402,15 @@ export default class extends Vue {
       console.log("nft got", item);
       console.log(info);
       return info;
-    } else {
-      return {
-        image: "",
-        mint: "",
-        title: "",
-        category: "",
-      };
     }
+
+    // if not found return something
+    return {
+      image: "",
+      mint: "",
+      title: "",
+      category: "",
+    };
   }
 }
 </script>

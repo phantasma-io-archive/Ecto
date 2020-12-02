@@ -258,6 +258,24 @@ export interface Swap {
   value: string;
 }
 
+export interface KeyValue {
+  Key: string;
+  Value: string;
+}
+
+export interface NFT {
+    ID: string;
+    series: string;
+    mint: string;
+    chainName: string;
+    ownerAddress: string;
+    creatorAddress: string;
+    ram: string;
+    rom: string;
+    infusion: KeyValue[];
+    properties: KeyValue[]; 
+}
+
 export class PhantasmaAPI {
   host: string;
   rpcName: string;
@@ -627,5 +645,11 @@ export class PhantasmaAPI {
   async getSwapsForAddress(account: string): Promise<Swap> {
     let params: Array<any> = [account];
     return (await this.JSONRPC("getSwapsForAddress", params)) as Swap;
+  }
+
+  //Returns info of a nft.
+  async getNFT(symbol: string, nftId: string): Promise<NFT> {
+    let params: Array<any> = [symbol, nftId, true];
+    return (await this.JSONRPC("getNFT", params)) as NFT;
   }
 }

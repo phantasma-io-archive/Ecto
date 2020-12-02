@@ -1,4 +1,5 @@
 import bigInt from "big-integer";
+import { VMType } from './VMType';
 
 export enum EventKind {
   Unknown = 0,
@@ -131,6 +132,18 @@ export class Decoder {
       res = res.times(256).plus(parseInt(c, 16));
     });
     return res.toString();
+  }
+
+  readVmObject() {
+    const type = this.readByte();
+    switch (type) {
+      case VMType.String:
+        return this.readString();
+      case VMType.Number:
+        return this.readBigIntAccurate();
+      default:
+        return "unsupported type "+type;
+    }
   }
 }
 

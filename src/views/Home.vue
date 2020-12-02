@@ -22,7 +22,7 @@
         indeterminate
         style="z-index:7777"
       ></v-progress-linear>
-      <v-tabs background-color="white" color="#17b1e8" right>
+      <v-tabs v-model="activeTab" background-color="white" color="#17b1e8" right>
         <v-tab>Assets</v-tab>
         <v-tab @change="onActivityTab">Activity</v-tab>
 
@@ -570,6 +570,7 @@ import { state, TxArgsData, PopupState } from "@/popup/PopupState";
 import { Script } from "vm";
 import ErrorDialogVue from "@/components/ErrorDialog.vue";
 import TransactionComponent from "@/components/TransactionComponent.vue";
+import { Watch } from "vue-property-decorator";
 
 @Component({
   components: { ErrorDialog: ErrorDialogVue, TransactionComponent },
@@ -582,6 +583,8 @@ export default class extends Vue {
   txs: TransactionData[] = [];
   loadingTxs = [0, 1, 2, 3, 4, 5, 6, 7];
   showLoadMore = false;
+
+  activeTab = 0;
 
   claimDialog = false;
   stakeDialog = false;
@@ -609,6 +612,7 @@ export default class extends Vue {
   password = "";
 
   async mounted() {
+    (window as any).state = state;
     await this.state.check();
     await Promise.all([
       this.state.refreshCurrentAccount(),
@@ -693,6 +697,14 @@ export default class extends Vue {
       "..." +
       addr.substring(addr.length - 8, addr.length)
     );
+  }
+
+  @Watch('state.nexus')
+  onWatchNexus(oldValue: string, newValue: string) {
+    if (this.activeTab == 1)
+    {
+      this.onActivityTab();   // refresh activity tab on nexus change
+    }
   }
 
   getTime(timestamp: number) {
@@ -1020,7 +1032,7 @@ export default class extends Vue {
     event.stopImmediatePropagation();
     console.log("Going to transfer: " + item.symbol);
 
-    if (item.symbol == "TTRS") {
+    if (item.symbol == "TTRS" || item.symbol == "CROWN" || item.symbol == "GHOST") {
       this.goto("/nfts/" + item.symbol + "/send");
       return;
     }
@@ -1102,7 +1114,6 @@ export default class extends Vue {
   }
 
   async onActivityTab() {
-    console.log("On Activity Tab");
     if (!this.account) return;
 
     this.isLoading = true;
