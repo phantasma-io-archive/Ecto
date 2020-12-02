@@ -97,10 +97,129 @@
         </v-tab-item>
 
         <v-tab-item key="2">
-          <div style="padding: 80px 20px">
-            Wallet creation is not implemented yet. Use Poltergeist or Phantom
-            Wallet.
-          </div>
+          <v-container v-if="createStep === 0">
+            <div style="padding: 80px 20px">
+              <!-- Text describing process -->
+            </div>
+            <v-btn block @click="generate">
+              Generate new wallet
+            </v-btn>
+          </v-container>
+          <v-container v-if="createStep === 1">
+            <div style="padding: 20px 20px">
+              Wallet created with the following address and private key (WIF
+              format)
+            </div>
+            <v-textarea
+              v-model="newAddress"
+              readonly
+              class="mx-2"
+              label="Address"
+              rows="2"
+            ></v-textarea>
+            <v-textarea
+              v-model="newWif"
+              readonly
+              class="mx-2"
+              label="WIF"
+              rows="2"
+            ></v-textarea>
+            <v-btn block class="mt-3" @click="generate">
+              Generate new wallet
+            </v-btn>
+            <v-btn block primary class="mt-3" @click="copyWifDialog = true">
+              Import wallet
+            </v-btn>
+          </v-container>
+          <v-container v-if="createStep === 2">
+            <v-textarea
+              ref="refWif"
+              v-if="newAddress.length > 0"
+              v-model="newWif"
+              readonly
+              append-outer-icon="mdi-comment"
+              @click:append-outer="copyWifToClipboard"
+              class="mx-2"
+              label="WIF"
+              rows="3"
+            ></v-textarea>
+          </v-container>
+
+          <v-dialog v-model="copyWifDialog" max-width="290">
+            <v-card>
+              <v-card-title class="headline">Backup your WIF</v-card-title>
+
+              <v-card-text>
+                <span>
+                  You only need your WIF to recover your wallet. Make sure you
+                  always have a secure backup.
+                </span>
+                <v-spacer class="ma-3" />
+
+                <v-textarea
+                  ref="refWif"
+                  v-if="newAddress.length > 0"
+                  v-model="newWif"
+                  readonly
+                  class="mx-2"
+                  label="WIF"
+                  rows="3"
+                ></v-textarea>
+                <v-btn block small @click="copyWifToClipboard">Copy to clipboard <v-icon right>mdi-content-copy</v-icon></v-btn>
+              </v-card-text>
+
+              <v-card-actions class="mt-4">
+                <v-btn color="gray darken-1" text @click="copyWifDialog=false">
+                  No
+                </v-btn>
+
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="copyWifDialog=false; setPassDialog=true">
+                  Yes, I did a backup
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog v-model="setPassDialog" max-width="290">
+            <v-card>
+              <v-card-title class="headline">Set password</v-card-title>
+
+              <v-card-text>
+                <span>
+                  Insert a password to secure your wallet. You can always use WIF to recover it.
+                </span>
+                <v-spacer />
+
+                <v-form
+                  @keyup.native.enter="doSignTx"
+                  @submit.prevent
+                >
+                  <v-text-field
+                    tabindex="1"
+                    type="password"
+                    label="Password"
+                    v-model="password"
+                    required
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    prepend-inner-icon="mdi-lock"
+                  />
+                </v-form>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-btn color="gray darken-1" text @click="password='';setPassDialog=false">
+                  Cancel
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="wif=newWif;importWallet()">
+                  Import wallet
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-tab-item>
       </v-tabs>
     </v-main>
@@ -116,10 +235,18 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Account, Transaction, getPrivateKeyFromWif, Balance } from "@/phan-js";
+import {
+  Account,
+  Transaction,
+  getPrivateKeyFromWif,
+  Balance,
+  getAddressFromWif,
+} from "@/phan-js";
 
 import { state } from "@/popup/PopupState";
 import ErrorDialogVue from "@/components/ErrorDialog.vue";
+
+import WIF from "wif";
 
 @Component({
   components: {
@@ -134,6 +261,11 @@ export default class extends Vue {
   isLoading = false;
   errorDialog = false;
   errorMessage = "";
+
+  createStep = 0;
+  newWif = "";
+  newAddress = "";
+  copyWifDialog = false;
 
   state = state;
 
@@ -158,7 +290,29 @@ export default class extends Vue {
         this.errorDialog = true;
       }
     }
+    this.createStep = 0;
+    this.wif = "";
+    this.password = "";
+    this.newWif = "";
+    this.newAddress = "";
     this.isLoading = false;
+  }
+
+  generate() {
+    let buf = new Uint8Array(32);
+    let pk = new Buffer(32);
+    window.crypto.getRandomValues(buf);
+    for (let i = 0; i < 32; ++i) {
+      pk.writeUInt8(buf[i], i);
+    }
+    const wif = WIF.encode(128, pk, true);
+    this.newWif = wif;
+    this.newAddress = getAddressFromWif(wif);
+    this.createStep = 1;
+  }
+
+  copyWifToClipboard() {
+    navigator.clipboard.writeText(this.newWif);
   }
 }
 </script>
