@@ -10,6 +10,7 @@ import {
   Paginated,
   AccountTransactions,
   Balance,
+  signData,
 } from "@/phan-js";
 
 interface IAuthorization {
@@ -394,6 +395,18 @@ export class PopupState {
       )!
     );
 
+    await this.fetchNftData(
+      this._accounts[this._currentAccountIndex].data.balances.find(
+        (b) => b.symbol == "GHOST"
+      )!
+    );
+
+    await this.fetchNftData(
+      this._accounts[this._currentAccountIndex].data.balances.find(
+        (b) => b.symbol == "CROWN"
+      )!
+    );
+
     console.log(
       "Refreshed account " +
         JSON.stringify(this._accounts[this._currentAccountIndex])
@@ -491,6 +504,84 @@ export class PopupState {
     return hash;
   }
 
+  signDataWithPassword(
+    data: string,
+    address: string,
+    password: string
+  ): string {
+    const account = this.accounts.find((a) => a.address == address);
+    if (!account) throw new Error("Cannot find account");
+
+    let wif = "";
+    if (password == "") {
+      if (account.wif) wif = account.wif;
+    } else {
+      if (!account.encKey) throw new Error("Cannot find encrypted key");
+
+      const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
+      for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
+        wif += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    }
+
+    if (!this.isWifValidForAccount(wif))
+      throw new Error("Password does not match");
+
+    return this.signData(data, wif);
+  }
+
+  signData(data: string, wif: string): string {
+    const account = this.currentAccount;
+    if (!account) throw new Error("Account not valid");
+
+    if (!this.isWifValidForAccount(wif))
+      throw new Error("Account does not match");
+
+    const privateKey = getPrivateKeyFromWif(wif);
+
+    return signData(data, privateKey);
+  }
+
+  formatBalance(symbol: string, amount: string): string {
+    let decimals = 0;
+    switch (symbol) {
+      case "KCAL":
+        decimals = 10;
+        break;
+      case "SOUL":
+        decimals = 8;
+        break;
+      case "NEO":
+        decimals = 0;
+        break;
+      case "GAS":
+        decimals = 8;
+        break;
+      case "GOATI":
+        decimals = 3;
+        break;
+      case "ETH":
+        decimals = 18;
+        break;
+      default:
+        decimals = 0;
+    }
+
+    if (decimals == 0) return amount + " " + symbol;
+    while (amount.length < decimals + 1) amount = "0" + amount;
+
+    const intPart = amount.substring(0, amount.length - decimals);
+    const decimalPart = amount.substring(
+      amount.length - decimals,
+      amount.length
+    );
+    if (parseInt(decimalPart) == 0) return intPart + " " + symbol;
+    return (
+      intPart +
+      "." +
+      (decimalPart.length >= 2 ? decimalPart.substring(0, 2) : decimalPart) + " " + symbol
+    );
+  }
+
   async getAccountTransactions(
     address: string,
     offsetPage: number = 0
@@ -559,6 +650,7 @@ export class PopupState {
 
       for (let i = 0; i < allNftsToQuery.length; ++i) {
         const nftId = allNftsToQuery[i];
+        console.log("getNFT of " + token + " " + nftId);
         const nft = await this.api.getNFT(token, nftId);
         console.log("Got nft", nft);
 

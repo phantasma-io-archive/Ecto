@@ -298,6 +298,49 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
         break;
 
+        case "signData":
+          if (isValidRequest(args)) {
+            const address = getRequestAddress(args);
+            const token = args[args.length - 1];
+  
+            if (address == null) return;
+  
+            const hexdata = args[3];
+            const signKind = args[4];
+    
+            chrome.tabs.get(msg.tabid, (tab) => {
+              const url = tab.url || "http://unknown";
+              const favicon = tab.favIconUrl || "unknown";
+  
+              console.log("[background] Creating signData popup with " + hexdata);
+              chrome.windows.create(
+                {
+                  type: "popup",
+                  url:
+                    "popup.html?/#/SignData/" +
+                    token +
+                    "/" +
+                    id +
+                    "/" +
+                    msg.tabid +
+                    "/" +
+                    msg.sid +
+                    "/" +
+                    btoa(url) +
+                    "/" +
+                    btoa(favicon) +
+                    "/" +
+                    hexdata,
+                  width: 320,
+                  height: 600,
+                },
+                (wnd) => {}
+              );
+            });
+          }
+  
+          break;
+
       case "invokeScript":
         if (isValidRequest(args)) {
           let script = args[1];

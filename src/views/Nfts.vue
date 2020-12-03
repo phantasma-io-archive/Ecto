@@ -41,13 +41,17 @@
               <v-btn icon small class="mr-1" @click="sortDialog = true"
                 ><v-icon>mdi-sort</v-icon></v-btn
               >
-              <v-btn disabled="sendSymbol!=='TTRS'" icon small @click="filtersDialog = true"
+              <v-btn
+                :disabled="sendSymbol !== 'TTRS'"
+                icon
+                small
+                @click="filtersDialog = true"
                 ><v-icon>mdi-filter-menu</v-icon></v-btn
               >
             </v-col>
           </v-row>
           <p class="pa-0 ma-0" style="margin-top:-20px !important">
-            {{ nftArray.length }} {{sendSymbol}} NFTs
+            {{ nftArray.length }} {{ sendSymbol }} NFTs
             <span v-if="viewModeSend"
               >- {{ selectedNum }} selected
               <v-btn
@@ -90,7 +94,7 @@
                         class="text--primary"
                         style="font-size:12px;line-height: 1.0275rem"
                       >
-                        {{ item.name }}
+                        {{ item.name.length > 50 ? item.name.slice(0, 50)+"..." : item.name }}
                       </p>
                       <p></p>
                       <v-spacer />
@@ -99,6 +103,34 @@
                       style="position:absolute; bottom:5px; left:10px; color:gray"
                     >
                       #{{ item.mint }}
+                    </div>
+                      <!-- v-if="item.infusion && item.infusion.length > 0" -->
+
+                    <div
+                      style="position:absolute; bottom:5px; right:128px; color:gray"
+                    >
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-icon v-bind="attrs" v-on="on"
+                            >mdi-shield-lock-outline</v-icon
+                          >
+                        </template>
+                        <div
+                          style="width: 150px; max-width:240px; overflow: hidden"
+                        >
+                          <div
+                            class="overline"
+                            style="color:#17b1e8; font-size: 11px !important;text-shadow: 1px 1px 20px #000000, 1px 1px 2px #000000;"
+                          >
+                            Infused assets
+                          </div>
+                          <div
+                            style="text-shadow: 1px 1px 10px #000000, 1px 1px 2px #000000;"
+                            v-html="getInfusedItems(item)"
+                          >
+                          </div>
+                        </div>
+                      </v-tooltip>
                     </div>
                   </div>
 
@@ -425,9 +457,7 @@ export default class extends Vue {
     const searchText = this.searchText.toLowerCase();
 
     const search = (k: any[]) =>
-      k.filter((n) =>
-        n.name.toLowerCase().includes(searchText)
-      );
+      k.filter((n) => n.name.toLowerCase().includes(searchText));
 
     const filterType = (k: any[]) =>
       k.filter((n: any) => this.filterType == n.type);
@@ -452,7 +482,9 @@ export default class extends Vue {
         return true;
       });
 
-    let list = Object.keys(this.state.nfts).filter(k => k.startsWith(this.sendSymbol+"@")).map(k => this.state.nfts[k]);
+    let list = Object.keys(this.state.nfts)
+      .filter((k) => k.startsWith(this.sendSymbol + "@"))
+      .map((k) => this.state.nfts[k]);
 
     if (this.filterType !== "All") list = filterType(list);
     if (this.filterRarity !== "All") list = filterRarity(list);
@@ -557,6 +589,10 @@ export default class extends Vue {
     if (rarity) return rarities[rarity];
 
     return this.sendSymbol + " NFT";
+  }
+
+  getInfusedItems(item: any) {
+    return item.infusion.map((i: any) => state.formatBalance(i.Key, i.Value)  ).join("<br/>");
   }
 
   askSendWhere() {

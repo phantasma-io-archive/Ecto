@@ -1,7 +1,7 @@
 <style scoped></style>
 <template>
   <div>
-    <div v-for="(item, i) in getDescriptions" :key="i">
+    <div v-for="(item, i) in descriptions" :key="i">
       <v-tooltip v-if="item.tooltip" top>
         <template v-slot:activator="{ on, attrs }">
           <span v-bind="attrs" v-on="on">
@@ -53,9 +53,10 @@
           >
             {{ getNftInfo(item.nftId, item.symbol).mint }}
           </div>
+
+          <div style="opacity: 0.8" v-html="getNftInfusion(item.nftId, item.symbol)"></div>
         </div>
       </v-tooltip>
-      <!-- <v-img v-if="item.image" contain :src="item.image" height="84px"></v-img> -->
     </div>
   </div>
 </template>
@@ -130,12 +131,21 @@ export default class extends Vue {
 
   private hasQueriedNfts = false;
 
-  get getDescriptions() {
+  descriptions: any[] = [];
+
+
+  mounted() {
+    this.descriptions = this.getDescriptions();
+    console.log('Descriptions', JSON.stringify(this.descriptions, null, 2));
+  }
+
+
+  getDescriptions() : any[]{
     let res: any[] = [];
 
     if (this.tx == null || this.tx.events == null) {
       console.log("TX undefined or no events");
-      return "undefined";
+      return [];
     }
 
     const events = this.tx.events;
@@ -353,6 +363,17 @@ export default class extends Vue {
       }
     }
 
+    const numEvents = res.length;
+
+    if (res.length > 100) {
+      res.length = 100;
+      res.push({
+        icon: "mdi-alert",
+        iconColor: "red",
+        text: "Unshown events (" + (numEvents - 100) + ")",
+      });
+    }
+
     // Query NFT Data that might be missing
     if (!this.hasQueriedNfts) {
       this.hasQueriedNfts = true;
@@ -360,9 +381,9 @@ export default class extends Vue {
       const allSymbols = [...new Set(allNfts.map((i) => i.symbol))];
       for (let k = 0; k < allSymbols.length; ++k) {
         const symbol = allSymbols[k];
-        const allNftOfSymbol = allNfts
+        const allNftOfSymbol = [...new Set(allNfts
           .filter((i) => i.symbol == symbol)
-          .map((i) => i.nftId);
+          .map((i) => i.nftId))];
         console.log("Going to query ", symbol, allNftOfSymbol);
         this.state.queryNfts(allNftOfSymbol, symbol);
       }
@@ -387,8 +408,18 @@ export default class extends Vue {
     return "NFT";
   }
 
+  getNftInfusion(nftId: string, symbol: string) {
+    // console.log(nftId, symbol);
+    const nfts = this.state.nfts;
+    const item = nfts[symbol + "@" + nftId];
+    if (item) {
+      return item.infusion.map((i:any) => state.formatBalance(i.Key, i.Value)  ).join("<br/>");
+    }
+    return "";
+  }
+
   getNftInfo(nftId: string, symbol: string) {
-    console.log(nftId, symbol);
+    // console.log(nftId, symbol);
     const nfts = this.state.nfts;
     const item = nfts[symbol + "@" + nftId];
     if (item) {
@@ -398,9 +429,6 @@ export default class extends Vue {
         mint: "#" + item.mint,
         category: this.getOverline(item),
       };
-
-      console.log("nft got", item);
-      console.log(info);
       return info;
     }
 
