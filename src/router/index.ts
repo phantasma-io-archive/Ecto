@@ -6,6 +6,7 @@ import Wallets from "../views/Wallets.vue";
 import AddWallet from "../views/AddWallet.vue";
 import Authorize from "../views/Authorize.vue";
 import Sign from "../views/Sign.vue";
+import SignData from "../views/SignData.vue";
 import Nfts from "../views/Nfts.vue";
 
 Vue.use(VueRouter);
@@ -45,6 +46,11 @@ const routes: Array<RouteConfig> = [
     path: "/sign/:token/:id/:tabid/:sid/:url/:favicon/:b64txdata",
     name: "Sign",
     component: Sign,
+  },
+  {
+    path: "/signdata/:token/:id/:tabid/:sid/:url/:favicon/:hexdata",
+    name: "SignData",
+    component: SignData,
   },
 ];
 
