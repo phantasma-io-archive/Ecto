@@ -593,7 +593,7 @@ export default class extends Vue {
   }
 
   getInfusedItems(item: any) {
-    return item.infusion ? item.infusion.map((i: any) => state.formatBalance(i.Key, i.Value)  ).join("<br/>") : '';
+    return item.infusion ? item.infusion.map((i: any) => '<v-avatar><img src="assets/' + i.Key.toLowerCase() + '.png" style="height: 1.5rem;vertical-align: middle;margin-right: 0.25rem;"/></v-avatar>' + state.formatBalance(i.Key, i.Value)  ).join("<br/>") : '';
   }
 
   askSendWhere() {
