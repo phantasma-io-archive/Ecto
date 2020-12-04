@@ -1119,7 +1119,7 @@ export default class extends Vue {
     this.isLoading = true;
     const res = await state.getAccountTransactions(this.account.address);
     this.offsetTxPage = 0;
-    this.showLoadMore = res.result.txs.length === 15;
+    this.showLoadMore = res.result.txs ? res.result.txs.length === 15 : false;
     this.txs = res.result.txs;
     this.loadingTxs = [];
     this.isLoading = false;
@@ -1135,7 +1135,7 @@ export default class extends Vue {
       this.account.address,
       this.offsetTxPage
     );
-    this.showLoadMore = res.result.txs.length === 15;
+    this.showLoadMore = res.result.txs ? res.result.txs.length === 15 : false;
     this.txs.push(...res.result.txs);
     this.loadingTxs = [];
     this.isLoading = false;
