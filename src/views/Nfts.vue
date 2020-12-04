@@ -107,6 +107,7 @@
                       <!-- v-if="item.infusion && item.infusion.length > 0" -->
 
                     <div
+                      v-if="item.infusion"
                       style="position:absolute; bottom:5px; right:128px; color:gray"
                     >
                       <v-tooltip bottom>
@@ -592,7 +593,7 @@ export default class extends Vue {
   }
 
   getInfusedItems(item: any) {
-    return item.infusion.map((i: any) => state.formatBalance(i.Key, i.Value)  ).join("<br/>");
+    return item.infusion ? item.infusion.map((i: any) => state.formatBalance(i.Key, i.Value)  ).join("<br/>") : '';
   }
 
   askSendWhere() {
