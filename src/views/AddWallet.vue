@@ -108,7 +108,7 @@
           <v-container v-if="createStep === 1">
             <div style="padding: 20px 20px">
               Wallet created with the following address and private key (WIF
-              format)
+              format). Note: you need to click "import wallet" below to be able to use it.
             </div>
             <v-textarea
               v-model="newAddress"
