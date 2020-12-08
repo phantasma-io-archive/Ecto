@@ -194,6 +194,17 @@ export function getMarketEventData(str: string) {
   };
 }
 
+export function getInfusionEventData(str: string) {
+  var dec = new Decoder(str);
+  return {
+    baseSymbol: dec.readString(),
+    TokenID: dec.readString(),
+    InfusedSymbol: dec.readString(),
+    InfusedValue: dec.readBigIntAccurate(),
+    ChainName: dec.readString(),
+  };
+}
+
 export function getString(str: string) {
   return new Decoder(str).readString();
 }

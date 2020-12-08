@@ -70,6 +70,7 @@ import {
   getString,
   getTokenEventData,
   getMarketEventData,
+  getInfusionEventData,
 } from "@/phan-js/vm/EventData";
 import { state } from "@/popup/PopupState";
 
@@ -356,6 +357,34 @@ export default class extends Vue {
               nftId,
               symbol: data.baseSymbol,
             });
+          }
+          // }
+          break;
+        }
+        case "Infusion": {
+          const data = getInfusionEventData(ev.data);
+          // if (ev.address == this.address) {
+          {
+            const nftId = data.TokenID;
+            if (data.InfusedSymbol === 'TTRS' || data.InfusedSymbol === 'GHOST' || data.InfusedSymbol === 'CROWN') {
+              res.push({
+                icon: "mdi-basket-fill",
+                text: "Infused NFT (" + data.baseSymbol + ")",
+                tooltip:
+                  "With " + data.InfusedSymbol + " NFT",
+                nftId,
+                symbol: data.baseSymbol,
+              });
+            } else {
+              res.push({
+                icon: "mdi-basket-fill",
+                text: "Infused NFT (" + data.baseSymbol + ")",
+                tooltip:
+                  "With " + formatSymbol("" + data.InfusedValue, data.InfusedSymbol),
+                nftId,
+                symbol: data.baseSymbol,
+              });
+            }
           }
           // }
           break;
