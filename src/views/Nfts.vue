@@ -678,7 +678,7 @@ export default class extends Vue {
       nexus: state.nexus,
       chain: "main",
       script,
-      payload: "4543542d30",
+      payload: "4543542D302E36",
     };
 
     try {
