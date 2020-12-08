@@ -566,6 +566,17 @@ export class PopupState {
         decimals = 0;
     }
 
+    switch (symbol) {
+      case "TTRS":
+        return symbol + ' NFT'
+      case "GHOST":
+        return symbol + ' NFT'
+      case "CROWN":
+        return symbol + ' NFT'
+      default:
+        break;
+    }
+
     if (decimals == 0) return amount + " " + symbol;
     while (amount.length < decimals + 1) amount = "0" + amount;
 
