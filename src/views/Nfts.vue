@@ -483,9 +483,19 @@ export default class extends Vue {
         return true;
       });
 
-    let list = Object.keys(this.state.nfts)
-      .filter((k) => k.startsWith(this.sendSymbol + "@"))
-      .map((k) => this.state.nfts[k]);
+    var idsNfts = this.account?.data.balances.find(b => b.symbol == this.sendSymbol)?.ids;
+
+    if (!idsNfts)
+      return [];
+
+    let list = [];
+    for (let i = 0; i < idsNfts.length; ++i) {
+      const key = this.sendSymbol+"@"+idsNfts[i];
+      const val = this.state.nfts[key];
+      if (val)
+        list.push(val);
+
+    }
 
     if (this.filterType !== "All") list = filterType(list);
     if (this.filterRarity !== "All") list = filterRarity(list);
