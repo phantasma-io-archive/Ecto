@@ -260,7 +260,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           const chain = args[2];
           const script = args[3];
           let payload = args[4];
-          payload = payload == null || payload == "" ? "4543542d30" : payload;
+          payload = payload == null || payload == "" ? "4543542D302E36" : payload;
 
           let txdata = JSON.stringify({ nexus, chain, script, payload });
           let b64txdata = btoa(txdata);
