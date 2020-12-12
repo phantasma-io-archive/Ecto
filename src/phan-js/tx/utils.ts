@@ -37,6 +37,9 @@ export function signData(msgHex: string, privateKey: string): string {
   const privateKeyBuffer = Buffer.from(privateKey, "hex");
 
   const sig = curve.sign(msgHashHex, privateKeyBuffer);
+  const numBytes = sig.toBytes().length;
 
-  return sig.toHex();
+  return (
+    "01" + (numBytes < 16 ? "0" : "") + numBytes.toString(16) + sig.toHex()
+  );
 }
