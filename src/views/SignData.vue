@@ -219,20 +219,21 @@ export default class extends Vue {
     let bufRand = new Uint8Array(4);
     window.crypto.getRandomValues(bufRand);
 
-    const random = Buffer.from(bufRand).toString('hex');
-    const allData = hexdata + random;
+    const random = Buffer.from(bufRand)
+      .toString("hex")
+      .toUpperCase();
+    const allData = random + hexdata;
 
     try {
       if (this.needsWif) {
         if (state.isWifValidForAccount(this.wif))
-
           signature = await state.signData(allData, this.wif);
         else {
           this.errorDialog = true;
-          this.errorMessage = "WIF is not valid for address "+ state.currentAccount?.address;
+          this.errorMessage =
+            "WIF is not valid for address " + state.currentAccount?.address;
         }
-      }
-      else
+      } else
         signature = await state.signDataWithPassword(
           allData,
           state.currentAccount!.address,
