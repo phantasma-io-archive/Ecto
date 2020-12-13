@@ -107,10 +107,9 @@
             </v-btn>
           </v-container>
           <v-container v-if="createStep === 1">
-            <div style="padding: 20px 20px">
+            <div class="mb-5" style="padding: 20px 8px">
               Wallet created with the following address and private key (WIF
-              format). Note: you need to click "import wallet" below to be able
-              to use it.
+              format)
             </div>
             <v-textarea
               v-model="newAddress"
@@ -126,12 +125,15 @@
               label="WIF"
               rows="2"
             ></v-textarea>
-            <v-btn block class="mt-3" @click="generate">
-              Generate new wallet
-            </v-btn>
             <v-btn block primary class="mt-3" @click="copyWifDialog = true">
               Import wallet
             </v-btn>
+            <div class="ma-3 mt-6">
+              Or if you don't like it, you can
+              <a href="" @click.prevent="generate">
+                generate another one
+              </a>
+            </div>
           </v-container>
           <v-container v-if="createStep === 2">
             <v-textarea

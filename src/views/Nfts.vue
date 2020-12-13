@@ -94,7 +94,11 @@
                         class="text--primary"
                         style="font-size:12px;line-height: 1.0275rem"
                       >
-                        {{ item.name.length > 50 ? item.name.slice(0, 50)+"..." : item.name }}
+                        {{
+                          item.name.length > 50
+                            ? item.name.slice(0, 50) + "..."
+                            : item.name
+                        }}
                       </p>
                       <p></p>
                       <v-spacer />
@@ -104,7 +108,7 @@
                     >
                       #{{ item.mint }}
                     </div>
-                      <!-- v-if="item.infusion && item.infusion.length > 0" -->
+                    <!-- v-if="item.infusion && item.infusion.length > 0" -->
 
                     <div
                       v-if="item.infusion"
@@ -128,8 +132,7 @@
                           <div
                             style="text-shadow: 1px 1px 10px #000000, 1px 1px 2px #000000;"
                             v-html="getInfusedItems(item)"
-                          >
-                          </div>
+                          ></div>
                         </div>
                       </v-tooltip>
                     </div>
@@ -483,18 +486,17 @@ export default class extends Vue {
         return true;
       });
 
-    var idsNfts = this.account?.data.balances.find(b => b.symbol == this.sendSymbol)?.ids;
+    var idsNfts = this.account?.data.balances.find(
+      (b) => b.symbol == this.sendSymbol
+    )?.ids;
 
-    if (!idsNfts)
-      return [];
+    if (!idsNfts) return [];
 
     let list = [];
     for (let i = 0; i < idsNfts.length; ++i) {
-      const key = this.sendSymbol+"@"+idsNfts[i];
+      const key = this.sendSymbol + "@" + idsNfts[i];
       const val = this.state.nfts[key];
-      if (val)
-        list.push(val);
-
+      if (val) list.push(val);
     }
 
     if (this.filterType !== "All") list = filterType(list);
@@ -603,7 +605,17 @@ export default class extends Vue {
   }
 
   getInfusedItems(item: any) {
-    return item.infusion ? item.infusion.map((i: any) => '<v-avatar><img src="assets/' + i.Key.toLowerCase() + '.png" style="height: 1.5rem;vertical-align: middle;margin-right: 0.25rem;"/></v-avatar>' + state.formatBalance(i.Key, i.Value)  ).join("<br/>") : '';
+    return item.infusion
+      ? item.infusion
+          .map(
+            (i: any) =>
+              '<v-avatar><img src="assets/' +
+              i.Key.toLowerCase() +
+              '.png" style="height: 1.5rem;vertical-align: middle;margin-right: 0.25rem;"/></v-avatar>' +
+              state.formatBalance(i.Key, i.Value)
+          )
+          .join("<br/>")
+      : "";
   }
 
   askSendWhere() {
@@ -678,7 +690,7 @@ export default class extends Vue {
       nexus: state.nexus,
       chain: "main",
       script,
-      payload: "4543542D302E36",
+      payload: state.payload,
     };
 
     try {
