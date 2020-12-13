@@ -22,7 +22,12 @@
         indeterminate
         style="z-index:7777"
       ></v-progress-linear>
-      <v-tabs v-model="activeTab" background-color="white" color="#17b1e8" right>
+      <v-tabs
+        v-model="activeTab"
+        background-color="white"
+        color="#17b1e8"
+        right
+      >
         <v-tab>Assets</v-tab>
         <v-tab @change="onActivityTab">Activity</v-tab>
 
@@ -699,11 +704,10 @@ export default class extends Vue {
     );
   }
 
-  @Watch('state.nexus')
+  @Watch("state.nexus")
   onWatchNexus(oldValue: string, newValue: string) {
-    if (this.activeTab == 1)
-    {
-      this.onActivityTab();   // refresh activity tab on nexus change
+    if (this.activeTab == 1) {
+      this.onActivityTab(); // refresh activity tab on nexus change
     }
   }
 
@@ -1032,7 +1036,11 @@ export default class extends Vue {
     event.stopImmediatePropagation();
     console.log("Going to transfer: " + item.symbol);
 
-    if (item.symbol == "TTRS" || item.symbol == "CROWN" || item.symbol == "GHOST") {
+    if (
+      item.symbol == "TTRS" ||
+      item.symbol == "CROWN" ||
+      item.symbol == "GHOST"
+    ) {
       this.goto("/nfts/" + item.symbol + "/send");
       return;
     }
@@ -1042,6 +1050,8 @@ export default class extends Vue {
     this.sendMaxAmount = parseFloat(
       this.formatBalance(item.amount, item.decimals)
     );
+    if (this.sendSymbol == "KCAL")
+      this.sendMaxAmount = this.sendMaxAmount - 0.01;
     this.sendDialog = true;
   }
 
