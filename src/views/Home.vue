@@ -36,6 +36,41 @@
             class="overflow-y-auto overflow-x-hidden pa-0"
             style="max-height:400px"
           >
+            <div
+              v-if="
+                noKcal() &&
+                  account.data.stake > 2 * 10 ** 8 &&
+                  account.data.name == 'anonymous'
+              "
+              class="pa-5"
+            >
+              KCAL is used for every transaction on the blockchain. You get
+              0.002 KCAL per SOUL staked daily. You can claim some now.
+              <a href="" @click.prevent="claimDialog = true">claim KCAL</a>
+            </div>
+            <div
+              v-else-if="
+                account.data.stake > 2 * 10 ** 8 &&
+                  account.data.name == 'anonymous'
+              "
+              class="pa-5"
+            >
+              You can use your account with a name instead of a public address.
+              <a href="" @click.prevent="registerNameDialog = true"
+                >register a name</a
+              >
+            </div>
+            <div
+              v-else-if="account.data.stake == 0 && getUnstackedSoul() == '0'"
+              class="pa-5"
+            >
+              Go and get some SOUL :)
+            </div>
+            <div v-else-if="account.data.stake == 0" class="pa-5">
+              Stake SOUL to register a name and get daily KCAL rewards. Minimum
+              stake period is 24 hours.
+              <a href="" @click.prevent="stakeDialog = true">stake</a>
+            </div>
             <v-expansion-panels
               v-if="account"
               v-model="panel"
@@ -550,6 +585,43 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="registerNameDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Register name</v-card-title>
+
+        <v-card-text>
+          <span>
+            Your address name can be used as your public address. Be aware, you
+            need to keep 2 SOUL staked or you will lose your name.
+          </span>
+          <br />
+          <v-spacer class="ma-4" />
+
+          <v-text-field
+            v-model="nameToRegister"
+            label="Pick your name"
+          ></v-text-field>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="registerNameDialog = false">
+            Cancel
+          </v-btn>
+
+          <v-btn
+            color="blue darken-1"
+            text
+            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15"
+            @click="askRegisterName"
+          >
+            Next
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <ErrorDialog
       :show="errorDialog"
       :message="errorMessage"
@@ -596,6 +668,7 @@ export default class extends Vue {
   unstakeDialog = false;
   sendDialog = false;
   sendWhereDialog = false;
+  registerNameDialog = false;
 
   stakeSoulAmount = 0;
   unstakeSoulAmount = 0;
@@ -604,6 +677,7 @@ export default class extends Vue {
   sendSymbol = "";
   sendDecimals = 0;
   sendDestination = "";
+  nameToRegister = "";
 
   errorDialog = false;
   errorMessage = "";
@@ -762,6 +836,15 @@ export default class extends Vue {
     return this.formatBalance(this.account!.data.unclaimed, 10);
   }
 
+  noKcal() {
+    if (!this.account) return true;
+    const kcalBalance = this.account.data.balances.find(
+      (b) => b.symbol == "KCAL"
+    );
+
+    return kcalBalance == null || kcalBalance.amount == "0";
+  }
+
   getStackedSoul() {
     if (!this.account) return "0";
     return this.formatBalance(this.account.data.stake, 8);
@@ -852,6 +935,12 @@ export default class extends Vue {
     this.signTxCallback = this.sendFT;
   }
 
+  askRegisterName() {
+    this.registerNameDialog = false;
+    this.signTxDialog = true;
+    this.signTxCallback = this.registerName;
+  }
+
   closeSignTx() {
     this.wif = "";
     this.password = "";
@@ -893,7 +982,7 @@ export default class extends Vue {
       nexus: state.nexus,
       chain: "main",
       script,
-      payload: "4543542D302E36",
+      payload: state.payload,
     };
 
     console.log(script);
@@ -948,7 +1037,7 @@ export default class extends Vue {
       nexus: state.nexus,
       chain: "main",
       script,
-      payload: "4543542D302E36",
+      payload: state.payload,
     };
 
     try {
@@ -1001,7 +1090,7 @@ export default class extends Vue {
       nexus: state.nexus,
       chain: "main",
       script,
-      payload: "4543542D302E36",
+      payload: state.payload,
     };
 
     try {
@@ -1092,8 +1181,63 @@ export default class extends Vue {
       nexus: state.nexus,
       chain: "main",
       script,
-      payload: "4543542D302E36",
+      payload: state.payload,
     };
+
+    try {
+      this.isLoading = true;
+      if (this.needsWif) {
+        const tx = await state.signTx(txdata, this.wif);
+        console.log("tx successful: " + tx);
+      } else if (this.needsPass) {
+        const tx = await state.signTxWithPassword(
+          txdata,
+          address,
+          this.password
+        );
+        console.log("tx successful: " + tx);
+      }
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2500);
+  }
+
+  async registerName() {
+    if (!this.account) return;
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 800;
+
+    let sb = new ScriptBuilder();
+
+    const kcalBalance = this.account.data.balances.find(
+      (b) => b.symbol == "KCAL"
+    );
+
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    sb.callContract("account", "RegisterName", [address, this.nameToRegister]);
+    sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    console.log(script);
 
     try {
       this.isLoading = true;

@@ -56,6 +56,8 @@ export class PopupState {
   accountNfts: any[] = [];
   nfts: any = {};
 
+  payload = "4543542D302E36";
+
   constructor() {}
 
   get accounts() {

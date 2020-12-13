@@ -1,6 +1,7 @@
 /// <reference types="chrome"/>
 
 import { PhantasmaAPI } from "@/phan-js";
+import { state } from "@/popup/PopupState";
 
 let phantasmaAPI = new PhantasmaAPI(
   "https://seed.ghostdevs.com:7077/rpc",
@@ -260,8 +261,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           const chain = args[2];
           const script = args[3];
           let payload = args[4];
-          payload =
-            payload == null || payload == "" ? "4543542D302E36" : payload;
+          payload = payload == null || payload == "" ? state.payload : payload;
 
           let txdata = JSON.stringify({ nexus, chain, script, payload });
           let b64txdata = btoa(txdata);
