@@ -1,3 +1,4 @@
+import WIF from "wif";
 import fetch from "cross-fetch";
 import * as CryptoJS from "crypto-js";
 
@@ -353,6 +354,40 @@ export class PopupState {
     });
   }
 
+  async addAccountWithHex(hex: string, password: string): Promise<Account> {
+    let pk = Buffer.from(hex, "hex");
+    const wif = WIF.encode(128, pk, true);
+    let address = getAddressFromWif(wif);
+    const accountData = await this.getAccountData(address);
+    const hasPass = password != null && password != "";
+    if (hasPass) {
+      const encKey = CryptoJS.AES.encrypt(wif, password).toString();
+      this._accounts.push({
+        address: accountData.address,
+        type: "encKey",
+        encKey,
+        data: accountData,
+      });
+    } else {
+      this._accounts.push({
+        address: accountData.address,
+        type: "wif",
+        wif,
+        data: accountData,
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          currentAccountIndex: this._accounts.length - 1,
+          accounts: this._accounts,
+        },
+        () => resolve()
+      );
+    });
+  }
+
   async selectAccount(account: WalletAccount): Promise<void> {
     const idx = this.accounts.findIndex((a) => a.address == account.address);
 
@@ -568,11 +603,11 @@ export class PopupState {
 
     switch (symbol) {
       case "TTRS":
-        return symbol + ' NFT'
+        return symbol + " NFT";
       case "GHOST":
-        return symbol + ' NFT'
+        return symbol + " NFT";
       case "CROWN":
-        return symbol + ' NFT'
+        return symbol + " NFT";
       default:
         break;
     }
@@ -589,7 +624,9 @@ export class PopupState {
     return (
       intPart +
       "." +
-      (decimalPart.length >= 2 ? decimalPart.substring(0, 2) : decimalPart) + " " + symbol
+      (decimalPart.length >= 2 ? decimalPart.substring(0, 2) : decimalPart) +
+      " " +
+      symbol
     );
   }
 
