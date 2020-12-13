@@ -34,8 +34,8 @@
             style="max-height:500px"
           >
             <div style="padding: 20px">
-              Import a wallet with its address or name (read only), or its WIF (read write).
-              When using WIF you must protect it using a password.
+              Import a wallet with its address or name (read only), or its WIF
+              (read/write). When using WIF you must protect it using a password.
             </div>
 
             <v-form
@@ -58,14 +58,14 @@
               <v-text-field
                 tabindex="2"
                 type="password"
-                label="WIF"
+                label="WIF or hex private key"
                 v-model="wif"
                 required
                 autocorrect="off"
                 autocapitalize="off"
                 spellcheck="false"
                 prepend-icon="mdi-key"
-                counter="52"
+                counter
               />
 
               <v-text-field
@@ -88,7 +88,8 @@
                 @click="importWallet"
                 :disabled="
                   addressOrName.length == 0 &&
-                    (wif.length != 52 || password.length < 6)
+                    (!(wif.length == 52 || wif.length == 64) ||
+                      password.length < 6)
                 "
                 >Import Wallet</v-btn
               >
@@ -108,7 +109,8 @@
           <v-container v-if="createStep === 1">
             <div style="padding: 20px 20px">
               Wallet created with the following address and private key (WIF
-              format). Note: you need to click "import wallet" below to be able to use it.
+              format). Note: you need to click "import wallet" below to be able
+              to use it.
             </div>
             <v-textarea
               v-model="newAddress"
@@ -165,16 +167,30 @@
                   label="WIF"
                   rows="3"
                 ></v-textarea>
-                <v-btn block small @click="copyWifToClipboard">Copy to clipboard <v-icon right>mdi-content-copy</v-icon></v-btn>
+                <v-btn block small @click="copyWifToClipboard"
+                  >Copy to clipboard
+                  <v-icon right>mdi-content-copy</v-icon></v-btn
+                >
               </v-card-text>
 
               <v-card-actions class="mt-4">
-                <v-btn color="gray darken-1" text @click="copyWifDialog=false">
+                <v-btn
+                  color="gray darken-1"
+                  text
+                  @click="copyWifDialog = false"
+                >
                   No
                 </v-btn>
 
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="copyWifDialog=false; setPassDialog=true">
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="
+                    copyWifDialog = false;
+                    setPassDialog = true;
+                  "
+                >
                   Yes, I did a backup
                 </v-btn>
               </v-card-actions>
@@ -187,14 +203,12 @@
 
               <v-card-text>
                 <span>
-                  Insert a password to secure your wallet. You can always use WIF to recover it.
+                  Insert a password to secure your wallet. You can always use
+                  WIF to recover it.
                 </span>
                 <v-spacer />
 
-                <v-form
-                  @keyup.native.enter="doSignTx"
-                  @submit.prevent
-                >
+                <v-form @keyup.native.enter="doSignTx" @submit.prevent>
                   <v-text-field
                     tabindex="1"
                     type="password"
@@ -210,11 +224,25 @@
               </v-card-text>
 
               <v-card-actions>
-                <v-btn color="gray darken-1" text @click="password='';setPassDialog=false">
+                <v-btn
+                  color="gray darken-1"
+                  text
+                  @click="
+                    password = '';
+                    setPassDialog = false;
+                  "
+                >
                   Cancel
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="wif=newWif;importWallet()">
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="
+                    wif = newWif;
+                    importWallet();
+                  "
+                >
                   Import wallet
                 </v-btn>
               </v-card-actions>
@@ -278,6 +306,15 @@ export default class extends Vue {
         this.$router.push("/");
       } catch (err) {
         this.errorMessage = "Error importing WIF wallet";
+        this.errorDialog = true;
+      }
+    } else if (this.wif.length == 64 && this.password.length >= 6) {
+      try {
+        this.isLoading = true;
+        let account = await state.addAccountWithHex(this.wif, this.password);
+        this.$router.push("/");
+      } catch (err) {
+        this.errorMessage = "Error importing HEX wallet";
         this.errorDialog = true;
       }
     } else {
