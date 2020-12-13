@@ -54,7 +54,10 @@
             {{ getNftInfo(item.nftId, item.symbol).mint }}
           </div>
 
-          <div style="opacity: 0.8" v-html="getNftInfusion(item.nftId, item.symbol)"></div>
+          <div
+            style="opacity: 0.8"
+            v-html="getNftInfusion(item.nftId, item.symbol)"
+          ></div>
         </div>
       </v-tooltip>
     </div>
@@ -134,14 +137,11 @@ export default class extends Vue {
 
   descriptions: any[] = [];
 
-
   mounted() {
     this.descriptions = this.getDescriptions();
-    console.log('Descriptions', JSON.stringify(this.descriptions, null, 2));
   }
 
-
-  getDescriptions() : any[]{
+  getDescriptions(): any[] {
     let res: any[] = [];
 
     if (this.tx == null || this.tx.events == null) {
@@ -366,12 +366,15 @@ export default class extends Vue {
           // if (ev.address == this.address) {
           {
             const nftId = data.TokenID;
-            if (data.InfusedSymbol === 'TTRS' || data.InfusedSymbol === 'GHOST' || data.InfusedSymbol === 'CROWN') {
+            if (
+              data.InfusedSymbol === "TTRS" ||
+              data.InfusedSymbol === "GHOST" ||
+              data.InfusedSymbol === "CROWN"
+            ) {
               res.push({
                 icon: "mdi-basket-fill",
                 text: "Infused NFT (" + data.baseSymbol + ")",
-                tooltip:
-                  "With " + data.InfusedSymbol + " NFT",
+                tooltip: "With " + data.InfusedSymbol + " NFT",
                 nftId,
                 symbol: data.baseSymbol,
               });
@@ -380,7 +383,8 @@ export default class extends Vue {
                 icon: "mdi-basket-fill",
                 text: "Infused NFT (" + data.baseSymbol + ")",
                 tooltip:
-                  "With " + formatSymbol("" + data.InfusedValue, data.InfusedSymbol),
+                  "With " +
+                  formatSymbol("" + data.InfusedValue, data.InfusedSymbol),
                 nftId,
                 symbol: data.baseSymbol,
               });
@@ -410,9 +414,11 @@ export default class extends Vue {
       const allSymbols = [...new Set(allNfts.map((i) => i.symbol))];
       for (let k = 0; k < allSymbols.length; ++k) {
         const symbol = allSymbols[k];
-        const allNftOfSymbol = [...new Set(allNfts
-          .filter((i) => i.symbol == symbol)
-          .map((i) => i.nftId))];
+        const allNftOfSymbol = [
+          ...new Set(
+            allNfts.filter((i) => i.symbol == symbol).map((i) => i.nftId)
+          ),
+        ];
         console.log("Going to query ", symbol, allNftOfSymbol);
         this.state.queryNfts(allNftOfSymbol, symbol);
       }
@@ -441,8 +447,10 @@ export default class extends Vue {
     // console.log(nftId, symbol);
     const nfts = this.state.nfts;
     const item = nfts[symbol + "@" + nftId];
-    if (item) {
-      return item.infusion.map((i:any) => state.formatBalance(i.Key, i.Value)  ).join("<br/>");
+    if (item && item.infusion) {
+      return item.infusion
+        .map((i: any) => state.formatBalance(i.Key, i.Value))
+        .join("<br/>");
     }
     return "";
   }
