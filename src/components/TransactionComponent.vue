@@ -373,6 +373,8 @@ export default class extends Vue {
             ) {
               res.push({
                 icon: "mdi-basket-fill",
+                postIcon: "mdi-eye-outline",
+                postIconColor: "gray",
                 text: "Infused NFT (" + data.baseSymbol + ")",
                 tooltip: "With " + data.InfusedSymbol + " NFT",
                 nftId,
@@ -381,6 +383,8 @@ export default class extends Vue {
             } else {
               res.push({
                 icon: "mdi-basket-fill",
+                postIcon: "mdi-eye-outline",
+                postIconColor: "gray",
                 text: "Infused NFT (" + data.baseSymbol + ")",
                 tooltip:
                   "With " +

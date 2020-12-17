@@ -83,6 +83,15 @@
                 :key="item.symbol"
               >
                 <v-expansion-panel-header>
+                  <div
+                    v-if="
+                      item.symbol == 'SOUL' &&
+                        account.data.stake > 50000 * 2 ** 8
+                    "
+                    style="font-size: 10px; color:#42b3f4; position: absolute; bottom: 9px; left: 13px;"
+                  >
+                    SOULMASTER
+                  </div>
                   <v-img :src="getAssetIcon(item)" max-width="40px"></v-img>
                   <div
                     style="margin:10px 1px 10px 15px;width:160px;font-size:16px"
