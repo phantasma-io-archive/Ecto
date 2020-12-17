@@ -31,6 +31,25 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-sheet
+      v-if="snackError"
+      @click="snackError = false"
+      elevation="12"
+      rounded="true"
+      class="pa-5 mx-auto"
+      style="max-width: 90%; left: 5%; bottom: 40px; position: absolute !important; background-color: #555; z-index: 303; color:white;opacity:0.95; border-radius:8px; font-size:14px"
+    >
+      {{ snackErrorMessage }}
+      <p style="opacity:0.7; font-size: 10px; margin-top: 8px">
+        {{ snackErrorMessageDetails }}
+      </p>
+
+      <v-row>
+        <v-spacer />
+        <v-btn text @click="snackError = false" color="#1bb7dc">OK</v-btn>
+      </v-row>
+    </v-sheet>
+
     <v-footer
       color="#17b1e8"
       tile
@@ -158,6 +177,10 @@ export default class extends Vue {
 
   settingsDialog = false;
 
+  snackError = false;
+  snackErrorMessage = "";
+  snackErrorMessageDetails = "";
+
   simnetRpc = "http://localhost:7077/rpc";
   editSimnetRpc = false;
   testnetRpc = "http://testnet.phantasma.io:7077/rpc";
@@ -195,6 +218,32 @@ export default class extends Vue {
     if (!state.hasAccount) {
       this.$router.push("/addwallet");
     }
+
+    this.$root.$on(
+      "errorMessage",
+      (error: { msg: string; details: string }) => {
+        console.log("Error message: " + error.msg + " with " + error.details);
+        this.snackErrorMessage = error.msg;
+        this.snackErrorMessageDetails = error.details;
+        this.snackError = true;
+      }
+    );
+
+    this.$root.$on("checkTx", (tx: string) => {
+      setTimeout(async () => {
+        if (tx && tx !== "") {
+          const error = await state.checkTxError(tx);
+          if (error) {
+            let shortError =
+              error.length > 120 ? error.substring(0, 120) + "..." : error;
+            this.$root.$emit("errorMessage", {
+              msg: "There has been an error in the transaction:",
+              details: shortError,
+            });
+          }
+        }
+      }, 2500);
+    });
   }
 
   async changeCurrency() {

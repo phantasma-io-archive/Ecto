@@ -24,7 +24,7 @@
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
 
-      <v-tabs background-color="white" color="#17b1e8" right>
+      <v-tabs v-model="tabIndex" background-color="white" color="#17b1e8" right>
         <v-tab>Import</v-tab>
         <v-tab>Create</v-tab>
 
@@ -94,16 +94,27 @@
                 >Import Wallet</v-btn
               >
             </div>
+            <div class="ma-3">
+              Or if you don't have a wallet, you can
+              <a href="" @click.prevent="tabIndex = 1">
+                create a new one
+              </a>
+            </div>
           </v-container>
         </v-tab-item>
 
         <v-tab-item key="2">
           <v-container v-if="createStep === 0">
             <div style="padding: 80px 20px">
-              <!-- Text describing process -->
+              Every <strong>Phantasma wallet</strong> unlocks access to a rich
+              ecosystem of next generation <strong>Smart NFTs</strong>,
+              <strong>powerful dApps</strong>,
+              <strong>lightning fast transactions</strong> and a seamless user
+              experience. <br /><br />The best part?<br />
+              It's virtually free to use!
             </div>
             <v-btn block @click="generate">
-              Generate new wallet
+              Generate a new wallet
             </v-btn>
           </v-container>
           <v-container v-if="createStep === 1">
@@ -291,6 +302,8 @@ export default class extends Vue {
   isLoading = false;
   errorDialog = false;
   errorMessage = "";
+
+  tabIndex = 0;
 
   createStep = 0;
   newWif = "";

@@ -245,6 +245,13 @@ export class PopupState {
     });
   }
 
+  async checkTxError(tx: string): Promise<string | null> {
+    const txdata = await this.api.getTransaction(tx);
+    console.log("checkTx", txdata);
+    if (!txdata) return null;
+    return (txdata as any).error;
+  }
+
   clearAll() {
     chrome.storage.local.clear();
 
