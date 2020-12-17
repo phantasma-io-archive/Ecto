@@ -695,17 +695,14 @@ export default class extends Vue {
 
     try {
       this.isLoading = true;
+      let tx = "";
       if (this.needsWif) {
-        const tx = await state.signTx(txdata, this.wif);
-        console.log("tx successful: " + tx);
+        tx = await state.signTx(txdata, this.wif);
       } else if (this.needsPass) {
-        const tx = await state.signTxWithPassword(
-          txdata,
-          address,
-          this.password
-        );
-        console.log("tx successful: " + tx);
+        tx = await state.signTxWithPassword(txdata, address, this.password);
       }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
