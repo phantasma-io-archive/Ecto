@@ -1,5 +1,5 @@
 import bigInt from "big-integer";
-import { VMType } from './VMType';
+import { VMType } from "./VMType";
 
 export enum EventKind {
   Unknown = 0,
@@ -142,7 +142,7 @@ export class Decoder {
       case VMType.Number:
         return this.readBigIntAccurate();
       default:
-        return "unsupported type "+type;
+        return "unsupported type " + type;
     }
   }
 }
@@ -198,7 +198,7 @@ export function getInfusionEventData(str: string) {
   var dec = new Decoder(str);
   return {
     baseSymbol: dec.readString(),
-    TokenID: dec.readString(),
+    TokenID: dec.readBigIntAccurate(),
     InfusedSymbol: dec.readString(),
     InfusedValue: dec.readBigIntAccurate(),
     ChainName: dec.readString(),
