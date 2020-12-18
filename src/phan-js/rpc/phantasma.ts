@@ -264,16 +264,16 @@ export interface KeyValue {
 }
 
 export interface NFT {
-    ID: string;
-    series: string;
-    mint: string;
-    chainName: string;
-    ownerAddress: string;
-    creatorAddress: string;
-    ram: string;
-    rom: string;
-    infusion: KeyValue[];
-    properties: KeyValue[]; 
+  ID: string;
+  series: string;
+  mint: string;
+  chainName: string;
+  ownerAddress: string;
+  creatorAddress: string;
+  ram: string;
+  rom: string;
+  infusion: KeyValue[];
+  properties: KeyValue[];
 }
 
 export class PhantasmaAPI {
@@ -339,6 +339,11 @@ export class PhantasmaAPI {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
     let resJson = await res.json();
+    console.log("method", method, resJson);
+    if (resJson.error) {
+      if (resJson.error.message) return { error: resJson.error.message };
+      return { error: resJson.error };
+    }
     return await resJson.result;
   }
 
