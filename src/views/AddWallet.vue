@@ -19,7 +19,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-main style="width:320px; max-height:500px">
+    <v-main style="width:320px; max-height:540px">
       <v-overlay :value="isLoading">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
@@ -33,7 +33,7 @@
             class="overflow-y-auto overflow-x-hidden pa-0"
             style="max-height:500px"
           >
-            <div style="padding: 20px">
+            <div style="padding: 15px">
               Import a wallet with its address or name (read only), or its WIF
               (read/write). When using WIF you must protect it using a password.
             </div>
@@ -82,7 +82,7 @@
                 @click:append="showpass = !showpass"
               />
             </v-form>
-            <div style="padding: 20px">
+            <div style="padding: 10px 20px">
               <v-btn
                 block
                 @click="importWallet"
