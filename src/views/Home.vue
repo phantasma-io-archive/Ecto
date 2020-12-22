@@ -86,7 +86,7 @@
                   <div
                     v-if="
                       item.symbol == 'SOUL' &&
-                        account.data.stake > 50000 * 2 ** 8
+                        account.data.stake > 50000 * 10 ** 8
                     "
                     style="font-size: 10px; color:#42b3f4; position: absolute; bottom: 9px; left: 13px;"
                   >
