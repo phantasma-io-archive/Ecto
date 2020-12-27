@@ -185,18 +185,17 @@ export default class extends Vue {
           break;
         }
         case "TokenBurn": {
-          // const data = getTokenEventData(ev.data);
-          // if (ev.address != this.address) break;
-          // if (isFungible(data.symbol)) {
-          //   const amount = data.value;
-          //   res.push({ text: "Burned " + amount + " of " + data.symbol });
-          // } else {
-          //   const nftId = data.value;
-          //   res.push({
-          //     text: "Burned NFT " + nftId,
-          //     url: "https://www.22series.com/part_info?id=" + nftId,
-          //   });
-          // }
+          const data = getTokenEventData(ev.data);
+          if (ev.address != this.address) break;
+          if (isFungible(data.symbol)) {
+            const amount = data.value;
+            res.push({ text: "Burned " + amount + " " + data.symbol });
+          } else {
+            res.push({
+              icon: "mdi-fire",
+              text: "Burned NFT (" + data.symbol + ")"
+            });
+          }
           break;
         }
         case "TokenClaim": {
