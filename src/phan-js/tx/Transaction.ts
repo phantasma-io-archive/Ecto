@@ -22,7 +22,7 @@ export class Transaction {
     this.chainName = chainName;
     this.script = script;
     this.expiration = expiration;
-    this.payload = payload == null || payload == "" ? "5048572D30" : payload;
+    this.payload = payload == null || payload == "" ? "454354" : payload;
 
     this.signatures = [];
   }
