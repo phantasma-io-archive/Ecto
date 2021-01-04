@@ -23,7 +23,7 @@
         style="z-index:7777"
       ></v-progress-linear>
       <div class="pl-3 pr-3" style="overflow: auto; height: 500px">
-        <div class="pa-0 ma-0 mt-1">
+        <div class="pa-0 ma-0 mt-1 mb-2">
           <v-row>
             <v-col class="pl-3 pt-1 flex-grow-1">
               <v-text-field
