@@ -9,14 +9,14 @@
     @click:outside="close"
   >
     <v-card>
-      <v-card-title class="overline">Error</v-card-title>
+      <v-card-title class="overline">{{ $t('errorDialog.errorDescription') }}</v-card-title>
       <v-card-text>
         {{ message }}
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click="close">
-          Cancel
+          {{ $t('errorDialog.cancelButton') }}
         </v-btn>
       </v-card-actions>
     </v-card>

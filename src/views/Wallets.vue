@@ -5,7 +5,7 @@
 
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>SELECT WALLET</v-list-item-title>
+          <v-list-item-title>{{ $t('wallets.select') }}</v-list-item-title>
           <v-list-item-subtitle></v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -44,7 +44,7 @@
       </v-list>
 
       <div style="padding: 20px">
-        <v-btn block @click="$router.push('/addwallet')">Add Wallet</v-btn>
+        <v-btn block @click="$router.push('/addwallet')">{{ $t('wallets.add') }}</v-btn>
       </div>
     </v-main>
   </div>
@@ -66,19 +66,21 @@ import PopupMenuComponent from "@/components/PopupMenu.vue";
 export default class extends Vue {
   state = state;
 
-  popupActions = [
-    // { icon: 'mdi-pen', title: "Add password", subtitle: "Store WIF with password", action: this.addPassword },
-    // { divider: true },
-    {
-      icon: "mdi-delete",
-      title: "Remove account",
-      subtitle: "Removes account",
-      action: this.deleteAccount,
-    },
-  ];
+popupActions: any[] = []
+desc: any = {}
 
   async mounted() {
     await this.state.check();
+    this.popupActions = [
+      // { icon: 'mdi-pen', title: "Add password", subtitle: "Store WIF with password", action: this.addPassword },
+      // { divider: true },
+      {
+        icon: "mdi-delete",
+        title: this.$i18n.t('wallets.title').toString(),
+        subtitle: this.$i18n.t('wallets.subtitle').toString(),
+        action: this.deleteAccount,
+      },
+    ];
   }
 
   getShorterAddress(account: Account): string {
@@ -102,13 +104,13 @@ export default class extends Vue {
   }
 
   getTypeDesc(type: string): string {
-    const desc: { [key: string]: string } = {
-      encKey: "Requires password",
-      unverified: "Read-only unverified account",
-      verified: "Requires WIF",
+    this.desc = {
+      encKey: this.$i18n.t('wallets.encKey').toString(),
+      unverified: this.$i18n.t('wallets.unverified').toString(),
+      verified: this.$i18n.t('wallets.verified').toString(),
     };
 
-    return desc[type];
+    return this.desc[type];
   }
 
   async gotoAccount(account: WalletAccount) {

@@ -47,6 +47,7 @@ export class PopupState {
   private _accounts: WalletAccount[] = [];
   private _authorizations: IAuthorization[] = [];
   private _currency: string = "USD";
+  private _language: string = "English";
   private _currenciesRate: any;
   private _nexus: string = "MainNet";
   private _simnetRpc = "http://localhost:7077/rpc";
@@ -76,6 +77,10 @@ export class PopupState {
 
   get currency() {
     return this._currency;
+  }
+
+  get language() {
+    return this._language;
   }
 
   get nexus() {
@@ -266,6 +271,18 @@ export class PopupState {
       chrome.storage.local.set(
         {
           currency: this._currency,
+        },
+        () => resolve()
+      );
+    });
+  }
+
+  async setLanguage(language: string): Promise<void> {
+    this._language = language;
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          language: this._language,
         },
         () => resolve()
       );

@@ -21,7 +21,7 @@
         style="max-height:400px; font-size:10px; text-align:center"
       >
         <div class="text-subtitle-1 mt-4">
-          This is your wallet's public address
+          {{ $t('qr.description') }}
         </div>
         <v-skeleton-loader
           v-if="isLoading"
@@ -33,7 +33,7 @@
         {{ account.address }}
         <br />
         <a href="" @click.prevent="copyAddressToClipboard()"
-          >copy to clipboard</a
+          >{{ $t('qr.copy') }}</a
         >
       </v-container>
     </v-main>
@@ -53,6 +53,8 @@ export default class extends Vue {
   isLoading = true;
   imgSrc = "";
 
+  messageNoWallet = "";
+
   state = state;
 
   goto(route: string) {
@@ -64,7 +66,8 @@ export default class extends Vue {
   }
 
   get shorterAddress(): string {
-    if (!this.account) return "<no wallet>";
+    this.messageNoWallet = this.$i18n.t('qr.noWallet').toString()
+    if (!this.account) return this.messageNoWallet;
 
     if (this.account.data.name && this.account.data.name != "")
       return this.account.data.name;
@@ -78,7 +81,8 @@ export default class extends Vue {
   }
 
   get shortAddress(): string {
-    if (!this.account) return "<no wallet>";
+    this.messageNoWallet = this.$i18n.t('qr.noWallet').toString()
+    if (!this.account) return this.messageNoWallet;
 
     let addr = this.account.address;
     return (

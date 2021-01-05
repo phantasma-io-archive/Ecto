@@ -6,7 +6,7 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>PHANTASMA LINK</v-list-item-title>
-          <v-list-item-subtitle>Data sign request</v-list-item-subtitle>
+          <v-list-item-subtitle>{{ $t('signData.request') }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-spacer />
@@ -39,7 +39,7 @@
         </v-row>
 
         <div style="padding-right: 30px">
-          Do you want to allow to sign tx for
+          {{ $t('signData.description') }}
           <strong>{{ currentAccountDescription }}</strong
           >?
         </div>
@@ -75,7 +75,7 @@
           <v-text-field
             tabindex="1"
             type="password"
-            label="Password"
+            :label="$t('signData.password')"
             v-model="password"
             required
             autocorrect="off"
@@ -87,14 +87,14 @@
 
         <v-row style="margin-top:50px">
           <v-col>
-            <v-btn secondary style="width: 85%" @click="refuse()">Refuse</v-btn>
+            <v-btn secondary style="width: 85%" @click="refuse()">{{ $t('signData.refuse') }}</v-btn>
           </v-col>
           <v-col>
             <v-btn
               dark
               style="width: 85%; background-color:#17b1e7"
               @click="signData()"
-              >Sign data</v-btn
+              >{{ $t('signData.signData') }}</v-btn
             >
           </v-col>
         </v-row>
@@ -102,10 +102,10 @@
 
       <v-dialog v-model="errorDialog" persistent max-width="290">
         <v-card>
-          <v-card-title class="title">Error</v-card-title>
+          <v-card-title class="title">{{ $t('signData.error') }}</v-card-title>
           <v-card-text>{{ errorMessage }}</v-card-text>
           <v-card-actions>
-            <v-btn color="blue darken-1" text @click="refuse()">Cancel</v-btn>
+            <v-btn color="blue darken-1" text @click="refuse()">{{ $t('signData.cancel') }}</v-btn>
             <v-spacer />
             <v-btn
               color="blue darken-1"
@@ -114,7 +114,7 @@
                 isLoading = false;
                 errorDialog = false;
               "
-              >Retry</v-btn
+              >{{ $t('signData.retry') }}</v-btn
             >
           </v-card-actions>
         </v-card>
@@ -143,6 +143,8 @@ export default class extends Vue {
   hostname = "";
   domain = "";
   faviconUrl = "";
+
+  messageRejected = "";
 
   state = state;
 
@@ -196,11 +198,13 @@ export default class extends Vue {
     const tabid = parseInt(this.$route.params.tabid);
     const sid = this.$route.params.sid;
 
+    this.messageRejected = this.$i18n.t('signData.rejected').toString()
+
     chrome.runtime.sendMessage({
       uid: "plsres",
       tabid,
       sid,
-      data: { id, success: false, message: "user rejected" },
+      data: { id, success: false, message: this.messageRejected },
     });
     window.close();
   }
@@ -224,6 +228,8 @@ export default class extends Vue {
       .toUpperCase();
     const allData = random + hexdata;
 
+    this.messageRejected = this.$i18n.t('signData.rejected').toString()
+
     try {
       if (this.needsWif) {
         if (state.isWifValidForAccount(this.wif))
@@ -231,7 +237,7 @@ export default class extends Vue {
         else {
           this.errorDialog = true;
           this.errorMessage =
-            "WIF is not valid for address " + state.currentAccount?.address;
+            this.messageRejected + " " + state.currentAccount?.address;
         }
       } else
         signature = await state.signDataWithPassword(

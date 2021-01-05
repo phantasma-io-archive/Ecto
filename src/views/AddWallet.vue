@@ -5,7 +5,7 @@
 
       <v-list-item link @click="goto('/wallets')">
         <v-list-item-content>
-          <v-list-item-title>ADD WALLET</v-list-item-title>
+          <v-list-item-title>{{ $t('addWallet.add') }}</v-list-item-title>
           <v-list-item-subtitle></v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -25,8 +25,8 @@
       </v-overlay>
 
       <v-tabs v-model="tabIndex" background-color="white" color="#17b1e8" right>
-        <v-tab>Import</v-tab>
-        <v-tab>Create</v-tab>
+        <v-tab>{{ $t('addWallet.import') }}</v-tab>
+        <v-tab>{{ $t('addWallet.create') }}</v-tab>
 
         <v-tab-item key="1">
           <v-container
@@ -34,8 +34,7 @@
             style="max-height:500px"
           >
             <div style="padding: 15px">
-              Import a wallet with its address or name (read only), or its WIF
-              (read/write). When using WIF you must protect it using a password.
+              {{ $t('addWallet.description1') }}
             </div>
 
             <v-form
@@ -44,7 +43,7 @@
             >
               <v-text-field
                 tabindex="1"
-                label="Wallet address or name"
+                :label="$t('addWallet.labelAddress')"
                 v-model="addressOrName"
                 required
                 autocorrect="off"
@@ -53,12 +52,12 @@
                 prepend-icon="mdi-account"
               />
 
-              <span style="padding:120px">OR</span>
+              <span style="padding:120px">{{ $t('addWallet.or') }}</span>
 
               <v-text-field
                 tabindex="2"
                 type="password"
-                label="WIF or hex private key"
+                :label="$t('addWallet.labelWIF')"
                 v-model="wif"
                 required
                 autocorrect="off"
@@ -70,12 +69,12 @@
 
               <v-text-field
                 tabindex="3"
-                label="Password"
+                :label="$t('addWallet.labelPassword')"
                 v-model="password"
                 autocorrect="off"
                 autocapitalize="off"
                 spellcheck="false"
-                hint="Use at least 6 characters"
+                :hint="$t('addWallet.hintPassword')"
                 prepend-icon="mdi-lock"
                 :type="showpass ? 'text' : 'password'"
                 :append-icon="showpass ? 'mdi-eye' : 'mdi-eye-off'"
@@ -91,13 +90,13 @@
                     (!(wif.length == 52 || wif.length == 64) ||
                       password.length < 6)
                 "
-                >Import Wallet</v-btn
+                >{{ $t('addWallet.importLong') }}</v-btn
               >
             </div>
             <div class="ma-3">
-              Or if you don't have a wallet, you can
+              {{ $t('addWallet.description2') }}
               <a href="" @click.prevent="tabIndex = 1">
-                create a new one
+                {{ $t('addWallet.description3') }}
               </a>
             </div>
           </v-container>
@@ -105,28 +104,21 @@
 
         <v-tab-item key="2">
           <v-container v-if="createStep === 0">
-            <div style="padding: 80px 20px">
-              Every <strong>Phantasma wallet</strong> unlocks access to a rich
-              ecosystem of next generation <strong>Smart NFTs</strong>,
-              <strong>powerful dApps</strong>,
-              <strong>lightning fast transactions</strong> and a seamless user
-              experience. <br /><br />The best part?<br />
-              It's virtually free to use!
+            <div v-html="i18n.descriptionLong" style="padding: 80px 20px">
             </div>
             <v-btn block @click="generate">
-              Generate a new wallet
+              {{ $t('addWallet.generate') }}
             </v-btn>
           </v-container>
           <v-container v-if="createStep === 1">
             <div class="mb-5" style="padding: 20px 8px">
-              Wallet created with the following address and private key (WIF
-              format)
+              {{ $t('addWallet.created') }}
             </div>
             <v-textarea
               v-model="newAddress"
               readonly
               class="mx-2"
-              label="Address"
+              :label="$t('addWallet.labelAddressShort')"
               rows="2"
             ></v-textarea>
             <v-textarea
@@ -137,12 +129,12 @@
               rows="2"
             ></v-textarea>
             <v-btn block primary class="mt-3" @click="copyWifDialog = true">
-              Import wallet
+              {{ $t('addWallet.importLong') }}
             </v-btn>
             <div class="ma-3 mt-6">
-              Or if you don't like it, you can
+              {{ $t('addWallet.description4') }}
               <a href="" @click.prevent="generate">
-                generate another one
+                {{ $t('addWallet.description5') }}
               </a>
             </div>
           </v-container>
@@ -162,12 +154,11 @@
 
           <v-dialog v-model="copyWifDialog" max-width="290">
             <v-card>
-              <v-card-title class="headline">Backup your WIF</v-card-title>
+              <v-card-title class="headline">{{ $t('addWallet.backup') }}</v-card-title>
 
               <v-card-text>
                 <span>
-                  You only need your WIF to recover your wallet. Make sure you
-                  always have a secure backup.
+                  {{ $t('addWallet.recover') }}
                 </span>
                 <v-spacer class="ma-3" />
 
@@ -181,7 +172,7 @@
                   rows="3"
                 ></v-textarea>
                 <v-btn block small @click="copyWifToClipboard"
-                  >Copy to clipboard
+                  >{{ $t('addWallet.copy') }}
                   <v-icon right>mdi-content-copy</v-icon></v-btn
                 >
               </v-card-text>
@@ -192,7 +183,7 @@
                   text
                   @click="copyWifDialog = false"
                 >
-                  No
+                  {{ $t('addWallet.no') }}
                 </v-btn>
 
                 <v-spacer></v-spacer>
@@ -204,7 +195,7 @@
                     setPassDialog = true;
                   "
                 >
-                  Yes, I did a backup
+                  {{ $t('addWallet.backupConfirm') }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -212,12 +203,11 @@
 
           <v-dialog v-model="setPassDialog" max-width="290">
             <v-card>
-              <v-card-title class="headline">Set password</v-card-title>
+              <v-card-title class="headline">{{ $t('addWallet.setPassword') }}</v-card-title>
 
               <v-card-text>
                 <span>
-                  Insert a password to secure your wallet. You can always use
-                  WIF to recover it.
+                  {{ $t('addWallet.secure') }}
                 </span>
                 <v-spacer />
 
@@ -225,7 +215,7 @@
                   <v-text-field
                     tabindex="1"
                     type="password"
-                    label="Password"
+                    :label="$t('addWallet.labelPassword')"
                     v-model="password"
                     required
                     autocorrect="off"
@@ -245,7 +235,7 @@
                     setPassDialog = false;
                   "
                 >
-                  Cancel
+                  {{ $t('addWallet.cancel') }}
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn
@@ -256,7 +246,7 @@
                     importWallet();
                   "
                 >
-                  Import wallet
+                  {{ $t('addWallet.importLong') }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -298,6 +288,7 @@ export default class extends Vue {
   addressOrName = "";
   wif = "";
   password = "";
+  setPassDialog = false;
   showpass = false;
   isLoading = false;
   errorDialog = false;
@@ -312,15 +303,28 @@ export default class extends Vue {
 
   state = state;
 
+  errorMessage1 = "";
+  errorMessage2 = "";
+  errorMessage3 = "";
+
+  get i18n() {
+    return {
+      descriptionLong: this.$t('addWallet.descriptionLong')
+    };
+  }
+
   async importWallet() {
     console.log("Going to import wallet");
+    this.errorMessage1 = this.$i18n.t('addWallet.errorMessage1').toString();
+    this.errorMessage2 = this.$i18n.t('addWallet.errorMessage2').toString();
+    this.errorMessage3 = this.$i18n.t('addWallet.errorMessage3').toString();
     if (this.wif.length == 52 && this.password.length >= 6) {
       try {
         this.isLoading = true;
         let account = await state.addAccountWithWif(this.wif, this.password);
         this.$router.push("/");
       } catch (err) {
-        this.errorMessage = "Error importing WIF wallet";
+        this.errorMessage = this.errorMessage1;
         this.errorDialog = true;
       }
     } else if (this.wif.length == 64 && this.password.length >= 6) {
@@ -329,7 +333,7 @@ export default class extends Vue {
         let account = await state.addAccountWithHex(this.wif, this.password);
         this.$router.push("/");
       } catch (err) {
-        this.errorMessage = "Error importing HEX wallet";
+        this.errorMessage = this.errorMessage2;
         this.errorDialog = true;
       }
     } else {
@@ -338,7 +342,7 @@ export default class extends Vue {
         let account = await state.addAccount(this.addressOrName);
         this.$router.push("/");
       } catch (err) {
-        this.errorMessage = "Error importing wallet";
+        this.errorMessage = this.errorMessage3;
         this.errorDialog = true;
       }
     }

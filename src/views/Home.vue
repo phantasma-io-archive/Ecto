@@ -28,8 +28,8 @@
         color="#17b1e8"
         right
       >
-        <v-tab>Assets</v-tab>
-        <v-tab @change="onActivityTab">Activity</v-tab>
+        <v-tab>{{ $t('home.assets') }}</v-tab>
+        <v-tab @change="onActivityTab">{{ $t('home.activity') }}</v-tab>
 
         <v-tab-item key="1">
           <v-container
@@ -39,37 +39,35 @@
             <div
               v-if="
                 noKcal() &&
-                  account.data.stake > 2 * 10 ** 8 &&
+                  account && account.data && account.data.stake >= 2 * 10 ** 8 &&
                   account.data.name == 'anonymous'
               "
               class="pa-5"
             >
-              KCAL is used for every transaction on the blockchain. You get
-              0.002 KCAL per SOUL staked daily. You can claim some now.
-              <a href="" @click.prevent="claimDialog = true">claim KCAL</a>
+              {{ $t('home.kcalExplanation') }}
+              <a href="" @click.prevent="claimDialog = true">{{ $t('home.claim') }} KCAL</a>
             </div>
             <div
               v-else-if="
-                account.data.stake > 2 * 10 ** 8 &&
+                account && account.data && account.data.stake >= 2 * 10 ** 8 &&
                   account.data.name == 'anonymous'
               "
               class="pa-5"
             >
-              You can use your account with a name instead of a public address.
+              {{ $t('home.registerMain') }}
               <a href="" @click.prevent="registerNameDialog = true"
-                >register a name</a
+                >{{ $t('home.registerTitle') }}</a
               >
             </div>
             <div
-              v-else-if="account.data.stake == 0 && getUnstackedSoul() == '0'"
+              v-else-if="account && account.data && account.data.stake == 0 && getUnstackedSoul() == '0'"
               class="pa-5"
             >
-              Go and get some SOUL :)
+              {{ $t('home.registerDescription3') }}
             </div>
-            <div v-else-if="account.data.stake == 0" class="pa-5">
-              Stake SOUL to register a name and get daily KCAL rewards. Minimum
-              stake period is 24 hours.
-              <a href="" @click.prevent="stakeDialog = true">stake</a>
+            <div v-else-if="account && account.data && account.data.stake == 0" class="pa-5">
+              {{ $t('home.registerDescription2') }}
+              <a href="" @click.prevent="stakeDialog = true">{{ $t('home.stake') }}</a>
             </div>
             <v-expansion-panels
               v-if="account"
@@ -86,7 +84,7 @@
                   <div
                     v-if="
                       item.symbol == 'SOUL' &&
-                        account.data.stake > 50000 * 10 ** 8
+                        account.data.stake >= 50000 * 10 ** 8
                     "
                     style="font-size: 10px; color:#42b3f4; position: absolute; bottom: 9px; left: 13px;"
                   >
@@ -120,7 +118,7 @@
                       v-if="item.symbol == 'SOUL'"
                       @click.stop="unstakeDialog = true"
                       :disabled="account.data.stake == 0"
-                      ><v-icon>mdi-bank-transfer-out</v-icon> Unstake</v-btn
+                      ><v-icon>mdi-bank-transfer-out</v-icon> {{ $t('home.unstake') }}</v-btn
                     >
                     <v-btn
                       small
@@ -128,7 +126,7 @@
                       v-if="item.symbol == 'SOUL'"
                       @click.stop="stakeDialog = true"
                       :disabled="getUnstackedSoul() == '0'"
-                      ><v-icon>mdi-bank-transfer-in</v-icon> Stake</v-btn
+                      ><v-icon>mdi-bank-transfer-in</v-icon> {{ $t('home.stake') }}</v-btn
                     >
                     <v-btn
                       small
@@ -136,7 +134,7 @@
                       v-if="item.symbol == 'KCAL'"
                       @click.stop="claimDialog = true"
                       :disabled="account.data.unclaimed == 0"
-                      ><v-icon>mdi-piggy-bank</v-icon> Claim</v-btn
+                      ><v-icon>mdi-piggy-bank</v-icon> {{ $t('home.claim') }}</v-btn
                     >
                     <v-btn
                       small
@@ -144,7 +142,7 @@
                       v-if="item.symbol == 'TTRS'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
-                      ><v-icon>mdi-eye</v-icon> view</v-btn
+                      ><v-icon>mdi-eye</v-icon> {{ $t('home.view') }}</v-btn
                     >
                     <v-btn
                       small
@@ -152,7 +150,7 @@
                       v-if="item.symbol == 'CROWN'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
-                      ><v-icon>mdi-eye</v-icon> view</v-btn
+                      ><v-icon>mdi-eye</v-icon> {{ $t('home.view') }}</v-btn
                     >
                     <v-btn
                       small
@@ -160,14 +158,14 @@
                       v-if="item.symbol == 'GHOST'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
-                      ><v-icon>mdi-eye</v-icon> view</v-btn
+                      ><v-icon>mdi-eye</v-icon> {{ $t('home.view') }}</v-btn
                     >
                     <v-btn
                       small
                       text
                       @click="transferAsset($event, item)"
                       :disabled="item.amount == 0"
-                      ><v-icon>mdi-export</v-icon> Send</v-btn
+                      ><v-icon>mdi-export</v-icon> {{ $t('home.send') }}</v-btn
                     >
                   </div>
                 </v-expansion-panel-content>
@@ -199,7 +197,7 @@
                         :href="getExplorerLink(item.hash)"
                         target="_blank"
                         rel="noopener noreferrer"
-                        >view</a
+                        >{{ $t('home.view') }}</a
                       >
                     </td>
                   </tr>
@@ -225,7 +223,7 @@
                 class="ma-1"
                 color="blue darken-1"
                 @click="loadMoreTxs"
-                >Load more</v-btn
+                >{{ $t('home.load') }}</v-btn
               >
             </div>
           </div>
@@ -236,12 +234,11 @@
 
     <v-dialog v-if="claimDialog" v-model="claimDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Claim KCAL?</v-card-title>
+        <v-card-title class="headline">{{ $t('home.claim') }} KCAL?</v-card-title>
 
         <v-card-text>
-          You are going to claim
-          {{ getKcalUnclaimed() }} KCAL. This claims KCAL in advance, so you
-          won't be able to unstake during 24h.
+          {{ $t('home.claimDesc1') }}
+          {{ getKcalUnclaimed() }} {{ $t('home.claimDesc2') }}
 
           <v-spacer />
         </v-card-text>
@@ -250,11 +247,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="claimDialog = false">
-            Disagree
+            {{ $t('home.disagree') }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askClaimKcal">
-            Agree
+            {{ $t('home.agree') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -262,11 +259,10 @@
 
     <v-dialog v-model="stakeDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Stake SOUL</v-card-title>
+        <v-card-title class="headline">{{ $t('home.stake') }} SOUL</v-card-title>
 
         <v-card-text class="pb-0">
-          You have {{ getUnstackedSoul() }} unstaked SOUL. How many do you want
-          to stake?
+          {{ $t('home.have') }} {{ getUnstackedSoul() }} SOUL. {{ $t('home.haveStake') }}
 
           <v-slider
             v-model="stakeSoulAmount"
@@ -283,7 +279,7 @@
           >
           <v-row style="margin-top:-25px">
             <v-col class="mt-3">
-              Add to Stakes
+              {{ $t('home.addStakes') }}
             </v-col>
             <v-col>
               <v-text-field
@@ -300,7 +296,7 @@
           </v-row>
           <v-row style="margin-top:-18px">
             <v-col class="mt-3">
-              Result Stakes
+              {{ $t('home.resultStakes') }}
             </v-col>
             <v-col>
               <v-text-field
@@ -322,11 +318,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="stakeDialog = false">
-            Cancel
+            {{ $t('home.cancel') }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askStakeSoul">
-            Stake
+            {{ $t('home.stake') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -334,11 +330,10 @@
 
     <v-dialog v-model="unstakeDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Unstake SOUL</v-card-title>
+        <v-card-title class="headline">{{ $t('home.unstake') }} SOUL</v-card-title>
 
         <v-card-text class="pb-0">
-          You have {{ getStackedSoul() }} staked SOUL. How many do you want to
-          unstake?
+          {{ $t('home.have') }} {{ getStackedSoul() }} {{ $t('home.haveUnstake') }}
 
           <v-slider
             v-model="unstakeSoulAmount"
@@ -355,7 +350,7 @@
           >
           <v-row class="mb-0" style="margin-top:-25px">
             <v-col class="mt-3">
-              Remove from Stakes
+              {{ $t('home.removeStakes') }}
             </v-col>
             <v-col>
               <v-text-field
@@ -372,7 +367,7 @@
           </v-row>
           <v-row style="margin-top:-20px">
             <v-col class="mt-3">
-              Result Stakes
+              {{ $t('home.resultStakes') }}
             </v-col>
             <v-col>
               <v-text-field
@@ -394,11 +389,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="unstakeDialog = false">
-            Cancel
+            {{ $t('home.cancel') }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askUnstakeSoul">
-            Unstake
+            {{ $t('home.unstake') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -406,11 +401,10 @@
 
     <v-dialog v-model="sendDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Send {{ sendSymbol }}</v-card-title>
+        <v-card-title class="headline">{{ $t('home.send') }} {{ sendSymbol }}</v-card-title>
 
         <v-card-text class="pb-0">
-          You have {{ sendMaxAmount }} {{ sendSymbol }}. How many do you want to
-          send?
+          {{ $t('home.have') }} {{ sendMaxAmount }} {{ sendSymbol }}. {{ $t('home.sendAmount2') }}
 
           <v-slider
             v-model="sendAmount"
@@ -427,7 +421,7 @@
           >
           <v-row style="margin-top:-25px">
             <v-col class="mt-3">
-              Send Amount
+              {{ $t('home.sendAmount') }}
             </v-col>
             <v-col>
               <v-text-field
@@ -444,7 +438,7 @@
           </v-row>
           <v-row style="margin-top:-20px">
             <v-col class="mt-4">
-              Remaining
+              {{ $t('home.remaining') }}
             </v-col>
             <v-col>
               <v-text-field
@@ -464,11 +458,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="sendDialog = false">
-            Cancel
+            {{ $t('home.cancel') }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askSendWhere">
-            Next
+            {{ $t('home.next') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -476,11 +470,11 @@
 
     <v-dialog v-model="sendWhereDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Destination</v-card-title>
+        <v-card-title class="headline">{{ $t('home.destination') }}</v-card-title>
 
         <v-card-text>
           <span>
-            Select where do you want to send {{ sendAmount }} {{ sendSymbol }}
+            {{ $t('home.destinationDesc') }} {{ sendAmount }} {{ sendSymbol }}
           </span>
           <br />
           <v-spacer />
@@ -488,7 +482,7 @@
           <v-form class="mt-5" @submit.prevent>
             <v-combobox
               :items="accountSendList"
-              label="Dest address or name"
+              :label="$t('home.labelDest')"
               v-model="sendDestination"
               required
               autocorrect="off"
@@ -518,11 +512,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="sendWhereDialog = false">
-            Cancel
+            {{ $t('home.cancel') }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askSend">
-            Next
+            {{ $t('home.next') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -530,14 +524,14 @@
 
     <v-dialog v-model="signTxDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Authorize TX</v-card-title>
+        <v-card-title class="headline">{{ $t('home.authorize') }}</v-card-title>
 
         <v-card-text>
           <span v-if="needsWif">
-            Insert your WIF to sign transaction.
+            {{ $t('home.insertWIF') }}
           </span>
           <span v-if="needsPass">
-            Insert your password to sign transaction.
+            {{ $t('home.insertPassword') }}
           </span>
           <v-spacer />
 
@@ -569,7 +563,7 @@
             <v-text-field
               tabindex="1"
               type="password"
-              label="Password"
+              :label="$t('home.labelPassword')"
               v-model="password"
               required
               autocorrect="off"
@@ -584,11 +578,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="closeSignTx">
-            Cancel
+            {{ $t('home.cancel') }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="doSignTx">
-            Sign TX
+            {{ $t('home.sign') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -596,19 +590,18 @@
 
     <v-dialog v-model="registerNameDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Register name</v-card-title>
+        <v-card-title class="headline">{{ $t('home.register') }}</v-card-title>
 
         <v-card-text>
           <span>
-            Your address name can be used as your public address. Be aware, you
-            need to keep 2 SOUL staked or you will lose your name.
+            {{ $t('home.registerDescription') }}
           </span>
           <br />
           <v-spacer class="ma-4" />
 
           <v-text-field
             v-model="nameToRegister"
-            label="Pick your name"
+            :label="$t('home.labelPick')"
           ></v-text-field>
         </v-card-text>
 
@@ -616,7 +609,7 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="registerNameDialog = false">
-            Cancel
+            {{ $t('home.cancel') }}
           </v-btn>
 
           <v-btn
@@ -625,7 +618,7 @@
             :disabled="nameToRegister.length < 3 || nameToRegister.length > 15"
             @click="askRegisterName"
           >
-            Next
+            {{ $t('home.next') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -763,7 +756,7 @@ export default class extends Vue {
   }
 
   get shorterAddress(): string {
-    if (!this.account) return "<no wallet>";
+    if (!this.account) return this.$t('home.errorMessage1').toString();
 
     if (this.account.data.name && this.account.data.name != "")
       return this.account.data.name;
@@ -777,7 +770,7 @@ export default class extends Vue {
   }
 
   get shortAddress(): string {
-    if (!this.account) return "<no wallet>";
+    if (!this.account) return this.$t('home.errorMessage1').toString();
 
     let addr = this.account.address;
     return (
@@ -873,11 +866,11 @@ export default class extends Vue {
 
     if (item.symbol == "SOUL")
       return (
-        "Staked " + this.formatBalance(this.account.data.stake, 8) + " SOUL"
+        this.$t('home.secondLine1').toString() + " " + this.formatBalance(this.account.data.stake, 8) + " SOUL"
       );
     if (item.symbol == "KCAL")
       return (
-        "Unclaimed " +
+        this.$t('home.secondLine2').toString() + " " +
         this.formatBalance(this.account.data.unclaimed, 10) +
         " KCAL"
       );

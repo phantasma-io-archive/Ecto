@@ -137,12 +137,47 @@ export default class extends Vue {
 
   descriptions: any[] = [];
 
+  txSetName = "";
+  txMinted = "";
+  txBurned = "";
+  txClaimed = "";
+  txStaked = "";
+  txSwaped = "";
+  txSentTo = "";
+  txPaid = "";
+  txSent = "";
+  txFrom = "";
+  txFor = "";
+  txReceived = "";
+  txListed = "";
+  txnftSale = "";
+  txInfused = "";
+  txWith = "";
+  txUnshown = "";
+
   mounted() {
     this.descriptions = this.getDescriptions();
   }
 
   getDescriptions(): any[] {
     let res: any[] = [];
+    this.txSetName = this.$i18n.t('transactionComponent.setName').toString();
+    this.txMinted = this.$i18n.t('transactionComponent.minted').toString();
+    this.txBurned = this.$i18n.t('transactionComponent.burned').toString();
+    this.txClaimed = this.$i18n.t('transactionComponent.claimed').toString();
+    this.txStaked = this.$i18n.t('transactionComponent.staked').toString();
+    this.txSwaped = this.$i18n.t('transactionComponent.swaped').toString();
+    this.txSentTo = this.$i18n.t('transactionComponent.sentTo').toString();
+    this.txPaid = this.$i18n.t('transactionComponent.paid').toString();
+    this.txSent = this.$i18n.t('transactionComponent.sent').toString();
+    this.txFrom = this.$i18n.t('transactionComponent.from').toString();
+    this.txFor = this.$i18n.t('transactionComponent.for').toString();
+    this.txReceived = this.$i18n.t('transactionComponent.received').toString();
+    this.txListed = this.$i18n.t('transactionComponent.listed').toString();
+    this.txnftSale = this.$i18n.t('transactionComponent.nftSale').toString();
+    this.txInfused = this.$i18n.t('transactionComponent.infused').toString();
+    this.txWith = this.$i18n.t('transactionComponent.with').toString();
+    this.txUnshown = this.$i18n.t('transactionComponent.unshown').toString();
 
     if (this.tx == null || this.tx.events == null) {
       console.log("TX undefined or no events");
@@ -156,7 +191,7 @@ export default class extends Vue {
         case "AddressRegister": {
           res.push({
             icon: "mdi-account",
-            text: "Set name: " + getString(ev.data),
+            text: this.txSetName + ": " + getString(ev.data),
           });
           break;
         }
@@ -167,14 +202,14 @@ export default class extends Vue {
             const amount = data.value;
             res.push({
               icon: "mdi-plus-circle-outline",
-              text: "Minted " + formatSymbol(amount, data.symbol),
+              text: this.txMinted + " " + formatSymbol(amount, data.symbol),
             });
           } else {
             const nftId = data.value;
             if (ev.address == this.address) {
               res.push({
                 icon: "mdi-plus-circle-outline",
-                text: "Minted NFT (" /*+ nftId + " of "*/ + data.symbol + ")",
+                text: this.txMinted + " NFT (" /*+ nftId + " of "*/ + data.symbol + ")",
                 postIcon: "mdi-eye-outline",
                 postIconColor: "gray",
                 nftId,
@@ -189,11 +224,14 @@ export default class extends Vue {
           if (ev.address != this.address) break;
           if (isFungible(data.symbol)) {
             const amount = data.value;
-            res.push({ text: "Burned " + amount + " " + data.symbol });
+            res.push({ 
+              icon: "mdi-fire",
+              text: this.txBurned + " " + formatSymbol(amount, data.symbol)
+            });
           } else {
             res.push({
               icon: "mdi-fire",
-              text: "Burned NFT (" + data.symbol + ")"
+              text: this.txBurned + " NFT (" + data.symbol + ")"
             });
           }
           break;
@@ -205,13 +243,13 @@ export default class extends Vue {
             const amount = data.value;
             res.push({
               icon: "mdi-star-outline",
-              text: "Claimed " + formatSymbol(amount, data.symbol),
+              text: this.txClaimed + " " + formatSymbol(amount, data.symbol),
             });
           } else if (!isFungible(data.symbol)) {
             const nftId = data.value;
             res.push({
-              icon: "mdi-plus-circle-outline",
-              text: "Claimed NFT (" + data.symbol + ")",
+              icon: "mdi-star-outline",
+              text: this.txClaimed + " NFT (" + data.symbol + ")",
               postIcon: "mdi-eye-outline",
               postIconColor: "gray",
               nftId,
@@ -227,14 +265,14 @@ export default class extends Vue {
             const amount = data.value;
             res.push({
               icon: "mdi-bank-transfer-in",
-              text: "Staked " + formatSymbol(amount, data.symbol),
+              text: this.txStaked + " " + formatSymbol(amount, data.symbol),
             });
           }
           if (ev.contract == "swap") {
             const amount = data.value;
             res.push({
               icon: "mdi-swap-horizontal",
-              text: "Swaped " + formatSymbol(amount, data.symbol),
+              text: this.txSwaped + " " + formatSymbol(amount, data.symbol),
             });
           }
           break;
@@ -248,7 +286,7 @@ export default class extends Vue {
               let isPayment = false;
 
               if (i + 1 < events.length && ev.data == events[i + 1].data) {
-                to = "Sent to " + formatAddress(events[i + 1].address);
+                to = this.txSentTo + " " + formatAddress(events[i + 1].address);
                 isPayment =
                   events[i + 1].address ==
                   "S3dBVkyE9kdfbBjh7HMEr1BfPTg53CeSWaj3srYzBTZ4vyK";
@@ -258,27 +296,27 @@ export default class extends Vue {
                 res.push({
                   icon: "mdi-cash",
                   iconColor: "red",
-                  text: "Paid " + formatSymbol(amount, data.symbol),
+                  text: this.txPaid + " " + formatSymbol(amount, data.symbol),
                 });
               else
                 res.push({
                   icon: "mdi-arrow-right-bold-outline",
                   iconColor: "red",
-                  text: "Sent " + formatSymbol(amount, data.symbol),
+                  text: this.txSent + " " + formatSymbol(amount, data.symbol),
                   tooltip: to,
                 });
             } else {
               const nftId = data.value;
               let to = null;
               if (i + 1 < events.length && ev.data == events[i + 1].data) {
-                to = "Sent to " + formatAddress(events[i + 1].address);
+                to = this.txSentTo + " " + formatAddress(events[i + 1].address);
               }
               res.push({
                 icon: "mdi-arrow-right-bold-outline",
                 iconColor: "red",
                 postIcon: "mdi-eye-outline",
                 postIconColor: "gray",
-                text: "Sent NFT (" + data.symbol + ") ",
+                text: this.txSent + " NFT (" + data.symbol + ") ",
                 nftId,
                 symbol: data.symbol,
                 tooltip: to,
@@ -292,7 +330,7 @@ export default class extends Vue {
 
           let from = null;
           if (i > 0 && ev.data == events[i - 1].data) {
-            from = "From " + formatAddress(events[i - 1].address);
+            from = this.txFrom + " " + formatAddress(events[i - 1].address);
           }
 
           if (ev.address == this.address) {
@@ -301,7 +339,7 @@ export default class extends Vue {
               res.push({
                 icon: "mdi-arrow-left-bold-outline",
                 iconColor: "green",
-                text: "Received " + formatSymbol(amount, data.symbol),
+                text: this.txReceived + " " + formatSymbol(amount, data.symbol),
                 tooltip: from,
               });
             } else {
@@ -311,7 +349,7 @@ export default class extends Vue {
                 iconColor: "green",
                 postIcon: "mdi-eye-outline",
                 postIconColor: "gray",
-                text: "Received NFT (" + data.symbol + ")",
+                text: this.txReceived + " NFT (" + data.symbol + ")",
                 nftId,
                 symbol: data.symbol,
                 tooltip: from,
@@ -330,9 +368,9 @@ export default class extends Vue {
                 iconColor: "blue",
                 postIcon: "mdi-eye-outline",
                 postIconColor: "gray",
-                text: "Listed NFT (" + data.baseSymbol + ")",
+                text: this.txListed + " NFT (" + data.baseSymbol + ")",
                 tooltip:
-                  "For " + formatSymbol("" + data.amount, data.quoteSymbol),
+                  this.txFor + " " + formatSymbol("" + data.amount, data.quoteSymbol),
                 nftId,
                 symbol: data.baseSymbol,
               });
@@ -350,9 +388,9 @@ export default class extends Vue {
               iconColor: "green",
               postIcon: "mdi-eye-outline",
               postIconColor: "gray",
-              text: "NFT sale (" + data.baseSymbol + ")",
+              text: this.txnftSale + " (" + data.baseSymbol + ")",
               tooltip:
-                "For " + formatSymbol("" + data.amount, data.quoteSymbol),
+                this.txFor + " " + formatSymbol("" + data.amount, data.quoteSymbol),
               nftId,
               symbol: data.baseSymbol,
             });
@@ -374,8 +412,8 @@ export default class extends Vue {
                 icon: "mdi-basket-fill",
                 postIcon: "mdi-eye-outline",
                 postIconColor: "gray",
-                text: "Infused NFT (" + data.baseSymbol + ")",
-                tooltip: "With " + data.InfusedSymbol + " NFT",
+                text: this.txInfused + " NFT (" + data.baseSymbol + ")",
+                tooltip: this.txWith + " " + data.InfusedSymbol + " NFT",
                 nftId,
                 symbol: data.baseSymbol,
               });
@@ -384,9 +422,9 @@ export default class extends Vue {
                 icon: "mdi-basket-fill",
                 postIcon: "mdi-eye-outline",
                 postIconColor: "gray",
-                text: "Infused NFT (" + data.baseSymbol + ")",
+                text: this.txInfused + " NFT (" + data.baseSymbol + ")",
                 tooltip:
-                  "With " +
+                  this.txWith + " " +
                   formatSymbol("" + data.InfusedValue, data.InfusedSymbol),
                 nftId,
                 symbol: data.baseSymbol,
@@ -406,7 +444,7 @@ export default class extends Vue {
       res.push({
         icon: "mdi-alert",
         iconColor: "red",
-        text: "Unshown events (" + (numEvents - 100) + ")",
+        text: this.txUnshown + " (" + (numEvents - 100) + ")",
       });
     }
 
