@@ -7,7 +7,8 @@ export enum Locales {
     NL = 'nl',
     DE = 'de',
     TR = 'tr',
-    RU = 'ru'
+    RU = 'ru',
+    VN = 'vn'
   }
   
 export const LOCALES = [
@@ -19,5 +20,6 @@ export const LOCALES = [
 { value: Locales.NL, caption: 'Nederlands' },
 { value: Locales.DE, caption: '' },
 { value: Locales.TR, caption: 'Türkçe' },
-{ value: Locales.RU, caption: '' }
+{ value: Locales.RU, caption: '' },
+{ value: Locales.VN, caption: '' }
 ]
