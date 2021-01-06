@@ -123,6 +123,7 @@
                     <v-btn
                       small
                       text
+                      style="padding: 0 6px;"
                       v-if="item.symbol == 'SOUL'"
                       @click.stop="stakeDialog = true"
                       :disabled="getUnstackedSoul() == '0'"
@@ -131,6 +132,7 @@
                     <v-btn
                       small
                       text
+                      style="padding: 0 6px;"
                       v-if="item.symbol == 'KCAL'"
                       @click.stop="claimDialog = true"
                       :disabled="account.data.unclaimed == 0"
@@ -139,6 +141,7 @@
                     <v-btn
                       small
                       text
+                      style="padding: 0 6px;"
                       v-if="item.symbol == 'TTRS'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
@@ -147,6 +150,7 @@
                     <v-btn
                       small
                       text
+                      style="padding: 0 6px;"
                       v-if="item.symbol == 'CROWN'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
@@ -155,6 +159,7 @@
                     <v-btn
                       small
                       text
+                      style="padding: 0 6px;"
                       v-if="item.symbol == 'GHOST'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
@@ -163,6 +168,7 @@
                     <v-btn
                       small
                       text
+                      style="padding: 0 6px;"
                       @click="transferAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-export</v-icon> {{ $t('home.send') }}</v-btn

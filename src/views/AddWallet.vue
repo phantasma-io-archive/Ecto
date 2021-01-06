@@ -93,7 +93,7 @@
                 >{{ $t('addWallet.importLong') }}</v-btn
               >
             </div>
-            <div class="ma-3">
+            <div class="ma-3 mb-6">
               {{ $t('addWallet.description2') }}
               <a href="" @click.prevent="tabIndex = 1">
                 {{ $t('addWallet.description3') }}
