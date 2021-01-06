@@ -17,7 +17,7 @@
             <v-select
               v-model="currency"
               :items="currencies"
-              :label="$t('app.currencyDescription') + ' (' + currency.length + ')'"
+              :label="$t('app.currencyDescription') + ' (' + currencies.length + ')'"
               class="pl-4 pr-4"
               @input="changeCurrency()"
             ></v-select>
@@ -26,7 +26,7 @@
             <v-select
               v-model="language"
               :items="languages"
-              :label="$t('app.languageDescription') + ' (' + language.length + ')'"
+              :label="$t('app.languageDescription') + ' (' + languages.length + ')'"
               class="pl-4 pr-4"
               @input="changeLanguage()"
             >
