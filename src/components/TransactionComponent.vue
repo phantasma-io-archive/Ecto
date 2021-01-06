@@ -142,7 +142,7 @@ export default class extends Vue {
   txBurned = "";
   txClaimed = "";
   txStaked = "";
-  txSwaped = "";
+  txSwapped = "";
   txSentTo = "";
   txPaid = "";
   txSent = "";
@@ -166,7 +166,7 @@ export default class extends Vue {
     this.txBurned = this.$i18n.t('transactionComponent.burned').toString();
     this.txClaimed = this.$i18n.t('transactionComponent.claimed').toString();
     this.txStaked = this.$i18n.t('transactionComponent.staked').toString();
-    this.txSwaped = this.$i18n.t('transactionComponent.swaped').toString();
+    this.txSwapped = this.$i18n.t('transactionComponent.swapped').toString();
     this.txSentTo = this.$i18n.t('transactionComponent.sentTo').toString();
     this.txPaid = this.$i18n.t('transactionComponent.paid').toString();
     this.txSent = this.$i18n.t('transactionComponent.sent').toString();
@@ -272,7 +272,7 @@ export default class extends Vue {
             const amount = data.value;
             res.push({
               icon: "mdi-swap-horizontal",
-              text: this.txSwaped + " " + formatSymbol(amount, data.symbol),
+              text: this.txSwapped + " " + formatSymbol(amount, data.symbol),
             });
           }
           break;
