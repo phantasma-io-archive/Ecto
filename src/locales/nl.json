@@ -73,7 +73,7 @@
     },
     "home": {
         "assets": "Bezittingen",
-        "activity": "Activiteit",
+        "activity": "Activiteiten",
         "unstake": "Unstake",
         "stake": "Stake",
         "claim": "Claim",
@@ -88,7 +88,7 @@
         "removeStakes": "Verwijder Stakes",
         "sendAmount": "Verstuur Aantal",
         "sendAmount2": "Welk aantal wil je versturen?",
-        "remaining": "Rest",
+        "remaining": "Restant",
         "next": "Volgende",
         "insertWIF": "Type jouw WIF in om een transactie goed te keuren.",
         "insertPassword": "Type jouw wachtwoord in om een transactie goed te keuren.",
@@ -142,7 +142,7 @@
     },
     "qr": {
         "copy": "Kopieer naar klembord",
-        "description": "Hier is jouw privésleutel",
+        "description": "Hier is jouw openbare adres",
         "noWallet": "<geen wallet>"
     },
     "sign": {
