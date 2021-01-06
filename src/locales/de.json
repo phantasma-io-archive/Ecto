@@ -5,7 +5,7 @@
     },
     "transactionComponent": {
         "setName": "Name festlegen:",
-        "minted": "Minted",
+        "minted": "Gemintet",
         "sent": "Gesendet",
         "sentTo": "Gesendet an",
         "burned": "Verbrannt",
@@ -18,7 +18,7 @@
         "infused": "Infundiert",
         "unshown": "Nicht gezeigte Ereignisse",
         "swapped": "Getauscht",
-        "staked": "Staked",
+        "staked": "Gestaket",
         "with": "Mit",
         "for": "für"
     },
@@ -29,9 +29,9 @@
         "errorMessage": "Bei der Transaktion ist ein Fehler aufgetreten:"
     },
     "addWallet": {
-        "add": "GELDBÖRSE HINZUFÜGEN",
+        "add": "Brieftasche HINZUFÜGEN",
         "import": "Importieren",
-        "importLong": "Geldbörse importieren",
+        "importLong": "Brieftasche importieren",
         "create": "Erstellen",
         "no": "Nein",
         "or": "Oder",
@@ -40,24 +40,24 @@
         "copy": "In die Zwischenablage kopieren",
         "labelPassword": "Passwort",
         "labelWIF": "WIF oder hex privater Schlüssel",
-        "labelAddress": "Geldbörsenadresse oder -name",
+        "labelAddress": "Brieftaschenadresse oder -name",
         "labelAddressShort": "Adresse",
         "hintPassword": "Verwenden Sie mindestens 6 Zeichen",
-        "descriptionLong": "Jede <strong>Phantasma Geldbörse</strong> eröffnet den Zugang zu einem reichhaltigen Ökosystem von nächster Generation <strong>Smart-NFTs</strong>, <strong>leistungsstarken dApps</strong>, <strong>blitzschnellen Transaktionen</strong> und einer nahtlosen Benutzererfahrung. <br /><br />Das Beste daran?<br /> Die Benutzung ist quasi kostenlos!",
-        "description1": "Importiere eine Geldbörse anhand der Adresse oder des Namens  (schreibgeschützt), oder des WIF (lesen/schreiben). Bei WIF-Nutzung muss sie durch ein Passwort geschützt werden.",
-        "description2": "Oder wenn Sie keine Geldbörse haben, können Sie",
+        "descriptionLong": "Jede <strong>Phantasma Brieftasche</strong> eröffnet den Zugang zu einem reichhaltigen Ökosystem von nächster Generation <strong>Smart-NFTs</strong>, <strong>leistungsstarken dApps</strong>, <strong>blitzschnellen Transaktionen</strong> und einer nahtlosen Benutzererfahrung. <br /><br />Das Beste daran?<br /> Die Benutzung ist quasi kostenlos!",
+        "description1": "Importiere eine Brieftasche anhand der Adresse oder des Namens  (schreibgeschützt), oder des WIF (lesen/schreiben). Bei WIF-Nutzung muss sie durch ein Passwort geschützt werden.",
+        "description2": "Oder wenn Sie keine Brieftasche haben, können Sie",
         "description3": "eine neue erstellen",
         "description4": "Oder wenn sie Ihnen nicht gefällt, können Sie",
         "description5": "eine weitere generieren",
-        "generate": "Generiere eine neue Geldbörse",
-        "created": "Geldbörse mit der folgenden Addresse und dem folgenden privaten Schlüssel (WIF-Format) erstellt",
+        "generate": "Generiere eine neue Brieftasche",
+        "created": "Brieftasche mit der folgenden Addresse und dem folgenden privaten Schlüssel (WIF-Format) erstellt",
         "backup": "Sichern Sie den WIF",
-        "recover": "Sie brauchen ihren WIF nur um Ihre Geldbörse wiederherzustellen. Stellen Sie sicher, dass Sie immer ein sicheres Backup haben.",
+        "recover": "Sie brauchen ihren WIF nur um Ihre Brieftasche wiederherzustellen. Stellen Sie sicher, dass Sie immer ein sicheres Backup haben.",
         "backupConfirm": "Ja, ich habe ein Backup gemacht",
-        "secure": "Geben Sie ein Passwort ein, um die Geldbörse zu sichern. Sie können immer den WIF benutzen, um sie wiederherzustellen.",
-        "errorMessage1": "Fehler beim Importieren der WIF-Geldbörse",
-        "errorMessage2": "Fehler beim Importieren der HEX-Geldbörse",
-        "errorMessage3": "Fehler beim Importieren der Geldbörse"
+        "secure": "Geben Sie ein Passwort ein, um die Brieftasche zu sichern. Sie können immer den WIF benutzen, um sie wiederherzustellen.",
+        "errorMessage1": "Fehler beim Importieren der WIF-Brieftasche",
+        "errorMessage2": "Fehler beim Importieren der HEX-Brieftasche",
+        "errorMessage3": "Fehler beim Importieren der Brieftasche"
     },
     "authorize": {
         "description": "möchte sich mit Phantasma Link verbinden. Jede Transaktion wird Ihre Erlaubnis anfordern. Möchten Sie dies zulassen?",
@@ -74,8 +74,8 @@
     "home": {
         "assets": "Vermögenswerte",
         "activity": "Aktivität",
-        "unstake": "Unstake",
-        "stake": "Stake",
+        "unstake": "Entstaken",
+        "stake": "Staken",
         "claim": "Beanspruchen",
         "view": "ansehen",
         "send": "Senden",
@@ -95,7 +95,7 @@
         "authorize": "TX autorisieren",
         "sign": "TX signieren",
         "register": "Name registrieren",
-        "registerDescription": "Ihr Adressname kann als Ihre öffentliche Adresse verwendet werden. Sie müssen 2 SOUL staked behalten, oder Sie verlieren den Namen.",
+        "registerDescription": "Ihr Adressname kann als Ihre öffentliche Adresse verwendet werden. Sie müssen 2 SOUL gestaked behalten, oder Sie verlieren den Namen.",
         "registerDescription2": "Staken Sie SOUL um einen Namen zu registrieren und erhalten Sie täglich KCAL-Belohnungen. Die Mindest-Stake-Dauer beträgt 24 Stunden.",
         "registerDescription3": "Gehen Sie los und holen sich ein paar SOUL :)",
         "registerTitle": "Einen Namen registrieren",
@@ -104,15 +104,15 @@
         "destinationDesc": "Wählen Sie, wohin Sie senden möchten",
         "have": "Sie haben",
         "haveStake": "Wie viele möchten Sie senden?",
-        "haveUnstake": "staked SOUL. Wie viele möchten Sie unstaken?",
+        "haveUnstake": "gestakte SOUL. Wie viele möchten Sie entstaken?",
         "claimDesc1": "Sie sind dabei",
-        "claimDesc2": "KCAL zu beanspruchen. Dies beansprucht KCAL im Voraus, Sie können also während der nächsten 24 Stunden nicht unstaken",
+        "claimDesc2": "KCAL zu beanspruchen. Dies beansprucht KCAL im Voraus, Sie können also während der nächsten 24 Stunden nicht entstaken",
         "kcalExplanation": "KCAL wird für jede Transaktion der Blockchain verwendet. Sie erhalten täglich 0,002 KCAL pro SOUL. Sie können jetzt welche beanspruchen",
         "labelDest": "Zieladresse oder Name",
         "labelPassword": "Passwort", 
         "labelPick": "Wählen Sie Ihren Namen",
-        "errorMessage1": "<keine geldbörse>",
-        "secondLine1": "Staked",
+        "errorMessage1": "<keine brieftasche>",
+        "secondLine1": "Gestaked",
         "secondLine2": "Unbeansprucht"
     },
     "nfts": {
@@ -138,12 +138,12 @@
         "labelParameters": "Parameter",
         "sortDirOptionsAsc": "Aufsteigend",
         "sortDirOptionsDesc": "Absteigend",
-        "noWallet": "<keine geldbörse>"
+        "noWallet": "<keine brieftasche>"
     },
     "qr": {
         "copy": "In die Zwischenablage kopieren",
-        "description": "Dies ist die öffentliche Adresse Ihrer Geldbörse",
-        "noWallet": "<keine geldbörse>"
+        "description": "Dies ist die öffentliche Adresse Ihrer Brieftasche",
+        "noWallet": "<keine brieftasche>"
     },
     "sign": {
         "description": "Möchten Sie zulassen, dass die TX signiert wird, für",
@@ -170,8 +170,8 @@
         "notValid": "WIF ist für die Adresse nicht gültig"
     },
     "wallets": {
-        "add": "Geldbörse hinzufügen",
-        "select": "GELDBÖRSE AUSWÄHLEN",
+        "add": "Brieftasche hinzufügen",
+        "select": "BRIEFTASCHE AUSWÄHLEN",
         "title": "Konto entfernen",
         "subtitle": "Entfernt das Konto",
         "encKey": "Benötigt Passwort",
