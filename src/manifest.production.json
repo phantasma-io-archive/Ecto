@@ -26,5 +26,5 @@
 
   "permissions": ["storage", "unlimitedStorage", "<all_urls>", "tabs"],
 
-  "web_accessible_resources": ["js/inpage.js"]
+  "web_accessible_resources": ["js/inpage.js","placeholder-nft-img.png","placeholder-nft-video.png"]
 }

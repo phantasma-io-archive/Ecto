@@ -729,9 +729,11 @@ export class PopupState {
         const nft = await this.api.getNFT(token, nftId);
         console.log("Got nft", nft);
 
-        const imgUrl = nft.properties
+        const imgUrlUnformated = nft.properties
           .find((kv) => kv.Key == "ImageURL")
-          ?.Value.replace("ipfs://", "https://gateway.ipfs.io/ipfs/");
+          ?.Value
+
+        const imgUrl = imgUrlUnformated?.startsWith('ipfs://') ? imgUrlUnformated.replace("ipfs://", "https://gateway.ipfs.io/ipfs/") : imgUrlUnformated?.startsWith('ipfs-video://') ? 'placeholder-nft-video.png' : 'placeholder-nft-img.png';
 
         console.log("ImageURL", imgUrl);
 

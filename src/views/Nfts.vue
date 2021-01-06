@@ -146,8 +146,9 @@
                   >
                     <v-img
                       contain
-                      :src="item.img"
-                      :lazy-src="item.img"
+                      :class="{ placeholder: item.img.startsWith('placeholder') }"
+                      :src="getResource(item.img)"
+                      :lazy-src="getResource(item.img)"
                       height="84px"
                     ></v-img>
                   </v-avatar>
@@ -595,6 +596,16 @@ export default class extends Vue {
     console.log("switched item", JSON.stringify(item, null, 2));
   }
 
+  getResource(image: any) {
+    let resource = ''
+    if (image.startsWith('placeholder-nft-img') || image.startsWith('placeholder-nft-video')) {
+      resource = chrome.extension.getURL(image)
+    } else {
+      resource = image
+    }
+    return resource
+  }
+
   getOverline(item: any) {
     let rarities = [
       "None",
@@ -727,4 +738,8 @@ export default class extends Vue {
 }
 </script>
 
-<style></style>
+<style>
+.placeholder {
+  filter: invert(100%);
+}  
+</style>
