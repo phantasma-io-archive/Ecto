@@ -224,6 +224,7 @@ export class PopupState {
           : [];
         this._authorizations = items.authorizations ? items.authorizations : [];
         this._currency = items.currency ? items.currency : "USD";
+        this._language = items.language ? items.language : "en";
         this.nfts = items.nfts ? items.nfts : {};
 
         this._accounts = items.accounts

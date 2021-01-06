@@ -184,7 +184,7 @@ export default class extends Vue {
   version = "";
   currencies = ["EUR", "USD", "GBP", "JPY", "CAD", "AUD", "CNY"];
   currency = "EUR";
-  languages = ["English", "Français", "Italiano", "中文", "Nederlands", "Türkçe"];
+  languages = ["English", "Français", "Italiano", "中文", "Nederlands", "Deutsch", "Türkçe"];
   language = "en";
 
   LOCALES = LOCALES;
@@ -220,6 +220,34 @@ export default class extends Vue {
     await state.check();
     this.currency = state.currency;
     this.language = state.language;
+    if (this.language) {
+      switch(this.language) {
+        default:
+        case 'English':
+          this.$i18n.locale = 'en';
+          break;
+        case 'Français':
+          this.$i18n.locale = 'fr';
+          break;
+        case 'Italiano':
+          this.$i18n.locale = 'it';
+          break;
+        case '中文':
+          this.$i18n.locale = 'cn';
+          break;
+        case 'Nederlands':
+          this.$i18n.locale = 'nl';
+          break;
+        case 'Deutsch':
+          this.$i18n.locale = 'de';
+          break;
+        case 'Türkçe':
+          this.$i18n.locale = 'tr';
+          break;
+      }
+    } else {
+      this.$i18n.locale = 'en'
+    }
 
     this.version = chrome.runtime.getManifest().version;
 
@@ -271,27 +299,36 @@ export default class extends Vue {
 
   async changeLanguage() {
     console.log("setting language", this.language);
-    await this.state.setLanguage(this.language);
     if (this.$i18n.locale !== this.language) {
       switch(this.language) {
         default:
         case 'English':
           this.$i18n.locale = 'en';
+          await this.state.setLanguage(this.language);
           break;
         case 'Français':
           this.$i18n.locale = 'fr';
+          await this.state.setLanguage(this.language);
           break;
         case 'Italiano':
           this.$i18n.locale = 'it';
+          await this.state.setLanguage(this.language);
           break;
         case '中文':
           this.$i18n.locale = 'cn';
+          await this.state.setLanguage(this.language);
           break;
         case 'Nederlands':
           this.$i18n.locale = 'nl';
+          await this.state.setLanguage(this.language);
+          break;
+        case 'Deutsch':
+          this.$i18n.locale = 'de';
+          await this.state.setLanguage(this.language);
           break;
         case 'Türkçe':
           this.$i18n.locale = 'tr';
+          await this.state.setLanguage(this.language);
           break;
       }
     }
