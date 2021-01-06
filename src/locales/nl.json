@@ -73,7 +73,7 @@
     },
     "home": {
         "assets": "Bezittingen",
-        "activity": "Activiteit",
+        "activity": "Activiteiten",
         "unstake": "Unstake",
         "stake": "Stake",
         "claim": "Claim",
@@ -142,7 +142,7 @@
     },
     "qr": {
         "copy": "Kopieer naar klembord",
-        "description": "Hier is jouw privésleutel",
+        "description": "Hier is jouw openbaar adres",
         "noWallet": "<geen wallet>"
     },
     "sign": {
