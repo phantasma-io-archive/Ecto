@@ -605,6 +605,7 @@ export class PopupState {
 
   formatBalance(symbol: string, amount: string): string {
     let decimals = 0;
+    let decimalsToShow = 2;
     switch (symbol) {
       case "KCAL":
         decimals = 10;
@@ -623,6 +624,7 @@ export class PopupState {
         break;
       case "ETH":
         decimals = 18;
+        decimalsToShow = 3;
         break;
       default:
         decimals = 0;
@@ -651,7 +653,9 @@ export class PopupState {
     return (
       intPart +
       "." +
-      (decimalPart.length >= 2 ? decimalPart.substring(0, 2) : decimalPart) +
+      (decimalPart.length >= decimalsToShow
+        ? decimalPart.substring(0, decimalsToShow)
+        : decimalPart) +
       " " +
       symbol
     );
@@ -729,11 +733,19 @@ export class PopupState {
         const nft = await this.api.getNFT(token, nftId);
         console.log("Got nft", nft);
 
-        const imgUrlUnformated = nft.properties
-          .find((kv) => kv.Key == "ImageURL")
-          ?.Value
+        if ((nft as any).error) {
+          continue;
+        }
 
-        const imgUrl = imgUrlUnformated?.startsWith('ipfs://') ? imgUrlUnformated.replace("ipfs://", "https://gateway.ipfs.io/ipfs/") : imgUrlUnformated?.startsWith('ipfs-video://') ? 'placeholder-nft-video.png' : 'placeholder-nft-img.png';
+        const imgUrlUnformated = nft.properties.find(
+          (kv) => kv.Key == "ImageURL"
+        )?.Value;
+
+        const imgUrl = imgUrlUnformated?.startsWith("ipfs://")
+          ? imgUrlUnformated.replace("ipfs://", "https://gateway.ipfs.io/ipfs/")
+          : imgUrlUnformated?.startsWith("ipfs-video://")
+          ? "placeholder-nft-video.png"
+          : "placeholder-nft-img.png";
 
         console.log("ImageURL", imgUrl);
 
