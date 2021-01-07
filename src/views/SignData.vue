@@ -157,7 +157,7 @@ export default class extends Vue {
   async mounted() {
     console.log("authorize");
 
-    await state.check(this.$t);
+    await state.check(this.$parent.$i18n);
 
     this.dapp = state.getDapp(this.$route.params.token);
 
