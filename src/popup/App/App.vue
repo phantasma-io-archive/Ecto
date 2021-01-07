@@ -3,7 +3,7 @@
     <router-view></router-view>
 
     <v-dialog v-model="settingsDialog" style="z-index:100">
-      <v-card style="height:400px">
+      <v-card style="height:408px">
         <v-card-title>
           <v-img
             src="ecto.png"
@@ -17,8 +17,9 @@
             <v-select
               v-model="currency"
               :items="currencies"
-              :label="$t('app.currencyDescription') + ' (' + currencies.length + ')'"
+              :label="$t('app.currencyDescription')"
               class="pl-4 pr-4"
+              style="z-index:8888"
               @input="changeCurrency()"
             ></v-select>
           </v-row>
@@ -26,8 +27,9 @@
             <v-select
               v-model="language"
               :items="languages"
-              :label="$t('app.languageDescription') + ' (' + languages.length + ')'"
+              :label="$t('app.languageDescription')"
               class="pl-4 pr-4"
+              style="z-index:8888"
               @input="changeLanguage()"
             >
             </v-select>
@@ -35,9 +37,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text color="blue darken-1" @click="settingsDialog = false"
-            >{{ $t('app.closeButton') }}</v-btn
-          >
+          <v-btn text color="blue darken-1" @click="settingsDialog = false">{{
+            $t("app.closeButton")
+          }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -184,7 +186,15 @@ export default class extends Vue {
   version = "";
   currencies = ["EUR", "USD", "GBP", "JPY", "CAD", "AUD", "CNY"];
   currency = "EUR";
-  languages = ["English", "Français", "Italiano", "中文", "Nederlands", "Deutsch", "Türkçe"];
+  languages = [
+    "English",
+    "Français",
+    "Italiano",
+    "中文",
+    "Nederlands",
+    "Deutsch",
+    "Türkçe",
+  ];
   language = "en";
 
   LOCALES = LOCALES;
@@ -221,32 +231,32 @@ export default class extends Vue {
     this.currency = state.currency;
     this.language = state.language;
     if (this.language) {
-      switch(this.language) {
+      switch (this.language) {
         default:
-        case 'English':
-          this.$i18n.locale = 'en';
+        case "English":
+          this.$i18n.locale = "en";
           break;
-        case 'Français':
-          this.$i18n.locale = 'fr';
+        case "Français":
+          this.$i18n.locale = "fr";
           break;
-        case 'Italiano':
-          this.$i18n.locale = 'it';
+        case "Italiano":
+          this.$i18n.locale = "it";
           break;
-        case '中文':
-          this.$i18n.locale = 'cn';
+        case "中文":
+          this.$i18n.locale = "cn";
           break;
-        case 'Nederlands':
-          this.$i18n.locale = 'nl';
+        case "Nederlands":
+          this.$i18n.locale = "nl";
           break;
-        case 'Deutsch':
-          this.$i18n.locale = 'de';
+        case "Deutsch":
+          this.$i18n.locale = "de";
           break;
-        case 'Türkçe':
-          this.$i18n.locale = 'tr';
+        case "Türkçe":
+          this.$i18n.locale = "tr";
           break;
       }
     } else {
-      this.$i18n.locale = 'en'
+      this.$i18n.locale = "en";
     }
 
     this.version = chrome.runtime.getManifest().version;
@@ -283,7 +293,7 @@ export default class extends Vue {
             let shortError =
               error.length > 120 ? error.substring(0, 120) + "..." : error;
             this.$root.$emit("errorMessage", {
-              msg: this.$t('app.errorMessage'),
+              msg: this.$t("app.errorMessage"),
               details: shortError,
             });
           }
@@ -300,37 +310,38 @@ export default class extends Vue {
   async changeLanguage() {
     console.log("setting language", this.language);
     if (this.$i18n.locale !== this.language) {
-      switch(this.language) {
+      switch (this.language) {
         default:
-        case 'English':
-          this.$i18n.locale = 'en';
+        case "English":
+          this.$i18n.locale = "en";
           await this.state.setLanguage(this.language);
           break;
-        case 'Français':
-          this.$i18n.locale = 'fr';
+        case "Français":
+          this.$i18n.locale = "fr";
           await this.state.setLanguage(this.language);
           break;
-        case 'Italiano':
-          this.$i18n.locale = 'it';
+        case "Italiano":
+          this.$i18n.locale = "it";
           await this.state.setLanguage(this.language);
           break;
-        case '中文':
-          this.$i18n.locale = 'cn';
+        case "中文":
+          this.$i18n.locale = "cn";
           await this.state.setLanguage(this.language);
           break;
-        case 'Nederlands':
-          this.$i18n.locale = 'nl';
+        case "Nederlands":
+          this.$i18n.locale = "nl";
           await this.state.setLanguage(this.language);
           break;
-        case 'Deutsch':
-          this.$i18n.locale = 'de';
+        case "Deutsch":
+          this.$i18n.locale = "de";
           await this.state.setLanguage(this.language);
           break;
-        case 'Türkçe':
-          this.$i18n.locale = 'tr';
+        case "Türkçe":
+          this.$i18n.locale = "tr";
           await this.state.setLanguage(this.language);
           break;
       }
+      this.$root.$emit("changeLanguage");
     }
   }
 

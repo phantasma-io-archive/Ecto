@@ -157,27 +157,37 @@ export default class extends Vue {
 
   mounted() {
     this.descriptions = this.getDescriptions();
+    this.$root.$on("changeLanguage", this.onChangeLanguage);
+  }
+
+  beforeDestroy() {
+    this.$root.$off("changeLanguage", this.onChangeLanguage);
+  }
+
+  onChangeLanguage() {
+    this.descriptions = this.getDescriptions();
   }
 
   getDescriptions(): any[] {
     let res: any[] = [];
-    this.txSetName = this.$i18n.t('transactionComponent.setName').toString();
-    this.txMinted = this.$i18n.t('transactionComponent.minted').toString();
-    this.txBurned = this.$i18n.t('transactionComponent.burned').toString();
-    this.txClaimed = this.$i18n.t('transactionComponent.claimed').toString();
-    this.txStaked = this.$i18n.t('transactionComponent.staked').toString();
-    this.txSwapped = this.$i18n.t('transactionComponent.swapped').toString();
-    this.txSentTo = this.$i18n.t('transactionComponent.sentTo').toString();
-    this.txPaid = this.$i18n.t('transactionComponent.paid').toString();
-    this.txSent = this.$i18n.t('transactionComponent.sent').toString();
-    this.txFrom = this.$i18n.t('transactionComponent.from').toString();
-    this.txFor = this.$i18n.t('transactionComponent.for').toString();
-    this.txReceived = this.$i18n.t('transactionComponent.received').toString();
-    this.txListed = this.$i18n.t('transactionComponent.listed').toString();
-    this.txnftSale = this.$i18n.t('transactionComponent.nftSale').toString();
-    this.txInfused = this.$i18n.t('transactionComponent.infused').toString();
-    this.txWith = this.$i18n.t('transactionComponent.with').toString();
-    this.txUnshown = this.$i18n.t('transactionComponent.unshown').toString();
+
+    this.txSetName = this.$i18n.t("transactionComponent.setName").toString();
+    this.txMinted = this.$i18n.t("transactionComponent.minted").toString();
+    this.txBurned = this.$i18n.t("transactionComponent.burned").toString();
+    this.txClaimed = this.$i18n.t("transactionComponent.claimed").toString();
+    this.txStaked = this.$i18n.t("transactionComponent.staked").toString();
+    this.txSwapped = this.$i18n.t("transactionComponent.swapped").toString();
+    this.txSentTo = this.$i18n.t("transactionComponent.sentTo").toString();
+    this.txPaid = this.$i18n.t("transactionComponent.paid").toString();
+    this.txSent = this.$i18n.t("transactionComponent.sent").toString();
+    this.txFrom = this.$i18n.t("transactionComponent.from").toString();
+    this.txFor = this.$i18n.t("transactionComponent.for").toString();
+    this.txReceived = this.$i18n.t("transactionComponent.received").toString();
+    this.txListed = this.$i18n.t("transactionComponent.listed").toString();
+    this.txnftSale = this.$i18n.t("transactionComponent.nftSale").toString();
+    this.txInfused = this.$i18n.t("transactionComponent.infused").toString();
+    this.txWith = this.$i18n.t("transactionComponent.with").toString();
+    this.txUnshown = this.$i18n.t("transactionComponent.unshown").toString();
 
     if (this.tx == null || this.tx.events == null) {
       console.log("TX undefined or no events");
@@ -209,7 +219,11 @@ export default class extends Vue {
             if (ev.address == this.address) {
               res.push({
                 icon: "mdi-plus-circle-outline",
-                text: this.txMinted + " NFT (" /*+ nftId + " of "*/ + data.symbol + ")",
+                text:
+                  this.txMinted +
+                  " NFT (" /*+ nftId + " of "*/ +
+                  data.symbol +
+                  ")",
                 postIcon: "mdi-eye-outline",
                 postIconColor: "gray",
                 nftId,
@@ -224,14 +238,14 @@ export default class extends Vue {
           if (ev.address != this.address) break;
           if (isFungible(data.symbol)) {
             const amount = data.value;
-            res.push({ 
+            res.push({
               icon: "mdi-fire",
-              text: this.txBurned + " " + formatSymbol(amount, data.symbol)
+              text: this.txBurned + " " + formatSymbol(amount, data.symbol),
             });
           } else {
             res.push({
               icon: "mdi-fire",
-              text: this.txBurned + " NFT (" + data.symbol + ")"
+              text: this.txBurned + " NFT (" + data.symbol + ")",
             });
           }
           break;
@@ -370,7 +384,9 @@ export default class extends Vue {
                 postIconColor: "gray",
                 text: this.txListed + " NFT (" + data.baseSymbol + ")",
                 tooltip:
-                  this.txFor + " " + formatSymbol("" + data.amount, data.quoteSymbol),
+                  this.txFor +
+                  " " +
+                  formatSymbol("" + data.amount, data.quoteSymbol),
                 nftId,
                 symbol: data.baseSymbol,
               });
@@ -390,7 +406,9 @@ export default class extends Vue {
               postIconColor: "gray",
               text: this.txnftSale + " (" + data.baseSymbol + ")",
               tooltip:
-                this.txFor + " " + formatSymbol("" + data.amount, data.quoteSymbol),
+                this.txFor +
+                " " +
+                formatSymbol("" + data.amount, data.quoteSymbol),
               nftId,
               symbol: data.baseSymbol,
             });
@@ -424,7 +442,8 @@ export default class extends Vue {
                 postIconColor: "gray",
                 text: this.txInfused + " NFT (" + data.baseSymbol + ")",
                 tooltip:
-                  this.txWith + " " +
+                  this.txWith +
+                  " " +
                   formatSymbol("" + data.InfusedValue, data.InfusedSymbol),
                 nftId,
                 symbol: data.baseSymbol,

@@ -5,7 +5,7 @@
 
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>{{ $t('wallets.select') }}</v-list-item-title>
+          <v-list-item-title>{{ $t("wallets.select") }}</v-list-item-title>
           <v-list-item-subtitle></v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -44,7 +44,9 @@
       </v-list>
 
       <div style="padding: 20px">
-        <v-btn block @click="$router.push('/addwallet')">{{ $t('wallets.add') }}</v-btn>
+        <v-btn block @click="$router.push('/addwallet')">{{
+          $t("wallets.add")
+        }}</v-btn>
       </div>
     </v-main>
   </div>
@@ -66,18 +68,28 @@ import PopupMenuComponent from "@/components/PopupMenu.vue";
 export default class extends Vue {
   state = state;
 
-popupActions: any[] = []
-desc: any = {}
+  popupActions: any[] = [];
+  desc: any = {};
 
   async mounted() {
     await this.state.check();
+    this.onChangeLanguage();
+    this.$root.$on("changeLanguage", this.onChangeLanguage);
+  }
+
+  beforeDestroy() {
+    this.$root.$off("changeLanguage", this.onChangeLanguage);
+  }
+
+  onChangeLanguage() {
+    console.log("onChangeLanguage");
     this.popupActions = [
       // { icon: 'mdi-pen', title: "Add password", subtitle: "Store WIF with password", action: this.addPassword },
       // { divider: true },
       {
         icon: "mdi-delete",
-        title: this.$i18n.t('wallets.title').toString(),
-        subtitle: this.$i18n.t('wallets.subtitle').toString(),
+        title: this.$i18n.t("wallets.title").toString(),
+        subtitle: this.$i18n.t("wallets.subtitle").toString(),
         action: this.deleteAccount,
       },
     ];
@@ -104,13 +116,12 @@ desc: any = {}
   }
 
   getTypeDesc(type: string): string {
-    this.desc = {
-      encKey: this.$i18n.t('wallets.encKey').toString(),
-      unverified: this.$i18n.t('wallets.unverified').toString(),
-      verified: this.$i18n.t('wallets.verified').toString(),
-    };
-
-    return this.desc[type];
+    if (type == "encKey") return this.$i18n.t("wallets.encKey").toString();
+    else if (type == "unverified")
+      return this.$i18n.t("wallets.unverified").toString();
+    else if (type == "verified")
+      return this.$i18n.t("wallets.verified").toString();
+    return "";
   }
 
   async gotoAccount(account: WalletAccount) {

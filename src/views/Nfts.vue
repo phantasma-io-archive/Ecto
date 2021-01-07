@@ -53,14 +53,14 @@
           <p class="pa-0 ma-0" style="margin-top:-20px !important">
             {{ nftArray.length }} {{ sendSymbol }} NFTs
             <span v-if="viewModeSend"
-              >- {{ selectedNum }} {{ $t('nfts.selected') }}
+              >- {{ selectedNum }} {{ $t("nfts.selected") }}
               <v-btn
                 dense
                 text
                 style="height:25px; color:#17b1e8; margin-top:-2px"
                 @click="askSendWhere"
                 :disabled="sendNFTsDisabled"
-                >{{ $t('nfts.send') }}</v-btn
+                >{{ $t("nfts.send") }}</v-btn
               ></span
             >
           </p>
@@ -127,7 +127,7 @@
                             class="overline"
                             style="color:#17b1e8; font-size: 11px !important;text-shadow: 1px 1px 20px #000000, 1px 1px 2px #000000;"
                           >
-                            {{ $t('nfts.infused') }}
+                            {{ $t("nfts.infused") }}
                           </div>
                           <div
                             style="text-shadow: 1px 1px 10px #000000, 1px 1px 2px #000000;"
@@ -146,7 +146,9 @@
                   >
                     <v-img
                       contain
-                      :class="{ placeholder: item.img.startsWith('placeholder') }"
+                      :class="{
+                        placeholder: item.img.startsWith('placeholder'),
+                      }"
                       :src="getResource(item.img)"
                       :lazy-src="getResource(item.img)"
                       height="84px"
@@ -171,11 +173,13 @@
 
     <v-dialog v-model="sendWhereDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('nfts.destination') }}</v-card-title>
+        <v-card-title class="headline">{{
+          $t("nfts.destination")
+        }}</v-card-title>
 
         <v-card-text>
           <span>
-            {{ $t('nfts.select') }} {{ nftsToSend.length }}
+            {{ $t("nfts.select") }} {{ nftsToSend.length }}
             {{ sendSymbol }} NFTs
           </span>
           <br />
@@ -214,11 +218,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="sendWhereDialog = false">
-            {{ $t('nfts.cancel') }}
+            {{ $t("nfts.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askSend">
-            {{ $t('nfts.next') }}
+            {{ $t("nfts.next") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -226,14 +230,14 @@
 
     <v-dialog v-model="signTxDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('nfts.authorize') }}</v-card-title>
+        <v-card-title class="headline">{{ $t("nfts.authorize") }}</v-card-title>
 
         <v-card-text>
           <span v-if="needsWif">
-           {{ $t('nfts.insertWIF') }}
+            {{ $t("nfts.insertWIF") }}
           </span>
           <span v-if="needsPass">
-            {{ $t('nfts.insertPassword') }}
+            {{ $t("nfts.insertPassword") }}
           </span>
           <v-spacer />
 
@@ -279,11 +283,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="closeSignTx">
-            {{ $t('nfts.cancel') }}
+            {{ $t("nfts.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="doSignTx">
-            {{ $t('nfts.sign') }}
+            {{ $t("nfts.sign") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -291,7 +295,7 @@
 
     <v-dialog v-model="filtersDialog" max-width="290">
       <v-card>
-        <v-card-title class="overline">{{ $t('nfts.filters') }}</v-card-title>
+        <v-card-title class="overline">{{ $t("nfts.filters") }}</v-card-title>
         <v-card-text class="pb-0">
           <v-form>
             <v-select
@@ -313,7 +317,7 @@
         <v-card-actions class="pt-0">
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="filtersDialog = false">
-            {{ $t('nfts.close') }}
+            {{ $t("nfts.close") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -321,7 +325,7 @@
 
     <v-dialog v-model="sortDialog" max-width="290">
       <v-card>
-        <v-card-title class="overline">{{ $t('nfts.sort') }}</v-card-title>
+        <v-card-title class="overline">{{ $t("nfts.sort") }}</v-card-title>
         <v-card-text class="pb-0">
           <v-form>
             <v-select
@@ -342,7 +346,7 @@
         <v-card-actions class="pt-0">
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="sortDialog = false">
-            {{ $t('nfts.close') }}
+            {{ $t("nfts.close") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -444,8 +448,11 @@ export default class extends Vue {
       this.isLoading = value;
     });
 
-    this.sortDir = this.$i18n.t('nfts.sortDirOptionsAsc').toString()
-    this.sortDirOptions = [this.$i18n.t('nfts.sortDirOptionsAsc').toString(), this.$i18n.t('nfts.sortDirOptionsDesc').toString()];
+    this.sortDir = this.$i18n.t("nfts.sortDirOptionsAsc").toString();
+    this.sortDirOptions = [
+      this.$i18n.t("nfts.sortDirOptionsAsc").toString(),
+      this.$i18n.t("nfts.sortDirOptionsDesc").toString(),
+    ];
   }
 
   goto(route: string) {
@@ -462,7 +469,10 @@ export default class extends Vue {
     const sortAsc = (k: any[]) => k.sort((a, b) => a.mint - b.mint);
     const sortDesc = (k: any[]) => k.sort((a, b) => b.mint - a.mint);
 
-    const sort = this.sortDir == this.$i18n.t('nfts.sortDirOptionsAsc').toString() ? sortAsc : sortDesc;
+    const sort =
+      this.sortDir == this.$i18n.t("nfts.sortDirOptionsAsc").toString()
+        ? sortAsc
+        : sortDesc;
 
     const searchText = this.searchText.toLowerCase();
 
@@ -557,7 +567,7 @@ export default class extends Vue {
   }
 
   get shorterAddress(): string {
-    this.messageNoWallet = this.$i18n.t('nfts.noWallet').toString()
+    this.messageNoWallet = this.$i18n.t("nfts.noWallet").toString();
     if (!this.account) return this.messageNoWallet;
 
     if (this.account.data.name && this.account.data.name != "")
@@ -572,7 +582,7 @@ export default class extends Vue {
   }
 
   get shortAddress(): string {
-    this.messageNoWallet = this.$i18n.t('nfts.noWallet').toString()
+    this.messageNoWallet = this.$i18n.t("nfts.noWallet").toString();
     if (!this.account) return this.messageNoWallet;
 
     let addr = this.account.address;
@@ -597,13 +607,16 @@ export default class extends Vue {
   }
 
   getResource(image: any) {
-    let resource = ''
-    if (image.startsWith('placeholder-nft-img') || image.startsWith('placeholder-nft-video')) {
-      resource = chrome.extension.getURL(image)
+    let resource = "";
+    if (
+      image.startsWith("placeholder-nft-img") ||
+      image.startsWith("placeholder-nft-video")
+    ) {
+      resource = chrome.extension.getURL(image);
     } else {
-      resource = image
+      resource = image;
     }
-    return resource
+    return resource;
   }
 
   getOverline(item: any) {
@@ -741,5 +754,5 @@ export default class extends Vue {
 <style>
 .placeholder {
   filter: invert(100%);
-}  
+}
 </style>

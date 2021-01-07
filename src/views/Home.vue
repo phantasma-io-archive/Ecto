@@ -28,46 +28,62 @@
         color="#17b1e8"
         right
       >
-        <v-tab>{{ $t('home.assets') }}</v-tab>
-        <v-tab @change="onActivityTab">{{ $t('home.activity') }}</v-tab>
+        <v-tab>{{ $t("home.assets") }}</v-tab>
+        <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
 
         <v-tab-item key="1">
           <v-container
             class="overflow-y-auto overflow-x-hidden pa-0"
-            style="max-height:400px"
+            style="max-height:450px"
           >
             <div
               v-if="
                 noKcal() &&
-                  account && account.data && account.data.stake >= 2 * 10 ** 8 &&
+                  account &&
+                  account.data &&
+                  account.data.stake >= 2 * 10 ** 8 &&
                   account.data.name == 'anonymous'
               "
               class="pa-5"
             >
-              {{ $t('home.kcalExplanation') }}
-              <a href="" @click.prevent="claimDialog = true">{{ $t('home.claim') }} KCAL</a>
-            </div>
-            <div
-              v-else-if="
-                account && account.data && account.data.stake >= 2 * 10 ** 8 &&
-                  account.data.name == 'anonymous'
-              "
-              class="pa-5"
-            >
-              {{ $t('home.registerMain') }}
-              <a href="" @click.prevent="registerNameDialog = true"
-                >{{ $t('home.registerTitle') }}</a
+              {{ $t("home.kcalExplanation") }}
+              <a href="" @click.prevent="claimDialog = true"
+                >{{ $t("home.claim") }} KCAL</a
               >
             </div>
             <div
-              v-else-if="account && account.data && account.data.stake == 0 && getUnstackedSoul() == '0'"
+              v-else-if="
+                account &&
+                  account.data &&
+                  account.data.stake >= 2 * 10 ** 8 &&
+                  account.data.name == 'anonymous'
+              "
               class="pa-5"
             >
-              {{ $t('home.registerDescription3') }}
+              {{ $t("home.registerMain") }}
+              <a href="" @click.prevent="registerNameDialog = true">{{
+                $t("home.registerTitle")
+              }}</a>
             </div>
-            <div v-else-if="account && account.data && account.data.stake == 0" class="pa-5">
-              {{ $t('home.registerDescription2') }}
-              <a href="" @click.prevent="stakeDialog = true">{{ $t('home.stake') }}</a>
+            <div
+              v-else-if="
+                account &&
+                  account.data &&
+                  account.data.stake == 0 &&
+                  getUnstackedSoul() == '0'
+              "
+              class="pa-5"
+            >
+              {{ $t("home.registerDescription3") }}
+            </div>
+            <div
+              v-else-if="account && account.data && account.data.stake == 0"
+              class="pa-5"
+            >
+              {{ $t("home.registerDescription2") }}
+              <a href="" @click.prevent="stakeDialog = true">{{
+                $t("home.stake")
+              }}</a>
             </div>
             <v-expansion-panels
               v-if="account"
@@ -118,7 +134,8 @@
                       v-if="item.symbol == 'SOUL'"
                       @click.stop="unstakeDialog = true"
                       :disabled="account.data.stake == 0"
-                      ><v-icon>mdi-bank-transfer-out</v-icon> {{ $t('home.unstake') }}</v-btn
+                      ><v-icon>mdi-bank-transfer-out</v-icon>
+                      {{ $t("home.unstake") }}</v-btn
                     >
                     <v-btn
                       small
@@ -127,7 +144,8 @@
                       v-if="item.symbol == 'SOUL'"
                       @click.stop="stakeDialog = true"
                       :disabled="getUnstackedSoul() == '0'"
-                      ><v-icon>mdi-bank-transfer-in</v-icon> {{ $t('home.stake') }}</v-btn
+                      ><v-icon>mdi-bank-transfer-in</v-icon>
+                      {{ $t("home.stake") }}</v-btn
                     >
                     <v-btn
                       small
@@ -136,7 +154,8 @@
                       v-if="item.symbol == 'KCAL'"
                       @click.stop="claimDialog = true"
                       :disabled="account.data.unclaimed == 0"
-                      ><v-icon>mdi-piggy-bank</v-icon> {{ $t('home.claim') }}</v-btn
+                      ><v-icon>mdi-piggy-bank</v-icon>
+                      {{ $t("home.claim") }}</v-btn
                     >
                     <v-btn
                       small
@@ -145,7 +164,7 @@
                       v-if="item.symbol == 'TTRS'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
-                      ><v-icon>mdi-eye</v-icon> {{ $t('home.view') }}</v-btn
+                      ><v-icon>mdi-eye</v-icon> {{ $t("home.view") }}</v-btn
                     >
                     <v-btn
                       small
@@ -154,7 +173,7 @@
                       v-if="item.symbol == 'CROWN'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
-                      ><v-icon>mdi-eye</v-icon> {{ $t('home.view') }}</v-btn
+                      ><v-icon>mdi-eye</v-icon> {{ $t("home.view") }}</v-btn
                     >
                     <v-btn
                       small
@@ -163,7 +182,7 @@
                       v-if="item.symbol == 'GHOST'"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
-                      ><v-icon>mdi-eye</v-icon> {{ $t('home.view') }}</v-btn
+                      ><v-icon>mdi-eye</v-icon> {{ $t("home.view") }}</v-btn
                     >
                     <v-btn
                       small
@@ -171,7 +190,7 @@
                       style="padding: 0 6px;"
                       @click="transferAsset($event, item)"
                       :disabled="item.amount == 0"
-                      ><v-icon>mdi-export</v-icon> {{ $t('home.send') }}</v-btn
+                      ><v-icon>mdi-export</v-icon> {{ $t("home.send") }}</v-btn
                     >
                   </div>
                 </v-expansion-panel-content>
@@ -203,7 +222,7 @@
                         :href="getExplorerLink(item.hash)"
                         target="_blank"
                         rel="noopener noreferrer"
-                        >{{ $t('home.view') }}</a
+                        >{{ $t("home.view") }}</a
                       >
                     </td>
                   </tr>
@@ -229,7 +248,7 @@
                 class="ma-1"
                 color="blue darken-1"
                 @click="loadMoreTxs"
-                >{{ $t('home.load') }}</v-btn
+                >{{ $t("home.load") }}</v-btn
               >
             </div>
           </div>
@@ -240,11 +259,13 @@
 
     <v-dialog v-if="claimDialog" v-model="claimDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('home.claim') }} KCAL?</v-card-title>
+        <v-card-title class="headline"
+          >{{ $t("home.claim") }} KCAL?</v-card-title
+        >
 
         <v-card-text>
-          {{ $t('home.claimDesc1') }}
-          {{ getKcalUnclaimed() }} {{ $t('home.claimDesc2') }}
+          {{ $t("home.claimDesc1") }}
+          {{ getKcalUnclaimed() }} {{ $t("home.claimDesc2") }}
 
           <v-spacer />
         </v-card-text>
@@ -253,11 +274,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="claimDialog = false">
-            {{ $t('home.disagree') }}
+            {{ $t("home.disagree") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askClaimKcal">
-            {{ $t('home.agree') }}
+            {{ $t("home.agree") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -265,10 +286,13 @@
 
     <v-dialog v-model="stakeDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('home.stake') }} SOUL</v-card-title>
+        <v-card-title class="headline"
+          >{{ $t("home.stake") }} SOUL</v-card-title
+        >
 
         <v-card-text class="pb-0">
-          {{ $t('home.have') }} {{ getUnstackedSoul() }} SOUL. {{ $t('home.haveStake') }}
+          {{ $t("home.have") }} {{ getUnstackedSoul() }} SOUL.
+          {{ $t("home.haveStake") }}
 
           <v-slider
             v-model="stakeSoulAmount"
@@ -285,7 +309,7 @@
           >
           <v-row style="margin-top:-25px">
             <v-col class="mt-3">
-              {{ $t('home.addStakes') }}
+              {{ $t("home.addStakes") }}
             </v-col>
             <v-col>
               <v-text-field
@@ -302,7 +326,7 @@
           </v-row>
           <v-row style="margin-top:-18px">
             <v-col class="mt-3">
-              {{ $t('home.resultStakes') }}
+              {{ $t("home.resultStakes") }}
             </v-col>
             <v-col>
               <v-text-field
@@ -324,11 +348,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="stakeDialog = false">
-            {{ $t('home.cancel') }}
+            {{ $t("home.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askStakeSoul">
-            {{ $t('home.stake') }}
+            {{ $t("home.stake") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -336,10 +360,13 @@
 
     <v-dialog v-model="unstakeDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('home.unstake') }} SOUL</v-card-title>
+        <v-card-title class="headline"
+          >{{ $t("home.unstake") }} SOUL</v-card-title
+        >
 
         <v-card-text class="pb-0">
-          {{ $t('home.have') }} {{ getStackedSoul() }} {{ $t('home.haveUnstake') }}
+          {{ $t("home.have") }} {{ getStackedSoul() }}
+          {{ $t("home.haveUnstake") }}
 
           <v-slider
             v-model="unstakeSoulAmount"
@@ -356,7 +383,7 @@
           >
           <v-row class="mb-0" style="margin-top:-25px">
             <v-col class="mt-3">
-              {{ $t('home.removeStakes') }}
+              {{ $t("home.removeStakes") }}
             </v-col>
             <v-col>
               <v-text-field
@@ -373,7 +400,7 @@
           </v-row>
           <v-row style="margin-top:-20px">
             <v-col class="mt-3">
-              {{ $t('home.resultStakes') }}
+              {{ $t("home.resultStakes") }}
             </v-col>
             <v-col>
               <v-text-field
@@ -395,11 +422,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="unstakeDialog = false">
-            {{ $t('home.cancel') }}
+            {{ $t("home.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askUnstakeSoul">
-            {{ $t('home.unstake') }}
+            {{ $t("home.unstake") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -407,10 +434,13 @@
 
     <v-dialog v-model="sendDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('home.send') }} {{ sendSymbol }}</v-card-title>
+        <v-card-title class="headline"
+          >{{ $t("home.send") }} {{ sendSymbol }}</v-card-title
+        >
 
         <v-card-text class="pb-0">
-          {{ $t('home.have') }} {{ sendMaxAmount }} {{ sendSymbol }}. {{ $t('home.sendAmount2') }}
+          {{ $t("home.have") }} {{ sendMaxAmount }} {{ sendSymbol }}.
+          {{ $t("home.sendAmount2") }}
 
           <v-slider
             v-model="sendAmount"
@@ -427,7 +457,7 @@
           >
           <v-row style="margin-top:-25px">
             <v-col class="mt-3">
-              {{ $t('home.sendAmount') }}
+              {{ $t("home.sendAmount") }}
             </v-col>
             <v-col>
               <v-text-field
@@ -444,7 +474,7 @@
           </v-row>
           <v-row style="margin-top:-20px">
             <v-col class="mt-4">
-              {{ $t('home.remaining') }}
+              {{ $t("home.remaining") }}
             </v-col>
             <v-col>
               <v-text-field
@@ -464,11 +494,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="sendDialog = false">
-            {{ $t('home.cancel') }}
+            {{ $t("home.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askSendWhere">
-            {{ $t('home.next') }}
+            {{ $t("home.next") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -476,11 +506,13 @@
 
     <v-dialog v-model="sendWhereDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('home.destination') }}</v-card-title>
+        <v-card-title class="headline">{{
+          $t("home.destination")
+        }}</v-card-title>
 
         <v-card-text>
           <span>
-            {{ $t('home.destinationDesc') }} {{ sendAmount }} {{ sendSymbol }}
+            {{ $t("home.destinationDesc") }} {{ sendAmount }} {{ sendSymbol }}
           </span>
           <br />
           <v-spacer />
@@ -518,11 +550,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="sendWhereDialog = false">
-            {{ $t('home.cancel') }}
+            {{ $t("home.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askSend">
-            {{ $t('home.next') }}
+            {{ $t("home.next") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -530,14 +562,14 @@
 
     <v-dialog v-model="signTxDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('home.authorize') }}</v-card-title>
+        <v-card-title class="headline">{{ $t("home.authorize") }}</v-card-title>
 
         <v-card-text>
           <span v-if="needsWif">
-            {{ $t('home.insertWIF') }}
+            {{ $t("home.insertWIF") }}
           </span>
           <span v-if="needsPass">
-            {{ $t('home.insertPassword') }}
+            {{ $t("home.insertPassword") }}
           </span>
           <v-spacer />
 
@@ -584,11 +616,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="closeSignTx">
-            {{ $t('home.cancel') }}
+            {{ $t("home.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="doSignTx">
-            {{ $t('home.sign') }}
+            {{ $t("home.sign") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -596,11 +628,11 @@
 
     <v-dialog v-model="registerNameDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t('home.register') }}</v-card-title>
+        <v-card-title class="headline">{{ $t("home.register") }}</v-card-title>
 
         <v-card-text>
           <span>
-            {{ $t('home.registerDescription') }}
+            {{ $t("home.registerDescription") }}
           </span>
           <br />
           <v-spacer class="ma-4" />
@@ -615,7 +647,7 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="registerNameDialog = false">
-            {{ $t('home.cancel') }}
+            {{ $t("home.cancel") }}
           </v-btn>
 
           <v-btn
@@ -624,7 +656,7 @@
             :disabled="nameToRegister.length < 3 || nameToRegister.length > 15"
             @click="askRegisterName"
           >
-            {{ $t('home.next') }}
+            {{ $t("home.next") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -762,7 +794,7 @@ export default class extends Vue {
   }
 
   get shorterAddress(): string {
-    if (!this.account) return this.$t('home.errorMessage1').toString();
+    if (!this.account) return this.$t("home.errorMessage1").toString();
 
     if (this.account.data.name && this.account.data.name != "")
       return this.account.data.name;
@@ -776,7 +808,7 @@ export default class extends Vue {
   }
 
   get shortAddress(): string {
-    if (!this.account) return this.$t('home.errorMessage1').toString();
+    if (!this.account) return this.$t("home.errorMessage1").toString();
 
     let addr = this.account.address;
     return (
@@ -820,14 +852,18 @@ export default class extends Vue {
   }
 
   getAmount(balance: Balance) {
-    return this.formatBalance(balance.amount, balance.decimals);
+    return this.formatBalance(
+      balance.amount,
+      balance.decimals,
+      balance.symbol == "ETH" ? 3 : 2
+    );
   }
 
   getCurrencyValue(balance: Balance) {
     if (!balance) return "";
 
     const val = parseFloat(
-      this.formatBalance(balance.amount, balance.decimals)
+      this.formatBalance(balance.amount, balance.decimals, 5)
     );
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
@@ -846,6 +882,8 @@ export default class extends Vue {
 
   noKcal() {
     if (!this.account) return true;
+    if (!this.account.data) return true;
+    if (!this.account.data.balances) return true;
     const kcalBalance = this.account.data.balances.find(
       (b) => b.symbol == "KCAL"
     );
@@ -860,6 +898,8 @@ export default class extends Vue {
 
   getUnstackedSoul() {
     if (!this.account) return "0";
+    if (!this.account.data) return "0";
+    if (!this.account.data.balances) return "0";
     const soulBalance = this.account.data.balances.find(
       (b) => b.symbol == "SOUL"
     );
@@ -872,11 +912,15 @@ export default class extends Vue {
 
     if (item.symbol == "SOUL")
       return (
-        this.$t('home.secondLine1').toString() + " " + this.formatBalance(this.account.data.stake, 8) + " SOUL"
+        this.$t("home.secondLine1").toString() +
+        " " +
+        this.formatBalance(this.account.data.stake, 8) +
+        " SOUL"
       );
     if (item.symbol == "KCAL")
       return (
-        this.$t('home.secondLine2').toString() + " " +
+        this.$t("home.secondLine2").toString() +
+        " " +
         this.formatBalance(this.account.data.unclaimed, 10) +
         " KCAL"
       );
@@ -897,7 +941,7 @@ export default class extends Vue {
     return "";
   }
 
-  formatBalance(amount: string, decimals: number): string {
+  formatBalance(amount: string, decimals: number, decimalsToShow = 2): string {
     if (decimals == 0) return amount;
     while (amount.length < decimals + 1) amount = "0" + amount;
 
@@ -910,7 +954,9 @@ export default class extends Vue {
     return (
       intPart +
       "." +
-      (decimalPart.length >= 2 ? decimalPart.substring(0, 2) : decimalPart)
+      (decimalPart.length >= decimalsToShow
+        ? decimalPart.substring(0, decimalsToShow)
+        : decimalPart)
     );
   }
 
