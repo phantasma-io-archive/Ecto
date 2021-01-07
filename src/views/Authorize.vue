@@ -49,6 +49,7 @@
             :items="authorizeForItems"
             v-model="authorizeFor"
             :label="$t('authorize.label')"
+            style="z-index:8888"
           ></v-select>
         </v-row>
 
@@ -93,8 +94,7 @@ export default class extends Vue {
   async mounted() {
     console.log("authorize");
 
-    await state.check();
-    this.$i18n.locale = state.locale;
+    await state.check(this.$parent.$i18n);
 
     this.authorizeForItems = [
       this.$i18n.t("authorize.periodCurrent").toString(),

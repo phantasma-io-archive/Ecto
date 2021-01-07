@@ -72,7 +72,7 @@ export default class extends Vue {
   desc: any = {};
 
   async mounted() {
-    await this.state.check();
+    await this.state.check(this.$parent.$i18n);
     this.onChangeLanguage();
     this.$root.$on("changeLanguage", this.onChangeLanguage);
   }

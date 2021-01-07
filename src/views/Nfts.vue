@@ -441,7 +441,7 @@ export default class extends Vue {
     this.sendSymbol = this.$route.params.symbol;
     console.log("sendSymbol", this.sendSymbol);
 
-    await this.state.check();
+    await state.check(this.$parent.$i18n);
     this.isLoading = false;
 
     this.$root.$on("loading", (value: boolean) => {
