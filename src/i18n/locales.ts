@@ -15,7 +15,7 @@ export const LOCALES = [
 { value: Locales.EN, caption: 'English' },
 { value: Locales.FR, caption: 'Français' },
 { value: Locales.IT, caption: 'Italiano' },
-{ value: Locales.ES, caption: '' },
+{ value: Locales.ES, caption: 'Spanish' },
 { value: Locales.CN, caption: '中文' },
 { value: Locales.NL, caption: 'Nederlands' },
 { value: Locales.DE, caption: 'Deutsch' },

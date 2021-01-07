@@ -190,6 +190,7 @@ export default class extends Vue {
     "English",
     "Français",
     "Italiano",
+    "Spanish",
     "中文",
     "Nederlands",
     "Deutsch",
