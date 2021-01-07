@@ -88,7 +88,7 @@
     "removeStakes": "Vadeden kaldır",
     "sendAmount": "Gönderim miktarı",
     "sendAmount2": "var. Ne kadarını göndermek istiyorsun?",
-    "remaining": "Kalanlar",
+    "remaining": "Kalan",
     "next": "İleri",
     "insertWIF": "İşlemi onaylamak için WIF girin.",
     "insertPassword": "İşlemi onaylamak için şifre girin.",
@@ -102,7 +102,7 @@
     "registerMain": "Açık adresin yerine hesabını bir isim ile kullanabilirsin.",
     "destination": "Hedef",
     "destinationDesc": "Hangi adrese göndermek istiyorsun",
-    "have": "Şu kadar",
+    "have": "Hesabında",
     "haveStake": "var. Ne kadarını eklemek istiyorsun?",
     "haveUnstake": "SOUL vadede. Ne kadarını iptal etmek istiyorsun?",
     "claimDesc1": "Bu işlemle",
@@ -179,11 +179,11 @@
       "verified": "WIF gerektirir"
   },
   "error": {
-      "malformed": "Malformed request",
-      "noAccount": "Cannot find account",
-      "noEncrypted": "Cannot find encrypted key",
-      "noPasswordMatch": "Password does not match",
-      "notValid": "Account not valid",
-      "noAccountMatch": "Account does not match"
+      "malformed": "Hatalı istek",
+      "noAccount": "Hesap bulunamadı",
+      "noEncrypted": "Şifrelenmiş anahtar bulunamadı",
+      "noPasswordMatch": "Şifre eşleşmedi",
+      "notValid": "Hesap geçerli değil",
+      "noAccountMatch": "Böyle bir hesap yok"
   }
 }
