@@ -94,6 +94,7 @@ export default class extends Vue {
     console.log("authorize");
 
     await state.check();
+    this.$i18n.locale = state.locale;
 
     this.authorizeForItems = [
       this.$i18n.t("authorize.periodCurrent").toString(),

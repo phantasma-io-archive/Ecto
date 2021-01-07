@@ -83,6 +83,10 @@ export class PopupState {
     return this._language;
   }
 
+  get locale() {
+    return this.getLocaleFromLanguage(this._language);
+  }
+
   get nexus() {
     return this._nexus.toLowerCase();
   }
@@ -97,6 +101,29 @@ export class PopupState {
 
   get mainnetRpc() {
     return this._mainnetRpc;
+  }
+
+  getLocaleFromLanguage(language: string) {
+    if (language) {
+      switch (language) {
+        default:
+        case "English":
+          return "en";
+        case "Français":
+          return "fr";
+        case "Italiano":
+          return "it";
+        case "中文":
+          return "cn";
+        case "Nederlands":
+          return "nl";
+        case "Deutsch":
+          return "de";
+        case "Türkçe":
+          return "tr";
+      }
+    }
+    return "en";
   }
 
   async setNexus(value: string) {
@@ -605,7 +632,6 @@ export class PopupState {
 
   formatBalance(symbol: string, amount: string): string {
     let decimals = 0;
-    let decimalsToShow = 2;
     switch (symbol) {
       case "KCAL":
         decimals = 10;
@@ -624,7 +650,6 @@ export class PopupState {
         break;
       case "ETH":
         decimals = 18;
-        decimalsToShow = 3;
         break;
       default:
         decimals = 0;
@@ -653,9 +678,7 @@ export class PopupState {
     return (
       intPart +
       "." +
-      (decimalPart.length >= decimalsToShow
-        ? decimalPart.substring(0, decimalsToShow)
-        : decimalPart) +
+      (decimalPart.length >= 2 ? decimalPart.substring(0, 2) : decimalPart) +
       " " +
       symbol
     );
@@ -732,10 +755,6 @@ export class PopupState {
         console.log("getNFT of " + token + " " + nftId);
         const nft = await this.api.getNFT(token, nftId);
         console.log("Got nft", nft);
-
-        if ((nft as any).error) {
-          continue;
-        }
 
         const imgUrlUnformated = nft.properties.find(
           (kv) => kv.Key == "ImageURL"
