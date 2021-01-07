@@ -172,7 +172,7 @@
     "wallets": {
         "add": "Cüzdan Ekle",
         "select": "CÜZDAN SEÇ",
-        "title": "Hesap Seç",
+        "title": "Hesabı Sil",
         "subtitle": "Hesabı siler",
         "encKey": "Şifre Gerektirir",
         "unverified": "Salt okunur doğrulanmamış hesap",
