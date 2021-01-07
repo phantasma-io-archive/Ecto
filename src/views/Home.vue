@@ -444,7 +444,7 @@
 
           <v-slider
             v-model="sendAmount"
-            :min="1"
+            :min="0.001"
             :max="sendMaxAmount"
             :value="1"
             step="0.01"
