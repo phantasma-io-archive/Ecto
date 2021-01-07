@@ -1,33 +1,33 @@
 {
-    "errorDialog": {
-        "errorDescription": "Hata",
-        "cancelButton": "İptal"
-    },
-    "transactionComponent": {
-        "setName": "İsim ayarla:",
-        "minted": "Basıldı",
-        "sent": "Gönderildi",
-        "sentTo": "Şuraya gönderildi",
-        "burned": "Yakıldı",
-        "claimed": "Alındı",
-        "paid": "Ödendi",
-        "received": "Alındı",
-        "listed": "Listelendi",
-        "nftSale": "NFT Satışı",
-        "from": "Şuradan",
-        "infused": "Birleştirildi",
-        "unshown": "Gösterilmeyen olaylar",
-        "swapped": "Değiştirildi",
-        "staked": "Vadede",
-        "with": "İle",
-        "for": "İçin"
-    },
-    "app": {
-        "currencyDescription": "Para Birimi",
-        "languageDescription": "Dil",
-        "closeButton": "Kapat",
-        "errorMessage": "işlemde bir hata oluştu:"
-    },
+  "errorDialog": {
+      "errorDescription": "Hata",
+      "cancelButton": "İptal"
+  },
+  "transactionComponent": {
+      "setName": "İsim ayarla:",
+      "minted": "Basıldı",
+      "sent": "Gönderildi",
+      "sentTo": "Şuraya gönderildi",
+      "burned": "Yakıldı",
+      "claimed": "Alındı",
+      "paid": "Ödendi",
+      "received": "Alındı",
+      "listed": "Listelendi",
+      "nftSale": "NFT Satışı",
+      "from": "Şuradan",
+      "infused": "Birleştirildi",
+      "unshown": "Gösterilmeyen olaylar",
+      "swapped": "Değiştirildi",
+      "staked": "Vadede",
+      "with": "İle",
+      "for": "İçin"
+  },
+  "app": {
+      "currencyDescription": "Para Birimi",
+      "languageDescription": "Dil",
+      "closeButton": "Kapat",
+      "errorMessage": "işlemde bir hata oluştu:"
+  },
   "addWallet": {
     "add": "CÜZDAN EKLE",
     "import": "Aktar",
@@ -59,18 +59,18 @@
     "errorMessage2": "HEX ile cüzdan aktarmada hata",
     "errorMessage3": "Cüzdan aktarmada hata"
   },
-    "authorize": {
-        "description": "Phantasma Link'e bağlanmak istiyor. Her işlem izninizi isteyecek. izin vermek istiyor musunuz?",
-        "request": "Yetki verme isteği",
-        "label": "Bu süre kadar",
-        "refuse": "Reddet",
-        "connect": "Bağlan",
-        "periodCurrent": "Geçerli oturum",
-        "period1h": "Bir saat",
-        "period1d": "Bir gün",
-        "period1m": "Bir ay",
-        "periodAlways": "Her zaman"
-    },
+  "authorize": {
+      "description": "Phantasma Link'e bağlanmak istiyor. Her işlem izninizi isteyecek. izin vermek istiyor musunuz?",
+      "request": "Yetki verme isteği",
+      "label": "Bu süre kadar",
+      "refuse": "Reddet",
+      "connect": "Bağlan",
+      "periodCurrent": "Geçerli oturum",
+      "period1h": "Bir saat",
+      "period1d": "Bir gün",
+      "period1m": "Bir ay",
+      "periodAlways": "Her zaman"
+  },
   "home": {
     "assets": "Varlıklar",
     "activity": "Hareketler",
@@ -140,23 +140,23 @@
     "sortDirOptionsDesc": "Azalan",
     "noWallet": "<Cüzdan Yok>"
   },
-    "qr": {
-        "copy": "Panoya Kopyala",
-        "description": "Açık adresiniz",
-        "noWallet": "<Cüzdan Yok>"
-    },
-    "sign": {
-        "description": "Bu işleme(TX) şunun için izin veriyor musunuz?",
-        "request": "İşlem talebi",
-        "refuse": "Reddet",
-        "sign": "tx onay",
-        "password": "Şifre",
-        "error": "Hata",
-        "cancel": "Vazgeç",
-        "retry": "Tekrar dene",
-        "rejected": "kullanıcı iptal etti",
-        "notValid": "WIF bu adres için geçerli değil"
-    },
+  "qr": {
+      "copy": "Panoya Kopyala",
+      "description": "Açık adresiniz",
+      "noWallet": "<Cüzdan Yok>"
+  },
+  "sign": {
+      "description": "Bu işleme(TX) şunun için izin veriyor musunuz?",
+      "request": "İşlem talebi",
+      "refuse": "Reddet",
+      "sign": "tx onay",
+      "password": "Şifre",
+      "error": "Hata",
+      "cancel": "Vazgeç",
+      "retry": "Tekrar dene",
+      "rejected": "kullanıcı iptal etti",
+      "notValid": "WIF bu adres için geçerli değil"
+  },
   "signData": {
     "description": "Bu işleme(TX) şunun için izin veriyor musunuz?",
     "request": "Veri onay talebi",
@@ -169,13 +169,21 @@
     "rejected": "Kullanıcı iptal etti",
     "notValid": "WIF bu adres için geçerli değil"
   },
-    "wallets": {
-        "add": "Cüzdan Ekle",
-        "select": "CÜZDAN SEÇ",
-        "title": "Hesabı Sil",
-        "subtitle": "Hesabı siler",
-        "encKey": "Şifre Gerektirir",
-        "unverified": "Salt okunur doğrulanmamış hesap",
-        "verified": "WIF gerektirir"
-    }
+  "wallets": {
+      "add": "Cüzdan Ekle",
+      "select": "CÜZDAN SEÇ",
+      "title": "Hesabı Sil",
+      "subtitle": "Hesabı siler",
+      "encKey": "Şifre Gerektirir",
+      "unverified": "Salt okunur doğrulanmamış hesap",
+      "verified": "WIF gerektirir"
+  },
+  "error": {
+      "malformed": "Malformed request",
+      "noAccount": "Cannot find account",
+      "noEncrypted": "Cannot find encrypted key",
+      "noPasswordMatch": "Password does not match",
+      "notValid": "Account not valid",
+      "noAccountMatch": "Account does not match"
+  }
 }

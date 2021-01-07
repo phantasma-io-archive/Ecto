@@ -177,5 +177,13 @@
         "encKey": "Requires password",
         "unverified": "Read-only unverified account",
         "verified": "Requires WIF"
+    },
+    "error": {
+        "malformed": "Malformed request",
+        "noAccount": "Cannot find account",
+        "noEncrypted": "Cannot find encrypted key",
+        "noPasswordMatch": "Password does not match",
+        "notValid": "Account not valid",
+        "noAccountMatch": "Account does not match"
     }
 }

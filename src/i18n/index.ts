@@ -21,7 +21,7 @@ export const messages = {
   [Locales.DE]: de,
   [Locales.TR]: tr,
   // [Locales.RU]: ru,
-  // [Locales.VN]: vn
+  [Locales.VN]: vn
 };
 
 export const defaultLocale = Locales.EN;

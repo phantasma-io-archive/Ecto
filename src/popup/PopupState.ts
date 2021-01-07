@@ -1,6 +1,17 @@
+import Vue from "vue";
 import WIF from "wif";
 import fetch from "cross-fetch";
 import * as CryptoJS from "crypto-js";
+import VueI18n from 'vue-i18n';
+import { messages, defaultLocale } from "@/i18n";
+
+Vue.use(VueI18n);
+
+const i18n = new VueI18n({
+  messages,
+  locale: defaultLocale,
+  fallbackLocale: defaultLocale
+});
 
 import {
   PhantasmaAPI,
@@ -57,7 +68,7 @@ export class PopupState {
   accountNfts: any[] = [];
   nfts: any = {};
 
-  payload = "4543542D302E312E32";
+  payload = "4543542D312E302E30";
 
   constructor() {}
 
@@ -113,6 +124,8 @@ export class PopupState {
           return "fr";
         case "Italiano":
           return "it";
+        case "Spanish":
+          return "es";
         case "中文":
           return "cn";
         case "Nederlands":
@@ -544,13 +557,13 @@ export class PopupState {
     password: string
   ) {
     const account = this.accounts.find((a) => a.address == address);
-    if (!account) throw new Error("Cannot find account");
+    if (!account) throw new Error(i18n.t('error.noAccount').toString());
 
     let wif = "";
     if (password == "") {
       if (account.wif) wif = account.wif;
     } else {
-      if (!account.encKey) throw new Error("Cannot find encrypted key");
+      if (!account.encKey) throw new Error(i18n.t('error.noEncrypted').toString());
 
       const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
       for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
@@ -558,17 +571,17 @@ export class PopupState {
     }
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error("Password does not match");
+      throw new Error(i18n.t('error.noPasswordMatch').toString());
 
     return await this.signTx(txdata, wif);
   }
 
   async signTx(txdata: TxArgsData, wif: string): Promise<string> {
     const account = this.currentAccount;
-    if (!account) throw new Error("Account not valid");
+    if (!account) throw new Error(i18n.t('error.notValid').toString());
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error("Account does not match");
+      throw new Error(i18n.t('error.noAccountMatch').toString());
 
     const address = account.address;
 
@@ -599,13 +612,13 @@ export class PopupState {
     password: string
   ): string {
     const account = this.accounts.find((a) => a.address == address);
-    if (!account) throw new Error("Cannot find account");
+    if (!account) throw new Error(i18n.t('error.noAccount').toString());
 
     let wif = "";
     if (password == "") {
       if (account.wif) wif = account.wif;
     } else {
-      if (!account.encKey) throw new Error("Cannot find encrypted key");
+      if (!account.encKey) throw new Error(i18n.t('error.noEncrypted').toString());
 
       const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
       for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
@@ -613,17 +626,17 @@ export class PopupState {
     }
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error("Password does not match");
+      throw new Error(i18n.t('error.noPasswordMatch').toString());
 
     return this.signData(data, wif);
   }
 
   signData(data: string, wif: string): string {
     const account = this.currentAccount;
-    if (!account) throw new Error("Account not valid");
+    if (!account) throw new Error(i18n.t('error.notValid').toString());
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error("Account does not match");
+      throw new Error(i18n.t('error.noAccountMatch').toString());
 
     const privateKey = getPrivateKeyFromWif(wif);
 

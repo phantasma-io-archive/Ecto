@@ -177,5 +177,13 @@
         "encKey": "Wachtwoord vereist",
         "unverified": "Ongeverifieerd account kan alleen worden gelezen",
         "verified": "WIF vereist"
+    },
+    "error": {
+        "malformed": "Malformed request",
+        "noAccount": "Cannot find account",
+        "noEncrypted": "Cannot find encrypted key",
+        "noPasswordMatch": "Password does not match",
+        "notValid": "Account not valid",
+        "noAccountMatch": "Account does not match"
     }
 }

@@ -177,5 +177,13 @@
         "encKey": "Password richiesta",
         "unverified": "Account non verificato in sola lettura",
         "verified": "Chiave WIF richiesta"
+    },
+    "error": {
+        "malformed": "Malformed request",
+        "noAccount": "Cannot find account",
+        "noEncrypted": "Cannot find encrypted key",
+        "noPasswordMatch": "Password does not match",
+        "notValid": "Account not valid",
+        "noAccountMatch": "Account does not match"
     }
 }

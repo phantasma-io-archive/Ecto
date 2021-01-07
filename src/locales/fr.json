@@ -177,5 +177,13 @@
         "encKey": "Requiert mot de passe",
         "unverified": "Compte non vérifié en lecture seule",
         "verified": "Requiert WIF"
+    },
+    "error": {
+        "malformed": "Requête incorrecte",
+        "noAccount": "Compte non trouvé",
+        "noEncrypted": "Clé encryptée non trouvée",
+        "noPasswordMatch": "Mot de passe ne correspond pas",
+        "notValid": "Compte non valide",
+        "noAccountMatch": "Compte ne correspond pas"
     }
 }
