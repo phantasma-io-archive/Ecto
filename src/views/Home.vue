@@ -867,7 +867,7 @@ export default class extends Vue {
     );
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
-      return (val * rate).toFixed(1) + " " + state.currencySymbol;
+      return state.currencySymbol + (val * rate).toFixed(1);
     }
     return "";
   }
@@ -936,7 +936,7 @@ export default class extends Vue {
     const val = parseFloat(this.formatBalance(amount, balance.decimals));
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
-      return (val * rate).toFixed(1) + " " + state.currencySymbol;
+      return state.currencySymbol + (val * rate).toFixed(1);
     }
     return "";
   }
