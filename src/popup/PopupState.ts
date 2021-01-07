@@ -1,17 +1,6 @@
-import Vue from "vue";
 import WIF from "wif";
 import fetch from "cross-fetch";
 import * as CryptoJS from "crypto-js";
-import VueI18n from 'vue-i18n';
-import { messages, defaultLocale } from "@/i18n";
-
-Vue.use(VueI18n);
-
-const i18n = new VueI18n({
-  messages,
-  locale: defaultLocale,
-  fallbackLocale: defaultLocale
-});
 
 import {
   PhantasmaAPI,
@@ -69,6 +58,10 @@ export class PopupState {
   nfts: any = {};
 
   payload = "4543542D312E302E30";
+
+  $i18n: any = {
+    t: (s: string) => s,
+  };
 
   constructor() {}
 
@@ -252,7 +245,8 @@ export class PopupState {
     return -1;
   }
 
-  async check(): Promise<void> {
+  async check($i18n: any): Promise<void> {
+    this.$i18n = $i18n; // save translate method from Vue i18n
     return new Promise((resolve, reject) => {
       chrome.storage.local.get((items) => {
         console.log("[PopupState] Get local storage");
@@ -266,6 +260,8 @@ export class PopupState {
         this._currency = items.currency ? items.currency : "USD";
         this._language = items.language ? items.language : "English";
         this.nfts = items.nfts ? items.nfts : {};
+
+        $i18n.locale = this.locale;
 
         this._accounts = items.accounts
           ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
@@ -320,6 +316,7 @@ export class PopupState {
 
   async setLanguage(language: string): Promise<void> {
     this._language = language;
+
     return new Promise((resolve, reject) => {
       chrome.storage.local.set(
         {
@@ -557,13 +554,14 @@ export class PopupState {
     password: string
   ) {
     const account = this.accounts.find((a) => a.address == address);
-    if (!account) throw new Error(i18n.t('error.noAccount').toString());
+    if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
 
     let wif = "";
     if (password == "") {
       if (account.wif) wif = account.wif;
     } else {
-      if (!account.encKey) throw new Error(i18n.t('error.noEncrypted').toString());
+      if (!account.encKey)
+        throw new Error(this.$i18n.t("error.noEncrypted").toString());
 
       const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
       for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
@@ -571,17 +569,17 @@ export class PopupState {
     }
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error(i18n.t('error.noPasswordMatch').toString());
+      throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
     return await this.signTx(txdata, wif);
   }
 
   async signTx(txdata: TxArgsData, wif: string): Promise<string> {
     const account = this.currentAccount;
-    if (!account) throw new Error(i18n.t('error.notValid').toString());
+    if (!account) throw new Error(this.$i18n.t("error.notValid").toString());
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error(i18n.t('error.noAccountMatch').toString());
+      throw new Error(this.$i18n.t("error.noAccountMatch").toString());
 
     const address = account.address;
 
@@ -612,13 +610,14 @@ export class PopupState {
     password: string
   ): string {
     const account = this.accounts.find((a) => a.address == address);
-    if (!account) throw new Error(i18n.t('error.noAccount').toString());
+    if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
 
     let wif = "";
     if (password == "") {
       if (account.wif) wif = account.wif;
     } else {
-      if (!account.encKey) throw new Error(i18n.t('error.noEncrypted').toString());
+      if (!account.encKey)
+        throw new Error(this.$i18n.t("error.noEncrypted").toString());
 
       const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
       for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
@@ -626,17 +625,17 @@ export class PopupState {
     }
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error(i18n.t('error.noPasswordMatch').toString());
+      throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
     return this.signData(data, wif);
   }
 
   signData(data: string, wif: string): string {
     const account = this.currentAccount;
-    if (!account) throw new Error(i18n.t('error.notValid').toString());
+    if (!account) throw new Error(this.$i18n.t("error.notValid").toString());
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error(i18n.t('error.noAccountMatch').toString());
+      throw new Error(this.$i18n.t("error.noAccountMatch").toString());
 
     const privateKey = getPrivateKeyFromWif(wif);
 

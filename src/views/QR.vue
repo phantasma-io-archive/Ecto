@@ -21,7 +21,7 @@
         style="max-height:400px; font-size:10px; text-align:center"
       >
         <div class="text-subtitle-1 mt-4">
-          {{ $t('qr.description') }}
+          {{ $t("qr.description") }}
         </div>
         <v-skeleton-loader
           v-if="isLoading"
@@ -32,9 +32,9 @@
 
         {{ account.address }}
         <br />
-        <a href="" @click.prevent="copyAddressToClipboard()"
-          >{{ $t('qr.copy') }}</a
-        >
+        <a href="" @click.prevent="copyAddressToClipboard()">{{
+          $t("qr.copy")
+        }}</a>
       </v-container>
     </v-main>
   </div>
@@ -66,7 +66,7 @@ export default class extends Vue {
   }
 
   get shorterAddress(): string {
-    this.messageNoWallet = this.$i18n.t('qr.noWallet').toString()
+    this.messageNoWallet = this.$i18n.t("qr.noWallet").toString();
     if (!this.account) return this.messageNoWallet;
 
     if (this.account.data.name && this.account.data.name != "")
@@ -81,7 +81,7 @@ export default class extends Vue {
   }
 
   get shortAddress(): string {
-    this.messageNoWallet = this.$i18n.t('qr.noWallet').toString()
+    this.messageNoWallet = this.$i18n.t("qr.noWallet").toString();
     if (!this.account) return this.messageNoWallet;
 
     let addr = this.account.address;
@@ -93,7 +93,7 @@ export default class extends Vue {
   }
 
   async mounted() {
-    await this.state.check();
+    await this.state.check(this.$parent.$i18n);
 
     if (this.account) {
       const qr = new QRCode();

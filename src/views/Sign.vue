@@ -6,7 +6,7 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>PHANTASMA LINK</v-list-item-title>
-          <v-list-item-subtitle>{{ $t('sign.request') }}</v-list-item-subtitle>
+          <v-list-item-subtitle>{{ $t("sign.request") }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-spacer />
@@ -39,7 +39,7 @@
         </v-row>
 
         <div style="padding-right: 30px">
-          {{ $t('sign.description') }}
+          {{ $t("sign.description") }}
           <strong>{{ currentAccountDescription }}</strong
           >?
         </div>
@@ -87,14 +87,16 @@
 
         <v-row style="margin-top:50px">
           <v-col>
-            <v-btn secondary style="width: 85%" @click="refuse()">{{ $t('sign.refuse') }}</v-btn>
+            <v-btn secondary style="width: 85%" @click="refuse()">{{
+              $t("sign.refuse")
+            }}</v-btn>
           </v-col>
           <v-col>
             <v-btn
               dark
               style="width: 85%; background-color:#17b1e7"
               @click="signtx()"
-              >{{ $t('sign.sign') }}</v-btn
+              >{{ $t("sign.sign") }}</v-btn
             >
           </v-col>
         </v-row>
@@ -102,10 +104,12 @@
 
       <v-dialog v-model="errorDialog" persistent max-width="290">
         <v-card>
-          <v-card-title class="title">{{ $t('sign.error') }}</v-card-title>
+          <v-card-title class="title">{{ $t("sign.error") }}</v-card-title>
           <v-card-text>{{ errorMessage }}</v-card-text>
           <v-card-actions>
-            <v-btn color="blue darken-1" text @click="refuse()">{{ $t('sign.cancel') }}</v-btn>
+            <v-btn color="blue darken-1" text @click="refuse()">{{
+              $t("sign.cancel")
+            }}</v-btn>
             <v-spacer />
             <v-btn
               color="blue darken-1"
@@ -114,7 +118,7 @@
                 isLoading = false;
                 errorDialog = false;
               "
-              >{{ $t('sign.retry') }}</v-btn
+              >{{ $t("sign.retry") }}</v-btn
             >
           </v-card-actions>
         </v-card>
@@ -152,7 +156,7 @@ export default class extends Vue {
   async mounted() {
     console.log("authorize");
 
-    await state.check();
+    await state.check(this.$parent.$i18n);
 
     this.dapp = state.getDapp(this.$route.params.token);
 
@@ -199,7 +203,7 @@ export default class extends Vue {
     const tabid = parseInt(this.$route.params.tabid);
     const sid = this.$route.params.sid;
 
-    this.messageRejected = this.$i18n.t('sign.rejected').toString()
+    this.messageRejected = this.$i18n.t("sign.rejected").toString();
 
     chrome.runtime.sendMessage({
       uid: "plsres",
@@ -220,7 +224,7 @@ export default class extends Vue {
 
     let hash = null;
 
-    this.messageNotValid = this.$i18n.t('sign.notValid').toString()
+    this.messageNotValid = this.$i18n.t("sign.notValid").toString();
 
     try {
       if (this.needsWif) {
@@ -228,10 +232,10 @@ export default class extends Vue {
           hash = await state.signTx(txdata, this.wif);
         else {
           this.errorDialog = true;
-          this.errorMessage = this.messageNotValid + " " + state.currentAccount?.address;
+          this.errorMessage =
+            this.messageNotValid + " " + state.currentAccount?.address;
         }
-      }
-      else
+      } else
         hash = await state.signTxWithPassword(
           txdata,
           state.currentAccount!.address,

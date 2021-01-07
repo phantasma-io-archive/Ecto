@@ -228,11 +228,9 @@ export default class extends Vue {
   }
 
   async mounted() {
-    await state.check();
+    await state.check(this.$parent.$i18n);
     this.currency = state.currency;
     this.language = state.language;
-
-    this.$i18n.locale = state.locale;
 
     this.version = chrome.runtime.getManifest().version;
 

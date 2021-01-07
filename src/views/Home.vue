@@ -732,7 +732,7 @@ export default class extends Vue {
 
   async mounted() {
     (window as any).state = state;
-    await this.state.check();
+    await state.check(this.$parent.$i18n);
     await Promise.all([
       this.state.refreshCurrentAccount(),
       this.state.fetchRates(),
