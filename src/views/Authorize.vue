@@ -6,7 +6,9 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>PHANTASMA LINK</v-list-item-title>
-          <v-list-item-subtitle>{{ $t('authorize.request') }}</v-list-item-subtitle>
+          <v-list-item-subtitle>{{
+            $t("authorize.request")
+          }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-spacer />
@@ -35,7 +37,8 @@
         </v-row>
 
         <div style="text-align:center" class="mb-7 mt-5">
-          <strong>{{ $route.params.dapp }}</strong> {{ $t('authorize.description') }}
+          <strong>{{ $route.params.dapp }}</strong>
+          {{ $t("authorize.description") }}
           <br />
           <br />
           {{ domain }}
@@ -51,16 +54,16 @@
 
         <v-row class="mt-6">
           <v-col>
-            <v-btn secondary style="width: 100%" @click="refuse()"
-              >{{ $t('authorize.refuse') }}</v-btn
-            >
+            <v-btn secondary style="width: 100%" @click="refuse()">{{
+              $t("authorize.refuse")
+            }}</v-btn>
           </v-col>
           <v-col>
             <v-btn
               dark
               style="width: 100%; background-color:#17b1e7"
               @click="connect()"
-              >{{ $t('authorize.connect') }}</v-btn
+              >{{ $t("authorize.connect") }}</v-btn
             >
           </v-col>
         </v-row>
@@ -85,26 +88,26 @@ export default class extends Vue {
   domain = "";
   faviconUrl = "";
   authorizeFor = "";
-  authorizeForItems: string[] = []
+  authorizeForItems: string[] = [];
 
   async mounted() {
     console.log("authorize");
 
+    await state.check();
+
     this.authorizeForItems = [
-      this.$i18n.t('authorize.periodCurrent').toString(),
-      this.$i18n.t('authorize.period1h').toString(),
-      this.$i18n.t('authorize.period1d').toString(),
-      this.$i18n.t('authorize.period1m').toString(),
-      this.$i18n.t('authorize.periodAlways').toString()
+      this.$i18n.t("authorize.periodCurrent").toString(),
+      this.$i18n.t("authorize.period1h").toString(),
+      this.$i18n.t("authorize.period1d").toString(),
+      this.$i18n.t("authorize.period1m").toString(),
+      this.$i18n.t("authorize.periodAlways").toString(),
     ];
-    this.authorizeFor = this.$i18n.t('authorize.periodCurrent').toString();
+    this.authorizeFor = this.$i18n.t("authorize.periodCurrent").toString();
 
     this.url = atob(this.$route.params.url);
     this.faviconUrl = atob(this.$route.params.favicon);
     this.hostname = new URL(this.url).hostname;
     this.domain = new URL(this.url).protocol + "//" + this.hostname;
-
-    await state.check();
 
     if (!state.hasAccount) {
       this.$router.push("/addwallet");
