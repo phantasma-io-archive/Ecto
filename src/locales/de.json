@@ -2,7 +2,7 @@
     "errorDialog": {
         "errorDescription": "Fehler",
         "cancelButton": "Abbrechen"
-    },
+   },
     "transactionComponent": {
         "setName": "Name festlegen:",
         "minted": "Gemintet",
@@ -31,13 +31,13 @@
     "addWallet": {
         "add": "Brieftasche HINZUFÜGEN",
         "import": "Importieren",
-        "importLong": "Brieftasche importieren",
+        "importLong": "Importieren",
         "create": "Erstellen",
         "no": "Nein",
         "or": "Oder",
         "setPassword": "Passwort festlegen",
         "cancel": "Abbrechen",
-        "copy": "In die Zwischenablage kopieren",
+        "copy": "Kopieren (Zwischenablage)",
         "labelPassword": "Passwort",
         "labelWIF": "WIF oder hex privater Schlüssel",
         "labelAddress": "Brieftaschenadresse oder -name",
@@ -53,7 +53,7 @@
         "created": "Brieftasche mit der folgenden Addresse und dem folgenden privaten Schlüssel (WIF-Format) erstellt",
         "backup": "Sichern Sie den WIF",
         "recover": "Sie brauchen ihren WIF nur um Ihre Brieftasche wiederherzustellen. Stellen Sie sicher, dass Sie immer ein sicheres Backup haben.",
-        "backupConfirm": "Ja, ich habe ein Backup gemacht",
+        "backupConfirm": "Ja, Backup erstellt",
         "secure": "Geben Sie ein Passwort ein, um die Brieftasche zu sichern. Sie können immer den WIF benutzen, um sie wiederherzustellen.",
         "errorMessage1": "Fehler beim Importieren der WIF-Brieftasche",
         "errorMessage2": "Fehler beim Importieren der HEX-Brieftasche",
@@ -112,7 +112,7 @@
         "labelPassword": "Passwort", 
         "labelPick": "Wählen Sie Ihren Namen",
         "errorMessage1": "<keine brieftasche>",
-        "secondLine1": "Gestaked",
+        "secondLine1": "Gestaket:",
         "secondLine2": "Unbeansprucht"
     },
     "nfts": {
