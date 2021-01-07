@@ -23,6 +23,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
       s.remove();
     };
   }
+  return Promise.resolve("Dummy response to keep the console quiet");
 });
 
 window.addEventListener("message", (msg) => {

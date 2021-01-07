@@ -351,4 +351,5 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
         break;
     }
   }
+  return Promise.resolve("Dummy response to keep the console quiet");
 });
