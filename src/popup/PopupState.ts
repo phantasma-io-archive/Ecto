@@ -127,6 +127,8 @@ export class PopupState {
           return "de";
         case "Türkçe":
           return "tr";
+        case "Vietnamese":
+          return "vn";
       }
     }
     return "en";

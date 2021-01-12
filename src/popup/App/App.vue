@@ -195,6 +195,7 @@ export default class extends Vue {
     "Nederlands",
     "Deutsch",
     "Türkçe",
+    "Vietnamese"
   ];
   language = "en";
 
