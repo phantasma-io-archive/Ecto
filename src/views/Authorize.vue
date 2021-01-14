@@ -49,7 +49,6 @@
             :items="authorizeForItems"
             v-model="authorizeFor"
             :label="$t('authorize.label')"
-            style="z-index:8888"
           ></v-select>
         </v-row>
 

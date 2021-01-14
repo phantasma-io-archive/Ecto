@@ -19,7 +19,6 @@
               :items="currencies"
               :label="$t('app.currencyDescription')"
               class="pl-4 pr-4"
-              style="z-index:8888"
               @input="changeCurrency()"
             ></v-select>
           </v-row>
@@ -29,7 +28,6 @@
               :items="languages"
               :label="$t('app.languageDescription')"
               class="pl-4 pr-4"
-              style="z-index:8888"
               @input="changeLanguage()"
             >
             </v-select>
