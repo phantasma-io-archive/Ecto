@@ -20,6 +20,6 @@ export const LOCALES = [
 { value: Locales.NL, caption: 'Nederlands' },
 { value: Locales.DE, caption: 'Deutsch' },
 { value: Locales.TR, caption: 'Türkçe' },
-{ value: Locales.RU, caption: '' },
+{ value: Locales.RU, caption: 'Русский' },
 { value: Locales.VN, caption: '' }
 ]
