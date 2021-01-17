@@ -142,7 +142,7 @@
     },
     "qr": {
         "copy": "Copy to clipboard",
-        "description": "Voici votre adresse publique",
+        "description": "Here's your public address",
         "noWallet": "<no wallet>"
     },
     "sign": {
