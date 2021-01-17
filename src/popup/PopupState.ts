@@ -119,6 +119,8 @@ export class PopupState {
           return "it";
         case "Spanish":
           return "es";
+        case "Русский":
+          return 'ru';
         case "中文":
           return "cn";
         case "Nederlands":
@@ -127,7 +129,7 @@ export class PopupState {
           return "de";
         case "Türkçe":
           return "tr";
-        case "Vietnamese":
+        case "Tiếng Việt":
           return "vn";
       }
     }

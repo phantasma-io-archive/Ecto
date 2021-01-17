@@ -8,7 +8,7 @@ import cn from "../locales/cn.json";
 import nl from "../locales/nl.json";
 import de from "../locales/de.json";
 import tr from "../locales/tr.json";
-// import ru from "../locales/ru.json";
+import ru from "../locales/ru.json";
 import vn from "../locales/vn.json";
 
 export const messages = {
@@ -20,7 +20,7 @@ export const messages = {
   [Locales.NL]: nl,
   [Locales.DE]: de,
   [Locales.TR]: tr,
-  // [Locales.RU]: ru,
+  [Locales.RU]: ru,
   [Locales.VN]: vn
 };
 

@@ -2,7 +2,7 @@
     "errorDialog": {
         "errorDescription": "Fehler",
         "cancelButton": "Abbrechen"
-   },
+    },
     "transactionComponent": {
         "setName": "Name festlegen:",
         "minted": "Gemintet",
@@ -76,12 +76,12 @@
         "activity": "Aktivität",
         "unstake": "Entstaken",
         "stake": "Staken",
-        "claim": "Beanspruchen",
+        "claim": "Beanspruchen:",
         "view": "ansehen",
-        "send": "Senden",
+        "send": "Senden:",
         "load": "Mehr laden",
         "agree": "Zustimmen",
-        "disagree": "Nicht zustimmen",
+        "disagree": "Ablehnen",
         "addStakes": "Zu Stakes hinzufügen",
         "resultStakes": "Ergebnis Stakes",
         "cancel": "Abbrechen",
@@ -101,7 +101,7 @@
         "registerTitle": "Einen Namen registrieren",
         "registerMain": "Sie können Ihr Konto mit einem Namen anstelle einer öffentlichen Adresse verwenden",
         "destination": "Zieladresse",
-        "destinationDesc": "Wählen Sie, wohin Sie senden möchten",
+        "destinationDesc": "Wählen Sie, wohin Sie senden möchten:",
         "have": "Sie haben",
         "haveStake": "Wie viele möchten Sie senden?",
         "haveUnstake": "gestakte SOUL. Wie viele möchten Sie entstaken?",
@@ -113,7 +113,7 @@
         "labelPick": "Wählen Sie Ihren Namen",
         "errorMessage1": "<keine brieftasche>",
         "secondLine1": "Gestaket:",
-        "secondLine2": "Unbeansprucht"
+        "secondLine2": "Unbeansprucht:"
     },
     "nfts": {
         "selected": "ausgewählt",
