@@ -157,9 +157,7 @@
               <v-card-title class="headline">{{ $t('addWallet.backup') }}</v-card-title>
 
               <v-card-text>
-                <span>
-                  {{ $t('addWallet.recover') }}
-                </span>
+                <span v-html="i18n.recover"></span>
                 <v-spacer class="ma-3" />
 
                 <v-textarea
@@ -309,7 +307,8 @@ export default class extends Vue {
 
   get i18n() {
     return {
-      descriptionLong: this.$t('addWallet.descriptionLong')
+      descriptionLong: this.$t('addWallet.descriptionLong'),
+      recover: this.$t('addWallet.recover')
     };
   }
 

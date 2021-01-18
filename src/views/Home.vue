@@ -287,7 +287,7 @@
     <v-dialog v-model="stakeDialog" max-width="290">
       <v-card>
         <v-card-title class="headline"
-          >{{ $t("home.stake") }} SOUL</v-card-title
+          >{{ $t("home.stakeTitle") }} SOUL</v-card-title
         >
 
         <v-card-text class="pb-0">
@@ -361,7 +361,7 @@
     <v-dialog v-model="unstakeDialog" max-width="290">
       <v-card>
         <v-card-title class="headline"
-          >{{ $t("home.unstake") }} SOUL</v-card-title
+          >{{ $t("home.unstakeTitle") }} SOUL</v-card-title
         >
 
         <v-card-text class="pb-0">
