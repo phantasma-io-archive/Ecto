@@ -4,7 +4,7 @@
       "cancelButton": "İptal"
   },
   "transactionComponent": {
-      "setName": "İsim ayarla:",
+      "setName": "İsim ayarla",
       "minted": "Basıldı",
       "sent": "Gönderildi",
       "sentTo": "Şuraya gönderildi",

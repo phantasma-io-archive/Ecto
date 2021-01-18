@@ -4,7 +4,7 @@
         "cancelButton": "Cancelar"
     },
     "transactionComponent": {
-        "setName": "Nombrar:",
+        "setName": "Nombrar",
         "minted": "Acuñado",
         "sent": "Enviado",
         "sentTo": "Enviado a",

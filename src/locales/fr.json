@@ -4,7 +4,7 @@
         "cancelButton": "Annuler"
     },
     "transactionComponent": {
-        "setName": "Nom:",
+        "setName": "Nom",
         "minted": "Mint",
         "sent": "Envoi",
         "sentTo": "Envoi à",

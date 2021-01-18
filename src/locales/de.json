@@ -4,7 +4,7 @@
         "cancelButton": "Abbrechen"
     },
     "transactionComponent": {
-        "setName": "Name festlegen:",
+        "setName": "Name festlegen",
         "minted": "Gemintet",
         "sent": "Gesendet",
         "sentTo": "Gesendet an",

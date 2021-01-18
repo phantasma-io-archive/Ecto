@@ -4,7 +4,7 @@
         "cancelButton": "Annulla"
     },
     "transactionComponent": {
-        "setName": "Imposta nome:",
+        "setName": "Imposta nome",
         "minted": "Coniati",
         "sent": "Spediti",
         "sentTo": "Spediti a",
