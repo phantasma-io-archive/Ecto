@@ -96,9 +96,12 @@ export default class extends Vue {
   }
 
   getShorterAddress(account: Account): string {
+    if (!account) return "account error";
     if (account.name && account.name != "") return account.name;
 
     let addr = account.address;
+    if (!addr || addr.length < 8) return "account error";
+
     return (
       addr.substring(0, 6) +
       "..." +
@@ -107,7 +110,9 @@ export default class extends Vue {
   }
 
   getShortAddress(account: Account): string {
+    if (!account) return "account error";
     let addr = account.address;
+    if (!addr || addr.length < 8) return "account error";
     return (
       addr.substring(0, 8) +
       "..." +
