@@ -13,6 +13,7 @@ import {
   Balance,
   signData,
 } from "@/phan-js";
+import { rejects } from "assert";
 
 interface IAuthorization {
   dapp: string;
@@ -120,7 +121,7 @@ export class PopupState {
         case "Spanish":
           return "es";
         case "Русский":
-          return 'ru';
+          return "ru";
         case "中文":
           return "cn";
         case "Nederlands":
@@ -364,6 +365,7 @@ export class PopupState {
 
     if (!address.startsWith("P") || address.length != 47) {
       address = await this.api.lookUpName(address);
+      if ((address as any).error) throw new Error("Wallet name not found");
     }
 
     const accountData = await this.getAccountData(address);
