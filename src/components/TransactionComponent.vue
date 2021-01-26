@@ -416,6 +416,28 @@ export default class extends Vue {
           // }
           break;
         }
+        case "OrderBid": {
+          const data = getMarketEventData(ev.data);
+          // if (ev.address == this.address) {
+          {
+            const nftId = data.id;
+            res.push({
+              icon: "mdi-database-plus",
+              iconColor: "blue",
+              postIcon: "mdi-eye-outline",
+              postIconColor: "gray",
+              text: 'Bid ' + data.type + ' Auction (' + data.baseSymbol + ')',
+              tooltip:
+                this.txFor +
+                " " +
+                formatSymbol("" + data.amount, data.quoteSymbol),
+              nftId,
+              symbol: data.baseSymbol,
+            });
+          }
+          // }
+          break;
+        }
         case "Infusion": {
           const data = getInfusionEventData(ev.data);
           // if (ev.address == this.address) {

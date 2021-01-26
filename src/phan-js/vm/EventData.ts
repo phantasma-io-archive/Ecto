@@ -55,6 +55,13 @@ export enum EventKind {
   Custom = 64,
 }
 
+export enum TypeAuction {
+  Fixed,
+  Reserve,
+  Schedule,
+  Dutch,
+}
+
 export class Decoder {
   str: string;
 
@@ -191,6 +198,7 @@ export function getMarketEventData(str: string) {
     quoteSymbol: dec.readString(),
     id: dec.readBigIntAccurate(),
     amount: dec.readBigInt(),
+    type: 'Schedule',
   };
 }
 
