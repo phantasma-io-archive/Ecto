@@ -52,6 +52,7 @@ export enum EventKind {
   ContractUpgrade = 47,
   Log = 48,
   Inflation = 49,
+  OrderBid = 58,
   Custom = 64,
 }
 
