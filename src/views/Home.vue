@@ -13,6 +13,9 @@
       <v-btn icon @click="goto('/qr')">
         <v-icon>mdi-qrcode</v-icon>
       </v-btn>
+      <!-- <v-btn icon @click="goto('/qr')">
+        <v-icon>mdi-apps</v-icon>
+      </v-btn> -->
     </v-app-bar>
 
     <v-main style="width:320px; max-height:500px">
@@ -30,6 +33,15 @@
       >
         <v-tab>{{ $t("home.assets") }}</v-tab>
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
+        <v-tab
+          ><v-badge
+            v-if="phaSwaps.concat(neoSwaps, ethSwaps).length > 0"
+            dot
+            color="#17b1e8"
+          >
+            Swaps</v-badge
+          ><span v-else>Swaps</span></v-tab
+        >
 
         <v-tab-item key="1">
           <v-container
@@ -251,6 +263,256 @@
                 >{{ $t("home.load") }}</v-btn
               >
             </div>
+          </div>
+          <div class="pa-3"></div>
+        </v-tab-item>
+
+        <v-tab-item key="3">
+          <div
+            v-if="account.neoAddress && account.ethAddress"
+            style="overflow: auto; height: 459px"
+          >
+            <div
+              v-if="
+                phaSwaps.length > 0 ||
+                  ethSwaps.lenght > 0 ||
+                  neoSwaps.length > 0
+              "
+              class="pa-4"
+            >
+              <div
+                v-for="(swap, idx) in phaSwaps.concat(neoSwaps, ethSwaps)"
+                :key="swap.sourceHash + idx"
+                class="pa-1"
+              >
+                {{ formatSymbol(swap.value, swap.symbol) }} pending swap from
+                {{ swap.sourcePlatform }} to
+                {{ swap.destinationPlatform }}
+                <a href="#" @click.prevent="claimSwap(swap)">claim</a>
+              </div>
+            </div>
+            <div style="text-align:center">
+              <v-expansion-panels focusable hover multiple>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <v-row>
+                      <v-col class="mt-2">
+                        Swap from NEO
+                      </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/neo.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/soul.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-2">
+                    <div v-if="!neoBalances || neoBalances.length === 0">
+                      There are no swappable assets in the NEO side of you
+                      wallet.<br />
+                      <br />Send the assets you want to swap to
+                      <strong>{{ account.neoAddress }}</strong>
+                      <v-btn
+                        icon
+                        small
+                        @click="copyToClipboard(account.neoAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                    </div>
+                    <div v-else>
+                      Swappable assets in
+                      <strong>{{ account.neoAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.neoAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                      <v-list>
+                        <v-list-item-group>
+                          <v-list-item
+                            v-for="bal in neoBalances"
+                            :key="bal.symbol"
+                          >
+                            <v-list-item-content>
+                              <v-img
+                                class="mr-3"
+                                :src="getAssetIcon(bal)"
+                                max-width="24px"
+                              ></v-img
+                              >{{ bal.amount }} {{ bal.symbol }}
+                            </v-list-item-content>
+                            <v-list-item-action>
+                              <a href="#" @click.prevent="askSwapFromNeo(bal)"
+                                >swap</a
+                              >
+                            </v-list-item-action>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+                    </div>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <v-row>
+                      <v-col class="mt-2">
+                        Swap from Ethereum
+                      </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/eth.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/soul.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-3">
+                    <div v-if="!ethBalances || ethBalances.length === 0">
+                      There are no swappable assets in the Ethereum side of you
+                      wallet.<br /><br />
+                      Send the assets you want to swap to
+                      <strong>{{ account.ethAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.ethAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                    </div>
+                    <div v-else>
+                      Swappable assets in
+                      <strong>{{ account.ethAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.ethAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                      <v-list>
+                        <v-list-item-group>
+                          <v-list-item
+                            v-for="bal in ethBalances"
+                            :key="bal.symbol"
+                          >
+                            <v-list-item-content>
+                              <v-img
+                                class="mr-3"
+                                :src="getAssetIcon(bal)"
+                                max-width="24px"
+                              ></v-img
+                              >{{ formatSymbol(bal.amount, bal.symbol) }}
+                            </v-list-item-content>
+                            <v-list-item-action>
+                              <a href="#" @click.prevent="askSwapFromEth(bal)"
+                                >swap</a
+                              >
+                            </v-list-item-action>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+                    </div>
+                    <br />
+                    or
+                    <a href="#" @click.prevent="goto('/addwallet')"
+                      >import your Ethereum wallet</a
+                    >
+                    with your hex private key (ie from Metamask) <br />
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <v-row style="vertical-align:middle">
+                      <v-col class="mt-2">
+                        Swap to NEO
+                      </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/soul.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/neo.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-3">
+                    Swap to NEO side of your wallet
+                    <a href="#" @click.prevent="selectAssetToSwap('neo', false)"
+                      >select asset</a
+                    ><br /><br />
+                    Or swap to another NEO wallet
+                    <a href="#" @click.prevent="selectAssetToSwap('neo', true)"
+                      >select asset and destination</a
+                    >
+                    <br />
+                    <!-- Each swap costs 0.1 GAS -->
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <v-row>
+                      <v-col class="mt-2">
+                        Swap to Ethereum
+                      </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/soul.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/eth.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-3">
+                    Swap to Ethereum side of your wallet
+                    <a href="#" @click.prevent="selectAssetToSwap('eth', false)"
+                      >select asset</a
+                    ><br /><br />
+                    Or swap to another Ethereum wallet
+                    <a href="#" @click.prevent="selectAssetToSwap('eth', true)"
+                      >select asset and destination</a
+                    >
+                    <br />
+                    <!-- Each swap costs 0.001 ETH -->
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </div>
+          </div>
+          <div v-else class="pa-6">
+            <v-spacer class="ma-9" />
+            To allow swaps you need to use your WIF or private key once. This
+            will generate the NEO and Ethereum addresses linked to your wallet.
+            <v-btn block class="mt-6" @click="generateSwapAddressDialog = true"
+              >continue</v-btn
+            >
           </div>
           <div class="pa-3"></div>
         </v-tab-item>
@@ -662,6 +924,280 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="selectAssetToSwapDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Select Asset</v-card-title>
+
+        <v-card-text class="pb-0">
+          <span>
+            You have the following available assets to swap to
+            {{ swapToChain.toUpperCase() }}
+          </span>
+          <br />
+          <v-list style="margin-left:-8px; margin-right:-8px;">
+            <v-list-item-group>
+              <template v-for="bal in account.data.balances">
+                <v-list-item
+                  v-if="isSwappable(bal.symbol, swapToChain)"
+                  :key="bal.symbol"
+                >
+                  <v-list-item-content>
+                    <v-img
+                      class="mr-3"
+                      :src="getAssetIcon(bal)"
+                      max-width="24px"
+                    ></v-img
+                    >{{ getAmount(bal) }} {{ bal.symbol }}
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <a href="#" @click="askAmountToSwap(bal)">swap</a>
+                  </v-list-item-action>
+                </v-list-item>
+              </template>
+            </v-list-item-group>
+          </v-list>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="gray darken-1"
+            text
+            @click="selectAssetToSwapDialog = false"
+          >
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <!-- <v-btn
+            color="blue darken-1"
+            text
+            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15"
+            @click="askRegisterName"
+          >
+            {{ $t("home.next") }}
+          </v-btn> -->
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="swapAmountDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">{{
+          "Swap" + " " + sendSymbol
+        }}</v-card-title>
+
+        <v-card-text class="pb-0">
+          {{ $t("home.have") }} {{ sendMaxAmount }} {{ sendSymbol }}.
+          {{ "How many you want to swap?" }}
+
+          <v-slider
+            v-model="sendAmount"
+            :min="0.001"
+            :max="sendMaxAmount"
+            :value="1"
+            step="0.01"
+            thumb-label="always"
+            style="margin-top:40px"
+          >
+            <template v-slot:thumb-label="{ value }">
+              {{ Math.round((100 * value) / sendMaxAmount) }}%
+            </template></v-slider
+          >
+          <v-row style="margin-top:-25px">
+            <v-col class="mt-3">
+              {{ $t("home.sendAmount") }}
+            </v-col>
+            <v-col>
+              <v-text-field
+                class="mt-0 mr-2"
+                v-model="sendAmount"
+                :min="1"
+                :max="sendMaxAmount"
+                single-line
+                type="number"
+                :suffix="sendSymbol"
+                style="width:120px"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row class="mt-8 mb-4">
+            <!-- <v-col class="mt-4">
+              {{ $t("home.remaining") }}
+            </v-col>
+            <v-col>
+              <v-text-field
+                class="mt-0 mr-2"
+                :value="sendMaxAmount - sendAmount"
+                single-line
+                type="number"
+                :suffix="sendSymbol"
+                style="width:120px"
+                disabled
+              ></v-text-field>
+            </v-col> -->
+            <template v-if="swapFromChain !== 'eth'">
+              <div class="mx-auto" style="display:inherit">
+                <v-icon class="mr-2">mdi-tortoise</v-icon>
+                <div
+                  class="pa-1"
+                  style="border:16px; background-color:#eee; border-radius:32px"
+                >
+                  <v-icon
+                    @click="swapGasIndex = 0"
+                    class="mr-3"
+                    :color="swapGasIndex == 0 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 0 ? "-medium" : "" }}</v-icon
+                  ><v-icon
+                    @click="swapGasIndex = 1"
+                    class="mr-3"
+                    :color="swapGasIndex == 1 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 1 ? "-medium" : "" }}</v-icon
+                  ><v-icon
+                    @click="swapGasIndex = 2"
+                    :color="swapGasIndex == 2 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 2 ? "-medium" : "" }}</v-icon
+                  >
+                </div>
+                <v-icon class="ml-2">mdi-rabbit</v-icon>
+              </div>
+              <div class="mx-auto" style="font-size:11px">
+                {{
+                  swapGasIndex == 0
+                    ? "Slow"
+                    : swapGasIndex == 1
+                    ? "Standard"
+                    : "Fast"
+                }}
+                Fee - {{ ethGasPrices[swapGasIndex] }} Gwei
+              </div>
+            </template>
+            <div v-else class="mx-auto">
+              To swap you need: {{ gasFeeAmount }} GAS
+            </div>
+          </v-row>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="sendDialog = false">
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="askSendWhere">
+            {{ $t("home.next") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="destinationSwapDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Swap destination</v-card-title>
+
+        <v-card-text class="pb-0">
+          <span>
+            Write {{ swapToChain.toUpperCase() }} destination address
+          </span>
+          <br />
+          <v-spacer class="ma-4" />
+
+          <v-text-field
+            v-model="nameToRegister"
+            :label="swapToChain + ' ' + 'destination address'"
+          ></v-text-field>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="gray darken-1"
+            text
+            @click="destinationSwapDialog = false"
+          >
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <v-btn
+            color="blue darken-1"
+            text
+            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15"
+            @click="askRegisterName"
+          >
+            {{ $t("home.next") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="generateSwapAddressDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Enable swaps</v-card-title>
+
+        <v-card-text>
+          <span v-if="needsWif">
+            Insert your WIF to generate swap public address.
+          </span>
+          <span v-if="needsPass">
+            Insert your password to generate swap public address.
+          </span>
+          <v-spacer />
+
+          <v-form
+            class="mt-3"
+            v-if="needsWif"
+            @keyup.native.enter="doGenerateSwapAddress"
+            @submit.prevent
+          >
+            <v-text-field
+              tabindex="1"
+              type="password"
+              label="WIF"
+              v-model="wif"
+              required
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              prepend-inner-icon="mdi-key"
+              counter="52"
+            />
+          </v-form>
+
+          <v-form
+            v-if="needsPass"
+            @keyup.native.enter="doGenerateSwapAddress"
+            @submit.prevent
+          >
+            <v-text-field
+              tabindex="1"
+              type="password"
+              :label="$t('home.labelPassword')"
+              v-model="password"
+              required
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              prepend-inner-icon="mdi-lock"
+            />
+          </v-form>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="closeSignTx">
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="doGenerateSwapAddress">
+            Generate
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <ErrorDialog
       :show="errorDialog"
       :message="errorMessage"
@@ -681,13 +1217,24 @@ import {
   Balance,
   TransactionData,
   ScriptBuilder,
+  Swap,
 } from "@/phan-js";
+
+import { hexToByteArray, byteArrayToHex } from "@/phan-js/utils";
 
 import { state, TxArgsData, PopupState } from "@/popup/PopupState";
 import { Script } from "vm";
 import ErrorDialogVue from "@/components/ErrorDialog.vue";
 import TransactionComponent from "@/components/TransactionComponent.vue";
 import { Watch } from "vue-property-decorator";
+import { getNeoBalances } from "@/neo";
+import { JSONRPC, getEthBalances } from "@/ethereum";
+import { Transaction as EthereumTx } from "ethereumjs-tx";
+
+interface ISymbolAmount {
+  symbol: string;
+  amount: string | number;
+}
 
 @Component({
   components: { ErrorDialog: ErrorDialogVue, TransactionComponent },
@@ -709,6 +1256,12 @@ export default class extends Vue {
   sendDialog = false;
   sendWhereDialog = false;
   registerNameDialog = false;
+  selectAssetToSwapDialog = false;
+  swapAmountDialog = false;
+  destinationSwapDialog = false;
+  generateSwapAddressDialog = false;
+  swapFromEthDialog = false;
+  swapFromNeoDialog = false;
 
   stakeSoulAmount = 0;
   unstakeSoulAmount = 0;
@@ -719,11 +1272,28 @@ export default class extends Vue {
   sendDestination = "";
   nameToRegister = "";
 
+  swapToCustomDest = false;
+  swapToChain = "";
+  swapFromChain = "";
+
   errorDialog = false;
   errorMessage = "";
 
   signTxDialog = false;
   signTxCallback: (() => void) | null = null;
+
+  ethBalances: ISymbolAmount[] = [];
+  neoBalances: ISymbolAmount[] = [];
+
+  ethSwaps: Swap[] = [];
+  neoSwaps: Swap[] = [];
+  phaSwaps: Swap[] = [];
+
+  swapToClaim: Swap | null = null;
+
+  ethGasPrices: number[] = [50, 70, 100];
+  swapGasIndex = 1;
+  gasFeeAmount = "0.01";
 
   state = state;
 
@@ -740,6 +1310,40 @@ export default class extends Vue {
     this.isLoading = false;
 
     console.log("all loaded with " + JSON.stringify(this.account));
+
+    const neoAddress = this.account!.neoAddress;
+    const ethAddress = this.account!.ethAddress;
+
+    if (neoAddress) {
+      this.neoBalances = await getNeoBalances(neoAddress); //this.account.neoAddress);
+      this.neoSwaps = await this.state.api.getSwapsForAddress(neoAddress);
+      console.log("neoBals", this.neoBalances);
+      console.log("neoSwaps", this.neoSwaps);
+      this.neoSwaps = this.neoSwaps.filter(
+        (s) => s.destinationHash === "pending"
+      );
+      console.log("neoSwaps", this.neoSwaps);
+    }
+
+    if (ethAddress) {
+      this.ethBalances = await getEthBalances(ethAddress);
+      this.ethSwaps = await this.state.api.getSwapsForAddress(ethAddress);
+      console.log("ethBals", this.ethBalances);
+      console.log("ethSwaps", this.ethSwaps);
+      this.ethSwaps = this.ethSwaps.filter(
+        (s) => s.destinationHash === "pending"
+      );
+      console.log("ethSwaps", this.ethSwaps);
+    }
+
+    this.phaSwaps = await this.state.api.getSwapsForAddress(
+      this.account!.address
+    );
+    console.log("phaSwaps", this.phaSwaps);
+    this.phaSwaps = this.phaSwaps.filter(
+      (s) => s.destinationHash === "pending"
+    );
+    console.log("phaSwaps", this.phaSwaps);
 
     this.$root.$on("loading", (value: boolean) => {
       this.isLoading = value;
@@ -844,7 +1448,11 @@ export default class extends Vue {
   }
 
   getExplorerLink(hash: string) {
-    return "https://explorer.phantasma.io/tx/" + hash;
+    return (
+      (state.nexus == "testnet"
+        ? "http://testnet.phantasma.io/tx/"
+        : "https://explorer.phantasma.io/tx/") + hash
+    );
   }
 
   getAssetIcon(item: Balance) {
@@ -856,6 +1464,40 @@ export default class extends Vue {
       balance.amount,
       balance.decimals,
       balance.symbol == "ETH" ? 3 : 2
+    );
+  }
+
+  decimals(symbol: string) {
+    switch (symbol) {
+      case "KCAL":
+        return 10;
+      case "SOUL":
+        return 8;
+      case "NEO":
+        return 0;
+      case "GAS":
+        return 8;
+      case "GOATI":
+        return 3;
+      case "ETH":
+        return 18;
+      case "MKNI":
+        return 0;
+      default:
+        return 0;
+    }
+  }
+
+  formatSymbol(amount: number | string, symbol: string) {
+    const value = amount.toString();
+    return (
+      this.formatBalance(
+        value,
+        this.decimals(symbol),
+        symbol == "ETH" ? 3 : 2
+      ) +
+      " " +
+      symbol
     );
   }
 
@@ -960,6 +1602,14 @@ export default class extends Vue {
     );
   }
 
+  isSwappable(symbol: string, swapToChain: string) {
+    if (swapToChain == "eth")
+      return symbol == "KCAL" || symbol == "SOUL" || symbol == "ETH";
+    else if (swapToChain == "neo")
+      return symbol == "SOUL" || symbol == "NEO" || symbol == "GAS";
+    return false;
+  }
+
   askClaimKcal() {
     this.claimDialog = false;
     this.signTxDialog = true;
@@ -1005,6 +1655,266 @@ export default class extends Vue {
   doSignTx() {
     if (this.signTxCallback) this.signTxCallback();
     this.signTxCallback = null;
+  }
+
+  doGenerateSwapAddress() {
+    if (this.needsWif) state.addSwapAddress(this.wif);
+    else state.addSwapAddressWithPassword(this.password);
+    this.generateSwapAddressDialog = false;
+  }
+
+  async claimSwap(swap: Swap) {
+    console.log("claim swap", swap);
+    if (
+      swap.destinationPlatform == "neo" ||
+      swap.destinationPlatform == "ethereum"
+    ) {
+      let res = await state.api.settleSwap(
+        swap.sourcePlatform,
+        swap.destinationPlatform,
+        swap.sourceHash
+      );
+      if ((res as any).error) {
+        this.$root.$emit("errorMessage", {
+          msg: this.$t("app.errorMessage"),
+          details: (res as any).error,
+        });
+      }
+    } else if (swap.destinationPlatform == "phantasma") {
+      if (swap.sourcePlatform == "ethereum") {
+        this.signTxDialog = true;
+        this.signTxCallback = this.settleFromEthereumTx;
+      }
+    }
+  }
+
+  async settleFromEthereumTx() {
+    console.log("settle from ethereum tx");
+    if (!this.swapToClaim || !this.account) return;
+
+    const swapTxHash = this.swapToClaim.sourceHash;
+
+    const symbol = "SOUL";
+
+    // this.sendDestination = this.neoInteropBytes;
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 800;
+
+    let transcodeAddress = "";
+
+    if (this.needsWif) transcodeAddress = state.getTranscodeAddress(this.wif);
+    else
+      transcodeAddress = state.getTranscodeAddressWithPassword(this.password);
+
+    // console.log("trans visible", transcodeAddrStr);
+    /*
+    let transAddrBytes: any = [0x22, 0x01].concat(
+      hexToByteArray(transcodeAddr)
+    );
+    // const transAddrBytes = "P2LCxYX2nFqb4Z3GxDgSHbb1571yMXaSEHU2tJXq9CatCii";
+
+    console.log("transAddr", transAddrBytes);
+    transAddrBytes = transcodeAddrStr;
+    console.log("transAddr", transAddrBytes); // ok
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+    sb.callContract("interop", "SettleTransaction", [
+      transAddrBytes,
+      "ethereum",
+      "ethereum",
+      hexToByteArray(reverseHex(swapTxHash)),
+    ]);
+
+    sb.callContract("swap", "SwapFee", [transAddrBytes, symbol, 1000000000]);
+
+    sb.allowGas(
+      transAddrBytes,
+      hexToByteArray(
+        "00000000000000000000000000000000000000000000000000000000000000000000"
+      ),
+      gasPrice,
+      800
+    );
+
+    // sb.TransferBalance(symbol, transcodeAddr, phantasmaKeys.Address)
+    sb.callInterop("Runtime.TransferBalance", [
+      transAddrBytes,
+      address,
+      symbol,
+    ]);
+
+    sb.spendGas(transAddrBytes);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    console.log("script", script);
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      // if (this.needsWif) {
+      tx = await state.signTxSettleEth(
+        txdata,
+        getPrivateKeyFrom WIF,
+        (msgHex, pkHex) => {
+          const sha256Msg = createHash("sha256")
+            .update(msgHex, "hex")
+            .digest();
+
+          console.log("msgToSign", msgHex);
+
+          const privateKey = Secp256k1.uint256(pkHex, 16);
+          const digest = Secp256k1.uint256(ba2hex(sha256Msg), 16);
+
+          console.log("pk to sign", pkHex, privateKey);
+
+          const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(
+            privateKey
+          );
+          console.log("public", publicKey);
+
+          const sig = Secp256k1.ecsign(privateKey, digest);
+
+          console.log(sig);
+          console.log("sign-concat", sig.r + sig.s);
+          return sig.r + sig.s;
+        }
+      );
+      // } else if (this.needsPass) {
+      //   tx = await state.signTxWithPassword(txdata, address, this.password);
+      // }
+      console.log("tx successful: " + tx);
+      // this.$root.$emit("checkTx", tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+*/
+    // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2500);
+  }
+
+  async askSwapFromEth(bal: ISymbolAmount) {
+    this.sendSymbol = bal.symbol;
+    this.sendMaxAmount = bal.amount as number;
+    this.swapAmountDialog = true;
+
+    const res = await fetch("https://gasprice.poa.network/");
+
+    const resJson = await res.json();
+
+    this.ethGasPrices[0] = resJson.slow;
+    this.ethGasPrices[1] = resJson.standard;
+    this.ethGasPrices[2] = (resJson.fast + resJson.instant) / 2;
+  }
+
+  askSwapFromNeo(bal: ISymbolAmount) {
+    this.sendSymbol = bal.symbol;
+    this.swapFromChain = "neo";
+    this.sendMaxAmount = parseFloat(bal.amount as string);
+    this.swapAmountDialog = true;
+  }
+
+  async swapFromNeo() {}
+
+  async swapFromEth() {
+    if (!this.account || !this.account.ethAddress) {
+      console.log("error");
+      return;
+    }
+
+    console.log("Ethereum Address", this.account.ethAddress);
+
+    const nonceRes = await JSONRPC(
+      "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
+      "eth_getTransactionCount",
+      [this.account.ethAddress, "pending"]
+    );
+
+    console.log("nonce", nonceRes);
+
+    const privateKey = Buffer.from(
+      getPrivateKeyFromWif(
+        this.needsWif ? this.wif : state.getWifFromPassword(this.password)
+      ),
+      "hex"
+    );
+
+    const amount = 1 * 10 ** 8; // amount erc-20
+    const gasPrice = this.ethGasPrices[this.swapGasIndex] * 10 ** 9; //100000000000;
+    const gasLimit = this.sendSymbol == "ETH" ? 21000 : 100000;
+
+    const isMainnet = state.isMainnet;
+
+    const platforms = await state.api.getPlatforms();
+    const interopAddr = platforms.find((p) => p.platform == "ethereum")
+      ?.interop[0];
+
+    if (!interopAddr) {
+      throw new Error("No available interop address for swap");
+    }
+
+    const destAddr = interopAddr.external //"0x259D17A3E6658B79CE7F6F87CAC614A696056E79"
+      .substring(2)
+      .padStart(64, "0")
+      .toLowerCase();
+    const amountStr = amount.toString(16).padStart(64, "0");
+
+    let txParams: any = {};
+    if (this.sendSymbol == "ETH") {
+      txParams = {
+        nonce: nonceRes,
+        gasPrice: "0x" + gasPrice.toString(16), //"0x09184e72a000",
+        gasLimit: "0x" + gasLimit.toString(16), //"0x2710",
+        to: destAddr,
+        value: "0x" + this.sendAmount.toString(16),
+      };
+    } else {
+      txParams = {
+        nonce: nonceRes,
+        gasPrice: "0x" + gasPrice.toString(16), //"0x09184e72a000",
+        gasLimit: "0x" + gasLimit.toString(16), //"0x2710",
+        to: "0x" + state.getEthContract(this.sendSymbol), // ropsten SOUL contract
+        value: "0x0", // no eth to transfer
+        data: "0xa9059cbb" + destAddr + amountStr,
+      };
+    }
+
+    // The second parameter is not necessary if these values are used
+    const tx = new EthereumTx(txParams, {
+      chain: isMainnet ? "mainnet" : "ropsten",
+    });
+    tx.sign(privateKey);
+    const serializedTx = tx
+      .serialize()
+      .toString("hex")
+      .toUpperCase();
+
+    console.log("%c" + serializedTx, "color:blue;font-size:20px");
+
+    const txRes = await JSONRPC(
+      "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
+      "eth_sendRawTransaction",
+      ["0x" + serializedTx]
+    );
+
+    console.log("%c" + txRes, "color:green;font-size:20px");
   }
 
   async claimKcal() {
@@ -1308,6 +2218,21 @@ export default class extends Vue {
     }, 2500);
   }
 
+  selectAssetToSwap(chain: string, customDest: boolean) {
+    this.swapToCustomDest = customDest;
+    this.swapToChain = chain;
+    this.selectAssetToSwapDialog = true;
+  }
+
+  askAmountToSwap(bal: Balance) {
+    this.selectAssetToSwapDialog = false;
+    this.sendSymbol = bal.symbol;
+    this.sendMaxAmount = parseFloat(
+      this.formatBalance(bal.amount, bal.decimals, bal.symbol == "ETH" ? 3 : 2)
+    );
+    this.swapAmountDialog = true;
+  }
+
   async onActivityTab() {
     if (!this.account) return;
 
@@ -1334,6 +2259,19 @@ export default class extends Vue {
     this.txs.push(...res.result.txs);
     this.loadingTxs = [];
     this.isLoading = false;
+  }
+
+  copyToClipboard(text: string) {
+    if (!this.account) return;
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.setAttribute("readonly", "");
+    el.style.position = "absolute";
+    el.style.left = "-9999px";
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
   }
 }
 </script>

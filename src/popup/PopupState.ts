@@ -1,6 +1,8 @@
 import WIF from "wif";
 import fetch from "cross-fetch";
 import * as CryptoJS from "crypto-js";
+import createHash from "create-hash";
+import * as Secp256k1 from "@enumatech/secp256k1-js";
 
 import {
   PhantasmaAPI,
@@ -15,6 +17,10 @@ import {
 } from "@/phan-js";
 import { rejects } from "assert";
 
+import { getNeoAddressFromWif } from "@/neo";
+import { getEthAddressFromWif, getEthContract } from "@/ethereum";
+import base58 from "bs58";
+
 interface IAuthorization {
   dapp: string;
   hostname: string;
@@ -25,6 +31,8 @@ interface IAuthorization {
 
 export interface WalletAccount {
   address: string;
+  ethAddress?: string;
+  neoAddress?: string;
   type: string;
   data: Account;
   wif?: string;
@@ -137,7 +145,7 @@ export class PopupState {
     return "en";
   }
 
-  async setNexus(value: string) {
+  async setNexus(value: string): Promise<void> {
     this._nexus = value;
     this.api.setNexus(value);
     if (this._nexus == "MainNet") this.api.setRpcByName(this._mainnetRpc);
@@ -154,7 +162,7 @@ export class PopupState {
     });
   }
 
-  async setSimnetRpc(value: string) {
+  async setSimnetRpc(value: string): Promise<void> {
     this._simnetRpc = value;
     if (this._nexus == "SimNet") this.api.setRpcHost(this._simnetRpc);
     return new Promise((resolve, reject) => {
@@ -167,7 +175,7 @@ export class PopupState {
     });
   }
 
-  async setTestnetRpc(value: string) {
+  async setTestnetRpc(value: string): Promise<void> {
     this._testnetRpc = value;
     if (this._nexus == "TestNet") this.api.setRpcHost(this._testnetRpc);
     return new Promise((resolve, reject) => {
@@ -180,7 +188,7 @@ export class PopupState {
     });
   }
 
-  async setMainnetRpc(value: string) {
+  async setMainnetRpc(value: string): Promise<void> {
     console.log("Saving to storage mainnet rpc", this._mainnetRpc);
     this._mainnetRpc = value;
     this.api.setRpcByName(this._mainnetRpc);
@@ -196,6 +204,10 @@ export class PopupState {
 
   get nexusName() {
     return this._nexus;
+  }
+
+  get isMainnet() {
+    return this.nexus == "mainnet";
   }
 
   get mainnetRpcList() {
@@ -360,7 +372,7 @@ export class PopupState {
     return data;
   }
 
-  async addAccount(addressOrName: string): Promise<Account> {
+  async addAccount(addressOrName: string): Promise<void> {
     let address = addressOrName;
 
     if (!address.startsWith("P") || address.length != 47) {
@@ -391,8 +403,10 @@ export class PopupState {
     }
   }
 
-  async addAccountWithWif(wif: string, password: string): Promise<Account> {
+  async addAccountWithWif(wif: string, password: string): Promise<void> {
     let address = getAddressFromWif(wif);
+    let ethAddress = getEthAddressFromWif(wif);
+    let neoAddress = getNeoAddressFromWif(wif);
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
 
@@ -400,6 +414,8 @@ export class PopupState {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
       this._accounts.push({
         address: accountData.address,
+        ethAddress,
+        neoAddress,
         type: "encKey",
         encKey,
         data: accountData,
@@ -407,6 +423,8 @@ export class PopupState {
     } else {
       this._accounts.push({
         address: accountData.address,
+        ethAddress,
+        neoAddress,
         type: "wif",
         wif,
         data: accountData,
@@ -424,16 +442,21 @@ export class PopupState {
     });
   }
 
-  async addAccountWithHex(hex: string, password: string): Promise<Account> {
+  async addAccountWithHex(hex: string, password: string): Promise<void> {
     let pk = Buffer.from(hex, "hex");
     const wif = WIF.encode(128, pk, true);
     let address = getAddressFromWif(wif);
+    let ethAddress = getEthAddressFromWif(wif);
+    let neoAddress = getNeoAddressFromWif(wif);
+
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
     if (hasPass) {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
       this._accounts.push({
         address: accountData.address,
+        ethAddress,
+        neoAddress,
         type: "encKey",
         encKey,
         data: accountData,
@@ -441,6 +464,8 @@ export class PopupState {
     } else {
       this._accounts.push({
         address: accountData.address,
+        ethAddress,
+        neoAddress,
         type: "wif",
         wif,
         data: accountData,
@@ -554,6 +579,40 @@ export class PopupState {
     return this._authorizations.find((a) => a.token == token)!.dapp;
   }
 
+  async addSwapAddressWithPassword(password: string) {
+    const account = this.currentAccount;
+    if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
+
+    let wif = "";
+    if (password == "") {
+      if (account.wif) wif = account.wif;
+    } else {
+      if (!account.encKey)
+        throw new Error(this.$i18n.t("error.noEncrypted").toString());
+
+      const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
+      for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
+        wif += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    }
+
+    if (!this.isWifValidForAccount(wif))
+      throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
+
+    return await this.addSwapAddress(wif);
+  }
+
+  async addSwapAddress(wif: string): Promise<void> {
+    const ethAddress = getEthAddressFromWif(wif);
+    const neoAddress = getNeoAddressFromWif(wif);
+
+    this._accounts[this._currentAccountIndex].ethAddress = ethAddress;
+    this._accounts[this._currentAccountIndex].neoAddress = neoAddress;
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set({ accounts: this._accounts }, () => resolve());
+    });
+  }
+
   async signTxWithPassword(
     txdata: TxArgsData,
     address: string,
@@ -646,6 +705,45 @@ export class PopupState {
     const privateKey = getPrivateKeyFromWif(wif);
 
     return signData(data, privateKey);
+  }
+
+  getEthContract(symbol: string) {
+    return getEthContract(symbol, this.isMainnet);
+  }
+
+  getTranscodeAddress(wif: string) {
+    const pkHex = getPrivateKeyFromWif(wif);
+    const privateKey = Secp256k1.uint256(pkHex, 16);
+    const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
+    console.log("public", publicKey);
+    var addressHex = Buffer.from("0103" + publicKey.x, "hex");
+    return "P" + base58.encode(addressHex);
+  }
+
+  getTranscodeAddressWithPassword(password: string) {
+    return this.getTranscodeAddress(this.getWifFromPassword(password));
+  }
+
+  getWifFromPassword(password: string) {
+    const account = this.currentAccount;
+    if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
+
+    let wif = "";
+    if (password == "") {
+      if (account.wif) wif = account.wif;
+    } else {
+      if (!account.encKey)
+        throw new Error(this.$i18n.t("error.noEncrypted").toString());
+
+      const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
+      for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
+        wif += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    }
+
+    if (!this.isWifValidForAccount(wif))
+      throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
+
+    return wif;
   }
 
   formatBalance(symbol: string, amount: string): string {

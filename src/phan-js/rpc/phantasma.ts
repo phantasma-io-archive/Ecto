@@ -625,9 +625,9 @@ export class PhantasmaAPI {
   }
 
   //Returns an array of available interop platforms.
-  async getPlatforms(): Promise<Platform> {
+  async getPlatforms(): Promise<Platform[]> {
     let params: Array<any> = [];
-    return (await this.JSONRPC("getPlatforms", params)) as Platform;
+    return (await this.JSONRPC("getPlatforms", params)) as Platform[];
   }
 
   //Returns an array of available validators.
@@ -647,9 +647,9 @@ export class PhantasmaAPI {
   }
 
   //Returns platform swaps for a specific address.
-  async getSwapsForAddress(account: string): Promise<Swap> {
+  async getSwapsForAddress(account: string): Promise<Swap[]> {
     let params: Array<any> = [account];
-    return (await this.JSONRPC("getSwapsForAddress", params)) as Swap;
+    return (await this.JSONRPC("getSwapsForAddress", params)) as Swap[];
   }
 
   //Returns info of a nft.
