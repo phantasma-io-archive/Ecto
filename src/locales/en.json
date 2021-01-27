@@ -123,7 +123,7 @@
         "to": "to",
         "swap": "swap",
         "swapUppercase": "Swap",
-        "swapHowMany": "How many you want to swap?",
+        "swapHowMany": "How many do you want to swap?",
         "swapFrom": "Swap from",
         "noSwapsNEO": "There are no swappable assets in the NEO side of you wallet.",
         "noSwapsETH": "There are no swappable assets in the Ethereum side of you wallet.",
@@ -155,7 +155,8 @@
         "feeSlow": "Slow",
         "feeStandard": "Standard",
         "feeFast": "Fast",
-        "or": "or"
+        "or": "or",
+        "swapAmount": "Swap Amount"
     },
     "nfts": {
         "selected": "selected",

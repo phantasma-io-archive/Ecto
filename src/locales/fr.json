@@ -33,7 +33,7 @@
     "addWallet": {
         "add": "AJOUTER PORTEFEUILLE",
         "import": "Importer",
-        "importLong": "Importer Portefeuille",
+        "importLong": "Importer",
         "create": "Créer",
         "no": "Non",
         "or": "Ou",
@@ -139,7 +139,7 @@
         "selectAsset": "sélectionner actif",
         "selectAssetUppercase": "Sélectionner Actif",
         "selectAssetAndDest": "sélectionner actif et destination",
-        "swapExplanation": "Pour pouvoir effectuer des swaps, vous devez utiliser votre WIF our clé privée au moins une fois. Cela permettra de générer vos addresses NEO et Ethereum liées à votre portefeuille.",
+        "swapExplanation": "Pour pouvoir effectuer des swaps, vous devez utiliser votre WIF our clé privée au moins une fois. Cela permettra de générer vos adresses NEO et Ethereum liées à votre portefeuille.",
         "continue": "continuer",
         "labelDestinationAddress": "adresse de destination",
         "availableToSwap": "Vous avez les actifs suivants disponibles pour être swappés vers",
@@ -155,7 +155,8 @@
         "feeSlow": "Lent",
         "feeStandard": "Standard",
         "feeFast": "Rapide",
-        "or": "ou"
+        "or": "ou",
+        "swapAmount": "A swap"
     },
     "nfts": {
         "selected": "sélectionné",

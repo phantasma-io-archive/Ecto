@@ -35,7 +35,7 @@
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
         <v-tab
           ><v-badge
-            v-if="phaSwaps.concat(neoSwaps, ethSwaps).length > 0"
+            v-if="phaSwaps && !phaSwaps.error && (neoSwaps || ethSwaps) && phaSwaps.concat(neoSwaps, ethSwaps).length > 0"
             dot
             color="#17b1e8"
           >
@@ -269,7 +269,7 @@
 
         <v-tab-item key="3">
           <div
-            v-if="account.neoAddress && account.ethAddress"
+            v-if="account && account.neoAddress && account.ethAddress"
             style="overflow: auto; height: 459px"
           >
             <div
@@ -297,7 +297,7 @@
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
-                        {{ $t("home.swapFrom") }} NEO <v-badge v-if="phaSwaps.concat(neoSwaps).length > 0" :content="phaSwaps.concat(neoSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge>
+                        {{ $t("home.swapFrom") }} NEO <v-badge v-if="phaSwaps && !phaSwaps.error && neoSwaps && phaSwaps.concat(neoSwaps).length > 0" :content="phaSwaps.concat(neoSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge>
                       </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
@@ -364,7 +364,7 @@
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
-                        {{ $t("home.swapFrom") }} Ethereum <v-badge v-if="phaSwaps.concat(ethSwaps).length > 0" :content="phaSwaps.concat(ethSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge>
+                        {{ $t("home.swapFrom") }} Ethereum <v-badge v-if="phaSwaps && !phaSwaps.error && ethSwaps && phaSwaps.concat(ethSwaps).length > 0" :content="phaSwaps.concat(ethSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge>
                       </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
@@ -1003,7 +1003,7 @@
           >
           <v-row style="margin-top:-25px">
             <v-col class="mt-3">
-              {{ $t("home.sendAmount") }}
+              {{ $t("home.swapAmount") }}
             </v-col>
             <v-col>
               <v-text-field
@@ -1058,7 +1058,7 @@
                 </div>
                 <v-icon class="ml-2">mdi-rabbit</v-icon>
               </div>
-              <div class="mx-auto" style="font-size:11px">
+              <div class="mx-auto" style="font-size:12px">
                 {{
                   swapGasIndex == 0
                     ? $t("home.feeSlow")
@@ -1066,7 +1066,7 @@
                     ? $t("home.feeStandard")
                     : $t("home.feeFast")
                 }}
-                {{ $t("home.availableToSwap") }} - {{ ethGasPrices[swapGasIndex] }} Gwei
+                {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
             <template v-if="swapFromChain === 'neo'">
@@ -1097,8 +1097,11 @@
                 }}
               </div>
             </template>
-            <div v-else class="mx-auto">
+            <div v-if="swapToChain === 'neo'" class="mx-auto">
               {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS
+            </div>
+            <div v-if="swapToChain === 'eth'" class="mx-auto">
+              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} ETH
             </div>
           </v-row>
         </v-card-text>
@@ -1106,7 +1109,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn color="gray darken-1" text @click="sendDialog = false">
+          <v-btn color="gray darken-1" text @click="swapAmountDialog = false">
             {{ $t("home.cancel") }}
           </v-btn>
 
@@ -1318,7 +1321,7 @@ export default class extends Vue {
 
   ethGasPrices: number[] = [50, 70, 100];
   swapGasIndex = 1;
-  gasFeeAmount = "0.011";
+  gasFeeAmount = "0.1";
 
   state = state;
 
@@ -1837,7 +1840,10 @@ export default class extends Vue {
 
   async askSwapFromEth(bal: ISymbolAmount) {
     this.sendSymbol = bal.symbol;
-    this.sendMaxAmount = bal.amount as number;
+    this.swapFromChain = "eth";
+    this.sendMaxAmount = parseFloat(
+      this.formatBalance((bal.amount).toString(), this.decimals(bal.symbol))
+    ) as number;
     this.swapAmountDialog = true;
 
     const res = await fetch("https://gasprice.poa.network/");
@@ -1846,13 +1852,15 @@ export default class extends Vue {
 
     this.ethGasPrices[0] = resJson.slow;
     this.ethGasPrices[1] = resJson.standard;
-    this.ethGasPrices[2] = (resJson.fast + resJson.instant) / 2;
+    this.ethGasPrices[2] = parseFloat(((resJson.fast + resJson.instant) / 2).toFixed(2));
   }
 
   askSwapFromNeo(bal: ISymbolAmount) {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "neo";
-    this.sendMaxAmount = parseFloat(bal.amount as string);
+    this.sendMaxAmount = parseFloat(
+      this.formatBalance((bal.amount).toString(), this.decimals(bal.symbol))
+    ) as number;
     this.swapAmountDialog = true;
   }
 
