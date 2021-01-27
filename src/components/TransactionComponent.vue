@@ -154,6 +154,8 @@ export default class extends Vue {
   txInfused = "";
   txWith = "";
   txUnshown = "";
+  txBid = "";
+  txAuction = "";
 
   mounted() {
     this.descriptions = this.getDescriptions();
@@ -188,6 +190,8 @@ export default class extends Vue {
     this.txInfused = this.$i18n.t("transactionComponent.infused").toString();
     this.txWith = this.$i18n.t("transactionComponent.with").toString();
     this.txUnshown = this.$i18n.t("transactionComponent.unshown").toString();
+    this.txBid = this.$i18n.t("transactionComponent.bid").toString();
+    this.txAuction = this.$i18n.t("transactionComponent.auction").toString();
 
     if (this.tx == null || this.tx.events == null) {
       console.log("TX undefined or no events");
@@ -426,7 +430,7 @@ export default class extends Vue {
               iconColor: "blue",
               postIcon: "mdi-eye-outline",
               postIconColor: "gray",
-              text: 'Bid ' + data.type + ' Auction (' + data.baseSymbol + ')',
+              text: this.txBid + ' ' + data.type + ' ' + this.txAuction + ' (' + data.baseSymbol + ')',
               tooltip:
                 this.txFor +
                 " " +

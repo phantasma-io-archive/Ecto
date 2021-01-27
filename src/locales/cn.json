@@ -20,7 +20,9 @@
         "swapped": "已转换",
         "staked": "已质押",
         "with": "与",
-        "for": "对于"
+        "for": "对于",
+        "bid": "Bid",
+        "auction": "Auction"
     },
     "app": {
         "currencyDescription": "币种",

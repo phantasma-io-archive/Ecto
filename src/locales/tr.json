@@ -20,7 +20,9 @@
       "swapped": "Değiştirildi",
       "staked": "Vadede",
       "with": "İle",
-      "for": "İçin"
+      "for": "İçin",
+      "bid": "Bid",
+      "auction": "Auction"
   },
   "app": {
       "currencyDescription": "Para Birimi",

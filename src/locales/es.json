@@ -20,7 +20,9 @@
         "swapped": "Intercambiado",
         "staked": "Estacado",
         "with": "Con",
-        "for": "para"
+        "for": "para",
+        "bid": "Bid",
+        "auction": "Auction"
     },
     "app": {
         "currencyDescription": "Moneda",

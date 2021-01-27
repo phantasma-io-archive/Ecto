@@ -20,7 +20,9 @@
         "swapped": "Đã hoán đổi",
         "staked": "Đã đặt cọc",
         "with": "Với",
-        "for": "Cho"
+        "for": "Cho",
+        "bid": "Bid",
+        "auction": "Auction"
     },
     "app": {
         "currencyDescription": "Tiền tệ",

@@ -39,8 +39,8 @@
             dot
             color="#17b1e8"
           >
-            Swaps</v-badge
-          ><span v-else>Swaps</span></v-tab
+            {{ $t("home.swaps") }}</v-badge
+          ><span v-else>{{ $t("home.swaps") }}</span></v-tab
         >
 
         <v-tab-item key="1">
@@ -285,10 +285,10 @@
                 :key="swap.sourceHash + idx"
                 class="pa-1"
               >
-                {{ formatSymbol(swap.value, swap.symbol) }} pending swap from
-                {{ swap.sourcePlatform }} to
+                {{ formatSymbol(swap.value, swap.symbol) }} {{ $t("home.pendingSwapFrom") }}
+                {{ swap.sourcePlatform }} {{ $t("home.to") }}
                 {{ swap.destinationPlatform }}
-                <a href="#" @click.prevent="claimSwap(swap)">claim</a>
+                <a href="#" @click.prevent="claimSwap(swap)">{{ $t("home.claim") }}</a>
               </div>
             </div>
             <div style="text-align:center">
@@ -297,7 +297,7 @@
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
-                        Swap from NEO
+                        {{ $t("home.swapFrom") }} NEO <v-badge v-if="phaSwaps.concat(neoSwaps).length > 0" :content="phaSwaps.concat(neoSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge>
                       </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
@@ -316,10 +316,9 @@
                   </v-expansion-panel-header>
                   <v-expansion-panel-content class="pa-2">
                     <div v-if="!neoBalances || neoBalances.length === 0">
-                      There are no swappable assets in the NEO side of you
-                      wallet.<br />
-                      <br />Send the assets you want to swap to
-                      <strong>{{ account.neoAddress }}</strong>
+                      {{ $t("home.noSwapsNEO") }}<br />
+                      <br />{{ $t("home.sendAssetsSwap") }}
+                      <strong>{{ account.neoAddress }}</strong><br />
                       <v-btn
                         icon
                         small
@@ -328,9 +327,9 @@
                       >
                     </div>
                     <div v-else>
-                      Swappable assets in
+                      {{ $t("home.swappableAssets") }}
                       <strong>{{ account.neoAddress }}</strong
-                      ><v-btn
+                      ><br /><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.neoAddress)"
@@ -352,7 +351,7 @@
                             </v-list-item-content>
                             <v-list-item-action>
                               <a href="#" @click.prevent="askSwapFromNeo(bal)"
-                                >swap</a
+                                >{{ $t("home.swap") }}</a
                               >
                             </v-list-item-action>
                           </v-list-item>
@@ -365,7 +364,7 @@
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
-                        Swap from Ethereum
+                        {{ $t("home.swapFrom") }} Ethereum <v-badge v-if="phaSwaps.concat(ethSwaps).length > 0" :content="phaSwaps.concat(ethSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge>
                       </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
@@ -384,11 +383,10 @@
                   </v-expansion-panel-header>
                   <v-expansion-panel-content class="pa-3">
                     <div v-if="!ethBalances || ethBalances.length === 0">
-                      There are no swappable assets in the Ethereum side of you
-                      wallet.<br /><br />
-                      Send the assets you want to swap to
+                      {{ $t("home.noSwapsETH") }}<br /><br />
+                      {{ $t("home.sendAssetsSwap") }}
                       <strong>{{ account.ethAddress }}</strong
-                      ><v-btn
+                      ><br /><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.ethAddress)"
@@ -396,9 +394,9 @@
                       >
                     </div>
                     <div v-else>
-                      Swappable assets in
+                      {{ $t("home.swappableAssets") }}
                       <strong>{{ account.ethAddress }}</strong
-                      ><v-btn
+                      ><br /><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.ethAddress)"
@@ -420,7 +418,7 @@
                             </v-list-item-content>
                             <v-list-item-action>
                               <a href="#" @click.prevent="askSwapFromEth(bal)"
-                                >swap</a
+                                >{{ $t("home.swap") }}</a
                               >
                             </v-list-item-action>
                           </v-list-item>
@@ -428,18 +426,18 @@
                       </v-list>
                     </div>
                     <br />
-                    or
+                    {{ $t("home.or") }}
                     <a href="#" @click.prevent="goto('/addwallet')"
-                      >import your Ethereum wallet</a
+                      >{{ $t("home.importETHWallet") }}</a
                     >
-                    with your hex private key (ie from Metamask) <br />
+                    {{ $t("home.withYourKey") }} <br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row style="vertical-align:middle">
                       <v-col class="mt-2">
-                        Swap to NEO
+                        {{ $t("home.swapTo") }} NEO
                       </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
@@ -457,13 +455,13 @@
                     </v-row>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content class="pa-3">
-                    Swap to NEO side of your wallet
+                    {{ $t("home.swapToNeo") }}<br />
                     <a href="#" @click.prevent="selectAssetToSwap('neo', false)"
-                      >select asset</a
+                      >{{ $t("home.selectAsset") }}</a
                     ><br /><br />
-                    Or swap to another NEO wallet
+                    {{ $t("home.swapToAnotherNEO") }}<br />
                     <a href="#" @click.prevent="selectAssetToSwap('neo', true)"
-                      >select asset and destination</a
+                      >{{ $t("home.selectAssetAndDest") }}</a
                     >
                     <br />
                     <!-- Each swap costs 0.1 GAS -->
@@ -473,7 +471,7 @@
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
-                        Swap to Ethereum
+                        {{ $t("home.swapTo") }} Ethereum
                       </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
@@ -491,13 +489,13 @@
                     </v-row>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content class="pa-3">
-                    Swap to Ethereum side of your wallet
+                    {{ $t("home.swapToETH") }}<br />
                     <a href="#" @click.prevent="selectAssetToSwap('eth', false)"
-                      >select asset</a
+                      >{{ $t("home.selectAsset") }}</a
                     ><br /><br />
-                    Or swap to another Ethereum wallet
+                    {{ $t("home.swapToAnotherETH") }}<br />
                     <a href="#" @click.prevent="selectAssetToSwap('eth', true)"
-                      >select asset and destination</a
+                      >{{ $t("home.selectAssetAndDest") }}</a
                     >
                     <br />
                     <!-- Each swap costs 0.001 ETH -->
@@ -508,10 +506,9 @@
           </div>
           <div v-else class="pa-6">
             <v-spacer class="ma-9" />
-            To allow swaps you need to use your WIF or private key once. This
-            will generate the NEO and Ethereum addresses linked to your wallet.
+            {{ $t("home.swapExplanation") }}
             <v-btn block class="mt-6" @click="generateSwapAddressDialog = true"
-              >continue</v-btn
+              >{{ $t("home.continue") }}</v-btn
             >
           </div>
           <div class="pa-3"></div>
@@ -926,12 +923,12 @@
 
     <v-dialog v-model="selectAssetToSwapDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Select Asset</v-card-title>
+        <v-card-title class="headline">{{ $t("home.selectAssetUppercase") }}</v-card-title>
 
         <v-card-text class="pb-0">
           <span>
-            You have the following available assets to swap to
-            {{ swapToChain.toUpperCase() }}
+            {{ $t("home.availableToSwap") }}
+            {{ swapToChain.toUpperCase() === 'ETH' ? 'Ethereum' : 'NEO' }}.
           </span>
           <br />
           <v-list style="margin-left:-8px; margin-right:-8px;">
@@ -950,7 +947,7 @@
                     >{{ getAmount(bal) }} {{ bal.symbol }}
                   </v-list-item-content>
                   <v-list-item-action>
-                    <a href="#" @click="askAmountToSwap(bal)">swap</a>
+                    <a href="#" @click="askAmountToSwap(bal)">{{ $t("home.swap") }}</a>
                   </v-list-item-action>
                 </v-list-item>
               </template>
@@ -984,12 +981,12 @@
     <v-dialog v-model="swapAmountDialog" max-width="290">
       <v-card>
         <v-card-title class="headline">{{
-          "Swap" + " " + sendSymbol
+          $t("home.swapUppercase") + " " + sendSymbol
         }}</v-card-title>
 
         <v-card-text class="pb-0">
           {{ $t("home.have") }} {{ sendMaxAmount }} {{ sendSymbol }}.
-          {{ "How many you want to swap?" }}
+          {{ $t("home.swapHowMany") }}
 
           <v-slider
             v-model="sendAmount"
@@ -1036,7 +1033,7 @@
                 disabled
               ></v-text-field>
             </v-col> -->
-            <template v-if="swapFromChain !== 'eth'">
+            <template v-if="swapFromChain === 'eth'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1064,16 +1061,44 @@
               <div class="mx-auto" style="font-size:11px">
                 {{
                   swapGasIndex == 0
-                    ? "Slow"
+                    ? $t("home.feeSlow")
                     : swapGasIndex == 1
-                    ? "Standard"
-                    : "Fast"
+                    ? $t("home.feeStandard")
+                    : $t("home.feeFast")
                 }}
-                Fee - {{ ethGasPrices[swapGasIndex] }} Gwei
+                {{ $t("home.availableToSwap") }} - {{ ethGasPrices[swapGasIndex] }} Gwei
+              </div>
+            </template>
+            <template v-if="swapFromChain === 'neo'">
+              <div class="mx-auto" style="display:inherit">
+                <v-icon class="mr-2">mdi-tortoise</v-icon>
+                <div
+                  class="pa-1"
+                  style="border:16px; background-color:#eee; border-radius:32px"
+                >
+                  <v-icon
+                    @click="swapGasIndex = 0"
+                    class="mr-3"
+                    :color="swapGasIndex == 0 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 0 ? "-medium" : "" }}</v-icon
+                  ><v-icon
+                    @click="swapGasIndex = 2"
+                    :color="swapGasIndex == 2 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 2 ? "-medium" : "" }}</v-icon
+                  >
+                </div>
+                <v-icon class="ml-2">mdi-rabbit</v-icon>
+              </div>
+              <div class="mx-auto" style="font-size:11px">
+                {{
+                  swapGasIndex == 0
+                    ? $t("home.feeSlow")
+                    : $t("home.feeFast")
+                }}
               </div>
             </template>
             <div v-else class="mx-auto">
-              To swap you need: {{ gasFeeAmount }} GAS
+              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS
             </div>
           </v-row>
         </v-card-text>
@@ -1094,18 +1119,18 @@
 
     <v-dialog v-model="destinationSwapDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Swap destination</v-card-title>
+        <v-card-title class="headline">{{ $t("home.swapDestination") }}</v-card-title>
 
         <v-card-text class="pb-0">
           <span>
-            Write {{ swapToChain.toUpperCase() }} destination address
+            {{ $t("home.write") }} {{ swapToChain.toUpperCase() }} {{ $t("home.destinationAddress") }}
           </span>
           <br />
           <v-spacer class="ma-4" />
 
           <v-text-field
             v-model="nameToRegister"
-            :label="swapToChain + ' ' + 'destination address'"
+            :label="swapToChain + ' ' + $t('home.destinationAddress')"
           ></v-text-field>
         </v-card-text>
 
@@ -1134,14 +1159,14 @@
 
     <v-dialog v-model="generateSwapAddressDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Enable swaps</v-card-title>
+        <v-card-title class="headline">{{ $t("home.enableSwaps") }}</v-card-title>
 
         <v-card-text>
           <span v-if="needsWif">
-            Insert your WIF to generate swap public address.
+            {{ $t("home.insertSwapsWIF") }}
           </span>
           <span v-if="needsPass">
-            Insert your password to generate swap public address.
+            {{ $t("home.insertSwapsPassword") }}
           </span>
           <v-spacer />
 
@@ -1192,7 +1217,7 @@
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="doGenerateSwapAddress">
-            Generate
+            {{ $t("home.insertSwapsPassword") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -1293,7 +1318,7 @@ export default class extends Vue {
 
   ethGasPrices: number[] = [50, 70, 100];
   swapGasIndex = 1;
-  gasFeeAmount = "0.01";
+  gasFeeAmount = "0.011";
 
   state = state;
 
