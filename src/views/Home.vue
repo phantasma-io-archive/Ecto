@@ -280,14 +280,15 @@
               "
               class="pa-4"
             >
+              <div style="font-size:1rem;text-decoration:underline;margin-bottom:0.5rem;">Pending Swaps<v-badge v-if="phaSwaps && !phaSwaps.error && neoSwaps && ethSwaps && phaSwaps.concat(neoSwaps, ethSwaps).length > 0" :content="phaSwaps.concat(neoSwaps, ethSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge></div>
               <div
                 v-for="(swap, idx) in phaSwaps.concat(neoSwaps, ethSwaps)"
                 :key="swap.sourceHash + idx"
                 class="pa-1"
               >
-                {{ formatSymbol(swap.value, swap.symbol) }} {{ $t("home.pendingSwapFrom") }}
-                {{ swap.sourcePlatform }} {{ $t("home.to") }}
-                {{ swap.destinationPlatform }}
+                {{ formatSymbol(swap.value, swap.symbol) }}
+                {{ $t("home.from") }} {{ formatChain(swap.sourcePlatform) }} {{ $t("home.to") }}
+                {{ formatChain(swap.destinationPlatform) }}
                 <a href="#" @click.prevent="claimSwap(swap)">{{ $t("home.claim") }}</a>
               </div>
             </div>
@@ -297,7 +298,7 @@
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
-                        {{ $t("home.swapFrom") }} NEO <v-badge v-if="phaSwaps && !phaSwaps.error && neoSwaps && phaSwaps.concat(neoSwaps).length > 0" :content="phaSwaps.concat(neoSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge>
+                        {{ $t("home.swapFrom") }} NEO
                       </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
@@ -364,7 +365,7 @@
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
-                        {{ $t("home.swapFrom") }} Ethereum <v-badge v-if="phaSwaps && !phaSwaps.error && ethSwaps && phaSwaps.concat(ethSwaps).length > 0" :content="phaSwaps.concat(ethSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge>
+                        {{ $t("home.swapFrom") }} Ethereum
                       </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
@@ -1033,7 +1034,7 @@
                 disabled
               ></v-text-field>
             </v-col> -->
-            <template v-if="swapFromChain === 'eth'">
+            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1058,6 +1059,7 @@
                 </div>
                 <v-icon class="ml-2">mdi-rabbit</v-icon>
               </div>
+              <br />
               <div class="mx-auto" style="font-size:12px">
                 {{
                   swapGasIndex == 0
@@ -1069,7 +1071,7 @@
                 {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
-            <template v-if="swapFromChain === 'neo'">
+            <template v-if="swapFromChain === 'neo' && swapToChain !== 'neo'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1082,6 +1084,11 @@
                     :color="swapGasIndex == 0 ? 'blue darken-3' : ''"
                     >mdi-circle{{ swapGasIndex !== 0 ? "-medium" : "" }}</v-icon
                   ><v-icon
+                    @click="swapGasIndex = 1"
+                    class="mr-3"
+                    :color="swapGasIndex == 1 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 1 ? "-medium" : "" }}</v-icon
+                  ><v-icon
                     @click="swapGasIndex = 2"
                     :color="swapGasIndex == 2 ? 'blue darken-3' : ''"
                     >mdi-circle{{ swapGasIndex !== 2 ? "-medium" : "" }}</v-icon
@@ -1089,18 +1096,22 @@
                 </div>
                 <v-icon class="ml-2">mdi-rabbit</v-icon>
               </div>
-              <div class="mx-auto" style="font-size:11px">
+              <br />
+              <div class="mx-auto" style="font-size:12px">
                 {{
                   swapGasIndex == 0
                     ? $t("home.feeSlow")
+                    : swapGasIndex == 1
+                    ? $t("home.feeStandard")
                     : $t("home.feeFast")
                 }}
+                {{ neoGasPrices[swapGasIndex] }} GAS {{ $t("home.fee") }}
               </div>
             </template>
-            <div v-if="swapToChain === 'neo'" class="mx-auto">
+            <div v-if="swapToChain === 'neo' && swapFromChain !== 'neo'" class="mx-auto">
               {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS
             </div>
-            <div v-if="swapToChain === 'eth'" class="mx-auto">
+            <div v-if="swapToChain === 'eth' & swapFromChain !== 'neo'" class="mx-auto">
               {{ $t("home.swapNeed") }} {{ gasFeeAmount }} ETH
             </div>
           </v-row>
@@ -1220,7 +1231,7 @@
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="doGenerateSwapAddress">
-            {{ $t("home.insertSwapsPassword") }}
+            {{ $t("home.continue") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -1320,6 +1331,7 @@ export default class extends Vue {
   swapToClaim: Swap | null = null;
 
   ethGasPrices: number[] = [50, 70, 100];
+  neoGasPrices: number[] = [0.0000, 0.0011, 0.1000];
   swapGasIndex = 1;
   gasFeeAmount = "0.1";
 
@@ -1527,6 +1539,19 @@ export default class extends Vue {
       " " +
       symbol
     );
+  }
+
+  formatChain(name: string) {
+    switch (name) {
+      case "neo":
+        return 'NEO';
+      case "ethereum":
+        return 'Ethereum';
+      case "phantasma":
+        return 'Phantasma';
+      default:
+        return '';
+    }
   }
 
   getCurrencyValue(balance: Balance) {
