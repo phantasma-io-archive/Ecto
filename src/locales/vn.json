@@ -119,6 +119,7 @@
         "errorMessage1": "<không có ví>",
         "secondLine1": "Đặt cọc",
         "secondLine2": "Hủy xác nhận quyền sở hữu",
+        "pendingSwaps": "Pending Swaps",
         "pendingSwapFrom": "pending:",
         "from": "from",
         "to": "to",

@@ -119,6 +119,7 @@
         "errorMessage1": "<no wallet>",
         "secondLine1": "Staked",
         "secondLine2": "Unclaimed",
+        "pendingSwaps": "Pending Swaps",
         "pendingSwapFrom": "pending:",
         "from": "from",
         "to": "to",

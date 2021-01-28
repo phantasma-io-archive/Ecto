@@ -119,6 +119,7 @@
         "errorMessage1": "<没有钱包>",
         "secondLine1": "已质押",
         "secondLine2": "未认领",
+        "pendingSwaps": "Pending Swaps",
         "pendingSwapFrom": "pending:",
         "from": "from",
         "to": "to",

@@ -119,6 +119,7 @@
     "errorMessage1": "<Cüzdan Yok>",
     "secondLine1": "Vadede",
     "secondLine2": "Alınmayan",
+    "pendingSwaps": "Pending Swaps",
     "pendingSwapFrom": "pending:",
     "from": "from",
     "to": "to",

@@ -119,6 +119,7 @@
         "errorMessage1": "<geen wallet>",
         "secondLine1": "Staked",
         "secondLine2": " Niet geclaimed",
+        "pendingSwaps": "Pending Swaps",
         "pendingSwapFrom": "pending:",
         "from": "from",
         "to": "to",

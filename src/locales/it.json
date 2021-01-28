@@ -119,6 +119,7 @@
         "errorMessage1": "<nessun portafoglio>",
         "secondLine1": "Staked",
         "secondLine2": "Riscattabili",
+        "pendingSwaps": "Pending Swaps",
         "pendingSwapFrom": "pending:",
         "from": "from",
         "to": "to",

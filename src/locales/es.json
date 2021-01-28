@@ -119,6 +119,7 @@
         "errorMessage1": "<no hay billetera>",
         "secondLine1": "Estaca",
         "secondLine2": "Sin reclamar",
+        "pendingSwaps": "Pending Swaps",
         "pendingSwapFrom": "pending:",
         "from": "from",
         "to": "to",

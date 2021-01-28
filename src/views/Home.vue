@@ -280,7 +280,7 @@
               "
               class="pa-4"
             >
-              <div style="font-size:1rem;text-decoration:underline;margin-bottom:0.5rem;">Pending Swaps<v-badge v-if="phaSwaps && !phaSwaps.error && neoSwaps && ethSwaps && phaSwaps.concat(neoSwaps, ethSwaps).length > 0" :content="phaSwaps.concat(neoSwaps, ethSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge></div>
+              <div style="font-size:1rem;text-decoration:underline;margin-bottom:0.5rem;">{{ $t("home.pendingSwaps") }}<v-badge v-if="phaSwaps && !phaSwaps.error && neoSwaps && ethSwaps && phaSwaps.concat(neoSwaps, ethSwaps).length > 0" :content="phaSwaps.concat(neoSwaps, ethSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge></div>
               <div
                 v-for="(swap, idx) in phaSwaps.concat(neoSwaps, ethSwaps)"
                 :key="swap.sourceHash + idx"

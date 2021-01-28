@@ -119,6 +119,7 @@
         "errorMessage1": "<pas de portefeuille>",
         "secondLine1": "Stakes",
         "secondLine2": "Disponible",
+        "pendingSwaps": "Swaps en attente",
         "pendingSwapFrom": "en attente:",
         "from": "de",
         "to": "à",
