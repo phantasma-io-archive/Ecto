@@ -160,7 +160,7 @@
         "or": "or",
         "swapAmount": "Swap Amount",
         "needGasToSwap": "You need {0} GAS on Phantasma to be able to pay for swap fees.",
-        "needEthToSwap": "You need aprox {0} ETH on Phantasma to be able to pay for swap fees.",
+        "needEthToSwap": "You need approx. {0} ETH on Phantasma to be able to pay for swap fees.",
         "swapInProgressTitle": "Swap in progress",
         "swapBeingProcessed": "Your swap is being processed.",
         "needsConfirmations": "It needs 12 confirmations to appear.",
