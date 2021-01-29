@@ -288,7 +288,8 @@
               <div
                 style="font-size:1rem;text-decoration:underline;margin-bottom:0.5rem;"
               >
-                Pending Swaps<v-badge
+                {{ $t("home.pendingSwaps")
+                }}<v-badge
                   v-if="
                     phaSwaps &&
                       !phaSwaps.error &&
@@ -1232,13 +1233,13 @@
     >
       <v-card>
         <v-card-title class="headline">{{
-          $t("swapInProgressTitle")
+          $t("home.swapInProgressTitle")
         }}</v-card-title>
 
         <v-card-text>
-          {{ $t("swapBeingProcessed") }}
-          {{ swapFromChain == "ethereum" ? $t("needsConfirmations") : "" }}
-          {{ $t("checkTransaction") }} <a href="#">{{ "here" }}</a>
+          {{ $t("home.swapBeingProcessed") }}
+          {{ swapFromChain == "ethereum" ? $t("home.needsConfirmations") : "" }}
+          {{ $t("home.checkTransaction") }} <a href="#">{{ "home.here" }}</a>
 
           <v-spacer />
         </v-card-text>

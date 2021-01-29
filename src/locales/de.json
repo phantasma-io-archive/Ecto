@@ -119,6 +119,7 @@
         "errorMessage1": "<keine brieftasche>",
         "secondLine1": "Gestaket:",
         "secondLine2": "Unbeansprucht:",
+        "pendingSwaps": "Pending Swaps",
         "pendingSwapFrom": "pending:",
         "from": "from",
         "to": "to",

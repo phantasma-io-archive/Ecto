@@ -119,6 +119,7 @@
         "errorMessage1": "<нет кошелька>",
         "secondLine1": "Заблокировано",
         "secondLine2": "Доступно к получению",
+        "pendingSwaps": "Pending Swaps",
         "pendingSwapFrom": "pending:",
         "from": "from",
         "to": "to",
