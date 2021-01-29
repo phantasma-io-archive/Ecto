@@ -35,7 +35,12 @@
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
         <v-tab
           ><v-badge
-            v-if="phaSwaps && !phaSwaps.error && (neoSwaps || ethSwaps) && phaSwaps.concat(neoSwaps, ethSwaps).length > 0"
+            v-if="
+              phaSwaps &&
+                !phaSwaps.error &&
+                (neoSwaps || ethSwaps) &&
+                phaSwaps.concat(neoSwaps, ethSwaps).length > 0
+            "
             dot
             color="#17b1e8"
           >
@@ -280,16 +285,35 @@
               "
               class="pa-4"
             >
-              <div style="font-size:1rem;text-decoration:underline;margin-bottom:0.5rem;">{{ $t("home.pendingSwaps") }}<v-badge v-if="phaSwaps && !phaSwaps.error && neoSwaps && ethSwaps && phaSwaps.concat(neoSwaps, ethSwaps).length > 0" :content="phaSwaps.concat(neoSwaps, ethSwaps).length" color="#17b1e8" style="margin-left:0.5rem;"></v-badge></div>
+              <div
+                style="font-size:1rem;text-decoration:underline;margin-bottom:0.5rem;"
+              >
+                {{ $t("home.pendingSwaps")
+                }}<v-badge
+                  v-if="
+                    phaSwaps &&
+                      !phaSwaps.error &&
+                      neoSwaps &&
+                      ethSwaps &&
+                      phaSwaps.concat(neoSwaps, ethSwaps).length > 0
+                  "
+                  :content="phaSwaps.concat(neoSwaps, ethSwaps).length"
+                  color="#17b1e8"
+                  style="margin-left:0.5rem;"
+                ></v-badge>
+              </div>
               <div
                 v-for="(swap, idx) in phaSwaps.concat(neoSwaps, ethSwaps)"
                 :key="swap.sourceHash + idx"
                 class="pa-1"
               >
                 {{ formatSymbol(swap.value, swap.symbol) }}
-                {{ $t("home.from") }} {{ formatChain(swap.sourcePlatform) }} {{ $t("home.to") }}
+                {{ $t("home.from") }} {{ formatChain(swap.sourcePlatform) }}
+                {{ $t("home.to") }}
                 {{ formatChain(swap.destinationPlatform) }}
-                <a href="#" @click.prevent="claimSwap(swap)">{{ $t("home.claim") }}</a>
+                <a href="#" @click.prevent="claimSwap(swap)">{{
+                  $t("home.claim")
+                }}</a>
               </div>
             </div>
             <div style="text-align:center">
@@ -319,7 +343,8 @@
                     <div v-if="!neoBalances || neoBalances.length === 0">
                       {{ $t("home.noSwapsNEO") }}<br />
                       <br />{{ $t("home.sendAssetsSwap") }}
-                      <strong>{{ account.neoAddress }}</strong><br />
+                      <strong>{{ account.neoAddress }}</strong
+                      ><br />
                       <v-btn
                         icon
                         small
@@ -351,7 +376,9 @@
                               >{{ bal.amount }} {{ bal.symbol }}
                             </v-list-item-content>
                             <v-list-item-action>
-                              <a href="#" @click.prevent="askSwapFromNeo(bal)"
+                              <a
+                                href="#"
+                                @click.prevent="askSwapFromNeo(bal)"
                                 >{{ $t("home.swap") }}</a
                               >
                             </v-list-item-action>
@@ -418,7 +445,9 @@
                               >{{ formatSymbol(bal.amount, bal.symbol) }}
                             </v-list-item-content>
                             <v-list-item-action>
-                              <a href="#" @click.prevent="askSwapFromEth(bal)"
+                              <a
+                                href="#"
+                                @click.prevent="askSwapFromEth(bal)"
                                 >{{ $t("home.swap") }}</a
                               >
                             </v-list-item-action>
@@ -428,18 +457,16 @@
                     </div>
                     <br />
                     {{ $t("home.or") }}
-                    <a href="#" @click.prevent="goto('/addwallet')"
-                      >{{ $t("home.importETHWallet") }}</a
-                    >
+                    <a href="#" @click.prevent="goto('/addwallet')">{{
+                      $t("home.importETHWallet")
+                    }}</a>
                     {{ $t("home.withYourKey") }} <br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row style="vertical-align:middle">
-                      <v-col class="mt-2">
-                        {{ $t("home.swapTo") }} NEO
-                      </v-col>
+                      <v-col class="mt-2"> {{ $t("home.swapTo") }} NEO </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
                           class="ma-1"
@@ -457,14 +484,20 @@
                   </v-expansion-panel-header>
                   <v-expansion-panel-content class="pa-3">
                     {{ $t("home.swapToNeo") }}<br />
-                    <a href="#" @click.prevent="selectAssetToSwap('neo', false)"
+                    <a
+                      href="#"
+                      @click.prevent="selectAssetToSwap('neo', false)"
                       >{{ $t("home.selectAsset") }}</a
                     ><br /><br />
                     {{ $t("home.swapToAnotherNEO") }}<br />
-                    <a href="#" @click.prevent="selectAssetToSwap('neo', true)"
+                    <a
+                      href="#"
+                      @click.prevent="selectAssetToSwap('neo', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
                     >
                     <br />
+                    <br />
+                    {{ $t("home.needGasToSwap", [0.1]) }}
                     <!-- Each swap costs 0.1 GAS -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -491,14 +524,20 @@
                   </v-expansion-panel-header>
                   <v-expansion-panel-content class="pa-3">
                     {{ $t("home.swapToETH") }}<br />
-                    <a href="#" @click.prevent="selectAssetToSwap('eth', false)"
+                    <a
+                      href="#"
+                      @click.prevent="selectAssetToSwap('eth', false)"
                       >{{ $t("home.selectAsset") }}</a
                     ><br /><br />
                     {{ $t("home.swapToAnotherETH") }}<br />
-                    <a href="#" @click.prevent="selectAssetToSwap('eth', true)"
+                    <a
+                      href="#"
+                      @click.prevent="selectAssetToSwap('eth', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
                     >
                     <br />
+                    <br />
+                    {{ $t("home.needEthToSwap", [0.001]) }}
                     <!-- Each swap costs 0.001 ETH -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -508,7 +547,10 @@
           <div v-else class="pa-6">
             <v-spacer class="ma-9" />
             {{ $t("home.swapExplanation") }}
-            <v-btn block class="mt-6" @click="generateSwapAddressDialog = true"
+            <v-btn
+              block
+              class="mt-6"
+              @click="generateSwapAddressDialog = true"
               >{{ $t("home.continue") }}</v-btn
             >
           </div>
@@ -922,14 +964,16 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="selectAssetToSwapDialog" max-width="290">
+    <v-dialog v-if="account" v-model="selectAssetToSwapDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t("home.selectAssetUppercase") }}</v-card-title>
+        <v-card-title class="headline">{{
+          $t("home.selectAssetUppercase")
+        }}</v-card-title>
 
         <v-card-text class="pb-0">
           <span>
             {{ $t("home.availableToSwap") }}
-            {{ swapToChain.toUpperCase() === 'ETH' ? 'Ethereum' : 'NEO' }}.
+            {{ swapToChain.toUpperCase() === "ETH" ? "Ethereum" : "NEO" }}.
           </span>
           <br />
           <v-list style="margin-left:-8px; margin-right:-8px;">
@@ -948,7 +992,9 @@
                     >{{ getAmount(bal) }} {{ bal.symbol }}
                   </v-list-item-content>
                   <v-list-item-action>
-                    <a href="#" @click="askAmountToSwap(bal)">{{ $t("home.swap") }}</a>
+                    <a href="#" @click="askAmountToSwap(bal)">{{
+                      $t("home.swap")
+                    }}</a>
                   </v-list-item-action>
                 </v-list-item>
               </template>
@@ -1108,10 +1154,16 @@
                 {{ neoGasPrices[swapGasIndex] }} GAS {{ $t("home.fee") }}
               </div>
             </template>
-            <div v-if="swapToChain === 'neo' && swapFromChain !== 'neo'" class="mx-auto">
+            <div
+              v-if="swapToChain === 'neo' && swapFromChain !== 'neo'"
+              class="mx-auto"
+            >
               {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS
             </div>
-            <div v-if="swapToChain === 'eth' & swapFromChain !== 'neo'" class="mx-auto">
+            <div
+              v-if="(swapToChain === 'eth') & (swapFromChain !== 'neo')"
+              class="mx-auto"
+            >
               {{ $t("home.swapNeed") }} {{ gasFeeAmount }} ETH
             </div>
           </v-row>
@@ -1133,11 +1185,14 @@
 
     <v-dialog v-model="destinationSwapDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t("home.swapDestination") }}</v-card-title>
+        <v-card-title class="headline">{{
+          $t("home.swapDestination")
+        }}</v-card-title>
 
         <v-card-text class="pb-0">
           <span>
-            {{ $t("home.write") }} {{ swapToChain.toUpperCase() }} {{ $t("home.destinationAddress") }}
+            {{ $t("home.write") }} {{ swapToChain.toUpperCase() }}
+            {{ $t("home.destinationAddress") }}
           </span>
           <br />
           <v-spacer class="ma-4" />
@@ -1171,9 +1226,39 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog
+      v-if="swapInProgressDialog"
+      v-model="swapInProgressDialog"
+      max-width="290"
+    >
+      <v-card>
+        <v-card-title class="headline">{{
+          $t("home.swapInProgressTitle")
+        }}</v-card-title>
+
+        <v-card-text>
+          {{ $t("home.swapBeingProcessed") }}
+          {{ swapFromChain == "ethereum" ? $t("home.needsConfirmations") : "" }}
+          {{ $t("home.checkTransaction") }} <a href="#">{{ "home.here" }}</a>
+
+          <v-spacer />
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="blue darken-1" text @click="askClaimKcal">
+            {{ $t("home.agree") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="generateSwapAddressDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t("home.enableSwaps") }}</v-card-title>
+        <v-card-title class="headline">{{
+          $t("home.enableSwaps")
+        }}</v-card-title>
 
         <v-card-text>
           <span v-if="needsWif">
@@ -1301,6 +1386,7 @@ export default class extends Vue {
   generateSwapAddressDialog = false;
   swapFromEthDialog = false;
   swapFromNeoDialog = false;
+  swapInProgressDialog = false;
 
   stakeSoulAmount = 0;
   unstakeSoulAmount = 0;
@@ -1331,7 +1417,7 @@ export default class extends Vue {
   swapToClaim: Swap | null = null;
 
   ethGasPrices: number[] = [50, 70, 100];
-  neoGasPrices: number[] = [0.0000, 0.0011, 0.1000];
+  neoGasPrices: number[] = [0.0, 0.0011, 0.1];
   swapGasIndex = 1;
   gasFeeAmount = "0.1";
 
@@ -1544,13 +1630,13 @@ export default class extends Vue {
   formatChain(name: string) {
     switch (name) {
       case "neo":
-        return 'NEO';
+        return "NEO";
       case "ethereum":
-        return 'Ethereum';
+        return "Ethereum";
       case "phantasma":
-        return 'Phantasma';
+        return "Phantasma";
       default:
-        return '';
+        return "";
     }
   }
 
@@ -1867,7 +1953,7 @@ export default class extends Vue {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "eth";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance((bal.amount).toString(), this.decimals(bal.symbol))
+      this.formatBalance(bal.amount.toString(), this.decimals(bal.symbol))
     ) as number;
     this.swapAmountDialog = true;
 
@@ -1877,14 +1963,16 @@ export default class extends Vue {
 
     this.ethGasPrices[0] = resJson.slow;
     this.ethGasPrices[1] = resJson.standard;
-    this.ethGasPrices[2] = parseFloat(((resJson.fast + resJson.instant) / 2).toFixed(2));
+    this.ethGasPrices[2] = parseFloat(
+      ((resJson.fast + resJson.instant) / 2).toFixed(2)
+    );
   }
 
   askSwapFromNeo(bal: ISymbolAmount) {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "neo";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance((bal.amount).toString(), this.decimals(bal.symbol))
+      this.formatBalance(bal.amount.toString(), this.decimals(bal.symbol))
     ) as number;
     this.swapAmountDialog = true;
   }

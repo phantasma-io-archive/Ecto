@@ -158,7 +158,14 @@
         "feeStandard": "Standard",
         "feeFast": "Fast",
         "or": "or",
-        "swapAmount": "Swap Amount"
+        "swapAmount": "Swap Amount",
+        "needGasToSwap": "You need {0} GAS in Phantasma to be able to pay for swap fees.",
+        "needEthToSwap": "You need aprox {0} ETH in Phantasma to be able to pay for swap fees.",
+        "swapInProgressTitle": "Swap in progress",
+        "swapBeingProcessed": "Your swap is being processed.",
+        "needsConfirmations": "It needs 12 confirmations to appear.",
+        "checkTransaction": "You can check your transaction",
+        "here": "here"
     },
     "nfts": {
         "selected": "выбрано",
