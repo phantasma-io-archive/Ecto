@@ -92,7 +92,7 @@
     "cancel": "Vazgeç",
     "removeStakes": "Vadeden kaldır",
     "sendAmount": "Gönderim miktarı",
-    "sendAmount2": "var. Ne kadarını göndermek istiyorsun?",
+    "sendAmount2": "Ne kadarını göndermek istiyorsun?",
     "remaining": "Kalan",
     "next": "İleri",
     "insertWIF": "İşlemi onaylamak için WIF girin.",
@@ -107,8 +107,8 @@
     "registerMain": "Açık adresin yerine hesabını bir isim ile kullanabilirsin.",
     "destination": "Hedef",
     "destinationDesc": "Hangi adrese göndermek istiyorsun",
-    "have": "Hesabında",
-    "haveStake": "var. Ne kadarını eklemek istiyorsun?",
+    "have": "Hesabında bulunan",
+    "haveStake": "Ne kadarını eklemek istiyorsun?",
     "haveUnstake": "SOUL vadede. Ne kadarını iptal etmek istiyorsun?",
     "claimDesc1": "Bu işlemle",
     "claimDesc2": "KCAL alacaksınız. Bu alımdan sonra 24 saat boyunca vadenizi iptal edemeyeceksiniz.",
@@ -141,7 +141,7 @@
     "selectAsset": "varlık seçin",
     "selectAssetUppercase": "Varlık seç",
     "selectAssetAndDest": "varlık ve hedef seçin",
-    "swapExplanation": "Değişimleri aktive etmek için WIF veya özel anahtarınızı bir kereye mahsus girmeniz gereklidir. Bu sayade cüzdanınızla ilintili NEO ve Ethereum adresleri oluşturulur.",
+    "swapExplanation": "Değişimleri aktive etmek için WIF veya özel anahtarınızı bir kereye mahsus girmeniz gereklidir. Bu sayede cüzdanınızla ilintili NEO ve Ethereum adresleri oluşturulur.",
     "continue": "devam",
     "labelDestinationAddress": " hedef adres",
     "availableToSwap": "Takip eden varlıklar şuraya geçirilebilir,",
@@ -175,7 +175,7 @@
     "select": "Hangi adrese göndermek istiyorsun",
     "cancel": "Vazgeç",
     "next": "İleri",
-    "authorize": "TX yetkisi",
+    "authorize": "İşlemi(Tx) onayla",
     "sign": "TX onay",
     "insertWIF": "İşlemi onaylamak için WIF girin.",
     "insertPassword": "İşlemi onaylamak için Şifre girin.",
@@ -198,7 +198,7 @@
       "noWallet": "<Cüzdan Yok>"
   },
   "sign": {
-      "description": "Bu işleme(TX) şunun için izin veriyor musunuz?",
+      "description": "Bu işleme(Tx) şunun için izin veriyor musunuz?",
       "request": "İşlem talebi",
       "refuse": "Reddet",
       "sign": "tx onay",
@@ -210,7 +210,7 @@
       "notValid": "WIF bu adres için geçerli değil"
   },
   "signData": {
-    "description": "Bu işleme(TX) şunun için izin veriyor musunuz?",
+    "description": "Bu işleme(Tx) şunun için izin veriyor musunuz?",
     "request": "Veri onay talebi",
     "signData": "Veriyi onayla",
     "password": "Şifre",
@@ -227,7 +227,7 @@
       "title": "Hesabı Sil",
       "subtitle": "Hesabı siler",
       "encKey": "Şifre Gerektirir",
-      "unverified": "Salt okunur doğrulanmamış hesap",
+      "unverified": "Salt okunur, doğrulanmamış hesap",
       "verified": "WIF gerektirir"
   },
   "error": {
