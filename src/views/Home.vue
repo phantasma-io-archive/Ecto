@@ -218,6 +218,15 @@
                       small
                       text
                       style="padding: 0 6px;"
+                      v-if="item.symbol == 'GHOST' || item.symbol == 'CROWN' || item.symbol == 'TTRS'"
+                      @click="burnAsset($event, item)"
+                      :disabled="item.amount == 0"
+                      ><v-icon>mdi-fire</v-icon> {{ $t("home.burn") }}</v-btn
+                    >
+                    <v-btn
+                      small
+                      text
+                      style="padding: 0 6px;"
                       @click="transferAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-export</v-icon> {{ $t("home.send") }}</v-btn
@@ -2302,6 +2311,21 @@ export default class extends Vue {
     if (this.sendSymbol == "KCAL")
       this.sendMaxAmount = this.sendMaxAmount - 0.01;
     this.sendDialog = true;
+  }
+
+
+  burnAsset(event: Event, item: Balance) {
+    event.stopImmediatePropagation();
+    console.log("Going to burn: " + item.symbol);
+
+    if (
+      item.symbol == "TTRS" ||
+      item.symbol == "CROWN" ||
+      item.symbol == "GHOST"
+    ) {
+      this.goto("/nfts/" + item.symbol + "/burn");
+      return;
+    }
   }
 
   async sendFT() {

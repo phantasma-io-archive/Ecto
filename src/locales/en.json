@@ -84,6 +84,7 @@
         "claim": "Claim",
         "view": "view",
         "send": "Send",
+        "burn": "Burn",
         "load": "Load more",
         "agree": "Agree",
         "disagree": "Disagree",
@@ -170,6 +171,10 @@
     "nfts": {
         "selected": "selected",
         "send": "send nfts",
+        "burn": "burn nfts",
+        "burnTitle": "Burn NFTs",
+        "confirmBurn": "Confirm that you want to burn",
+        "confirmBurnSecond": "This is irreversible, destroys these NFTs and claims the infused assets, if any.",
         "infused": "Infused assets",
         "destination": "Destination",
         "select": "Select where do you want to send",

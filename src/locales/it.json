@@ -84,6 +84,7 @@
         "claim": "Riscatta",
         "view": "Visualizza",
         "send": "Trasferisci",
+        "burn": "Burn",
         "load": "Carica altro",
         "agree": "Accetta",
         "disagree": "Rifiuta",
@@ -170,6 +171,10 @@
     "nfts": {
         "selected": "selezionato",
         "send": "Trasferisci nfts",
+        "burn": "burn nfts",
+        "burnTitle": "Burn NFTs",
+        "confirmBurn": "Confirm that you want to burn",
+        "confirmBurnSecond": "This is irreversible, destroys these NFTs and claims the infused assets, if any.",
         "infused": "Risorse infuse",
         "destination": "Destinazione",
         "select": "Seleziona dove vuoi trasferire",

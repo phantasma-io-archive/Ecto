@@ -84,6 +84,7 @@
         "claim": "Beanspruchen:",
         "view": "ansehen",
         "send": "Senden:",
+        "burn": "Burn",
         "load": "Mehr laden",
         "agree": "Zustimmen",
         "disagree": "Ablehnen",
@@ -170,6 +171,10 @@
     "nfts": {
         "selected": "ausgewählt",
         "send": "nfts senden",
+        "burn": "burn nfts",
+        "burnTitle": "Burn NFTs",
+        "confirmBurn": "Confirm that you want to burn",
+        "confirmBurnSecond": "This is irreversible, destroys these NFTs and claims the infused assets, if any.",
         "infused": "Infundierte Vermögenswerte",
         "destination": "Zieladresse",
         "select": "Wählen Sie, wohin Sie senden möchten",

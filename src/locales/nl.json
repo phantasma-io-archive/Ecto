@@ -84,6 +84,7 @@
         "claim": "Claim",
         "view": "Bekijk",
         "send": "Verstuur",
+        "burn": "Burn",
         "load": "Laad meer",
         "agree": "Eens",
         "disagree": "Oneens",
@@ -170,6 +171,10 @@
     "nfts": {
         "selected": "gekozen",
         "send": "stuur NFT's",
+        "burn": "burn nfts",
+        "burnTitle": "Burn NFTs",
+        "confirmBurn": "Confirm that you want to burn",
+        "confirmBurnSecond": "This is irreversible, destroys these NFTs and claims the infused assets, if any.",
         "infused": "Toegevoegde bezittingen",
         "destination": "Bestemming",
         "select": "Kies de bestemming voor",

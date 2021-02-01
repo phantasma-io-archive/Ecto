@@ -84,6 +84,7 @@
         "claim": "认领",
         "view": "查看",
         "send": "发送",
+        "burn": "Burn",
         "load": "下载更多",
         "agree": "同意",
         "disagree": "不同意",
@@ -170,6 +171,10 @@
     "nfts": {
         "selected": "已选择",
         "send": "发送NFT",
+        "burn": "burn nfts",
+        "burnTitle": "Burn NFTs",
+        "confirmBurn": "Confirm that you want to burn",
+        "confirmBurnSecond": "This is irreversible, destroys these NFTs and claims the infused assets, if any.",
         "infused": "镶入资产",
         "destination": "目的地",
         "select": "选择您要发送的目的地",

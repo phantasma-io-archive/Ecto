@@ -84,6 +84,7 @@
     "claim": "Al",
     "view": "Göster",
     "send": "Gönder",
+    "burn": "Burn",
     "load": "Dahası",
     "agree": "Onayla",
     "disagree": "Vazgeç",
@@ -170,6 +171,10 @@
   "nfts": {
     "selected": "Seçildi",
     "send": "nft'leri gönder",
+    "burn": "burn nfts",
+    "burnTitle": "Burn NFTs",
+    "confirmBurn": "Confirm that you want to burn",
+    "confirmBurnSecond": "This is irreversible, destroys these NFTs and claims the infused assets, if any.",
     "infused": "İç içe varlıklar",
     "destination": "Hedef",
     "select": "Hangi adrese göndermek istiyorsun",

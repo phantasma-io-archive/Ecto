@@ -84,6 +84,7 @@
         "claim": "Yêu cầu",
         "view": "Xem",
         "send": "Gửi",
+        "burn": "Burn",
         "load": "Tải thêm",
         "agree": "Đồng ý",
         "disagree": "Không đồng ý",
@@ -170,6 +171,10 @@
     "nfts": {
         "selected": "đã chọn",
         "send": "gửi nfts",
+        "burn": "burn nfts",
+        "burnTitle": "Burn NFTs",
+        "confirmBurn": "Confirm that you want to burn",
+        "confirmBurnSecond": "This is irreversible, destroys these NFTs and claims the infused assets, if any.",
         "infused": "Tài sản được truyền",
         "destination": "Nơi đến",
         "select": "Chọn nơi bạn muốn gửi",
