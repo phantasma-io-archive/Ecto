@@ -121,6 +121,7 @@
     "errorMessage1": "<pas de portefeuille>",
     "secondLine1": "Stakes",
     "secondLine2": "Disponible",
+    "pendingSwaps": "Swaps en attente",
     "pendingSwapFrom": "en attente:",
     "from": "de",
     "to": "à",
@@ -242,6 +243,5 @@
     "noPasswordMatch": "Mot de passe ne correspond pas",
     "notValid": "Compte non valide",
     "noAccountMatch": "Compte ne correspond pas"
-  },
-  "swapBeingProcessed": ""
+  }
 }
