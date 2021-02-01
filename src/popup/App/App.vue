@@ -155,7 +155,8 @@
           </v-list-item-group>
         </v-list> </v-menu
       ><v-icon x-small class="ml-2" @click="refreshAccount">mdi-refresh</v-icon
-      ><v-spacer /><span @click="settingsDialog = true"
+      ><v-icon x-small class="ml-2" @click="toggleBalance">mdi-eye</v-icon
+      ><v-spacer /><span style="cursor:pointer;" @click="settingsDialog = true"
         >v{{ version }}<v-icon x-small class="ml-2">mdi-settings</v-icon>
       </span>
     </v-footer>
@@ -197,6 +198,7 @@ export default class extends Vue {
     "Tiếng Việt"
   ];
   language = "en";
+  balanceShown = true;
 
   LOCALES = LOCALES;
   defaultLocale = defaultLocale;
@@ -231,6 +233,7 @@ export default class extends Vue {
     await state.check(this.$parent.$i18n);
     this.currency = state.currency;
     this.language = state.language;
+    this.balanceShown = state.balanceShown;
 
     this.version = chrome.runtime.getManifest().version;
 
@@ -298,6 +301,12 @@ export default class extends Vue {
     }
   }
 
+  async toggleBalance() {
+    this.balanceShown = !this.balanceShown
+    console.log("setting balance toggle", this.balanceShown);
+    await this.state.toggleBalance(this.balanceShown);
+  }
+
   async selectNet(item: string) {
     console.log("selectNet", item);
     state.setNexus(item);
@@ -350,5 +359,11 @@ header {
 
 .v-menu__content {
   max-width: 92%;
+}
+
+footer button:hover,
+footer span:hover,
+footer span:hover > i {
+  color: black;
 }
 </style>

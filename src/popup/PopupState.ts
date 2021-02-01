@@ -57,6 +57,7 @@ export class PopupState {
   private _authorizations: IAuthorization[] = [];
   private _currency: string = "USD";
   private _language: string = "English";
+  private _balanceShown: boolean = true;
   private _currenciesRate: any;
   private _nexus: string = "MainNet";
   private _simnetRpc = "http://localhost:7077/rpc";
@@ -90,6 +91,10 @@ export class PopupState {
 
   get currency() {
     return this._currency;
+  }
+
+  get balanceShown() {
+    return this._balanceShown;
   }
 
   get language() {
@@ -276,6 +281,7 @@ export class PopupState {
         this._authorizations = items.authorizations ? items.authorizations : [];
         this._currency = items.currency ? items.currency : "USD";
         this._language = items.language ? items.language : "English";
+        this._balanceShown = items.balanceShown ? true : false;
         this.nfts = items.nfts ? items.nfts : {};
 
         $i18n.locale = this.locale;
@@ -338,6 +344,18 @@ export class PopupState {
       chrome.storage.local.set(
         {
           language: this._language,
+        },
+        () => resolve()
+      );
+    });
+  }
+
+  async toggleBalance(balanceShown: boolean): Promise<void>  {
+    this._balanceShown = balanceShown;
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          balanceShown: this._balanceShown,
         },
         () => resolve()
       );
