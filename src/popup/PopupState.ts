@@ -399,11 +399,16 @@ export class PopupState {
     }
 
     const accountData = await this.getAccountData(address);
-    const len = this._accounts.push({
-      address: accountData.address,
-      type: "unverified",
-      data: accountData,
-    });
+    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
+    let len = 0;
+    if (!alreadyExisting) {
+      len = this._accounts.push({
+        address: accountData.address,
+        type: "unverified",
+        data: accountData,
+      });
+    }
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.set(
@@ -427,8 +432,10 @@ export class PopupState {
     let neoAddress = getNeoAddressFromWif(wif);
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
+    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
 
-    if (hasPass) {
+    if (hasPass && !alreadyExisting) {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
       this._accounts.push({
         address: accountData.address,
@@ -438,7 +445,7 @@ export class PopupState {
         encKey,
         data: accountData,
       });
-    } else {
+    } else if (!alreadyExisting) {
       this._accounts.push({
         address: accountData.address,
         ethAddress,
@@ -466,10 +473,12 @@ export class PopupState {
     let address = getAddressFromWif(wif);
     let ethAddress = getEthAddressFromWif(wif);
     let neoAddress = getNeoAddressFromWif(wif);
+    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
 
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
-    if (hasPass) {
+    if (hasPass && !alreadyExisting) {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
       this._accounts.push({
         address: accountData.address,
@@ -479,7 +488,7 @@ export class PopupState {
         encKey,
         data: accountData,
       });
-    } else {
+    } else if (!alreadyExisting) {
       this._accounts.push({
         address: accountData.address,
         ethAddress,
