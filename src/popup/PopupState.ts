@@ -145,6 +145,8 @@ export class PopupState {
           return "tr";
         case "Tiếng Việt":
           return "vn";
+        case "Norwegian":
+          return "nb";
       }
     }
     return "en";

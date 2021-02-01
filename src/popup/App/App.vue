@@ -195,7 +195,8 @@ export default class extends Vue {
     "Nederlands",
     "Deutsch",
     "Türkçe",
-    "Tiếng Việt"
+    "Tiếng Việt",
+    "Norwegian"
   ];
   language = "en";
   balanceShown = true;

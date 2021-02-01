@@ -10,6 +10,7 @@ import de from "../locales/de.json";
 import tr from "../locales/tr.json";
 import ru from "../locales/ru.json";
 import vn from "../locales/vn.json";
+import nb from "../locales/nb.json";
 
 export const messages = {
   [Locales.EN]: en,
@@ -21,7 +22,8 @@ export const messages = {
   [Locales.DE]: de,
   [Locales.TR]: tr,
   [Locales.RU]: ru,
-  [Locales.VN]: vn
+  [Locales.VN]: vn,
+  [Locales.NB]: nb
 };
 
 export const defaultLocale = Locales.EN;
