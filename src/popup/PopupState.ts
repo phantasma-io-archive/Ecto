@@ -147,7 +147,7 @@ export class PopupState {
           return "vn";
         case "Norwegian":
           return "nb";
-		case "Português":
+        case "Português":
           return "pt";
       }
     }
