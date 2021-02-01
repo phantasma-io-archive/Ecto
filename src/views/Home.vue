@@ -1868,6 +1868,7 @@ export default class extends Vue {
     this.password = "";
     this.signTxCallback = null;
     this.signTxDialog = false;
+    this.generateSwapAddressDialog = false;
   }
 
   doSignTx() {
