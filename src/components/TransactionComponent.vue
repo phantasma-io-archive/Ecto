@@ -103,17 +103,21 @@ function decimals(symbol: string) {
 }
 
 function formatBalance(amount: string, decimals: number): string {
-  if (decimals == 0) return amount;
+  if (decimals == 0) return formatNumber(amount);
   while (amount.length < decimals + 1) amount = "0" + amount;
 
   const intPart = amount.substring(0, amount.length - decimals);
   const decimalPart = amount.substring(amount.length - decimals, amount.length);
-  if (parseInt(decimalPart) == 0) return intPart;
+  if (parseInt(decimalPart) == 0) return formatNumber(intPart);
   return (
-    intPart +
+    formatNumber(intPart) +
     "." +
     (decimalPart.length >= 4 ? decimalPart.substring(0, 4) : decimalPart)
   );
+}
+
+function formatNumber(num: any) {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
 }
 
 function formatSymbol(amount: string, symbol: string): string {

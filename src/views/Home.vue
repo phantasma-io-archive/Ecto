@@ -1685,7 +1685,7 @@ export default class extends Vue {
     if (!balance) return "";
 
     const val = parseFloat(
-      this.formatBalance(balance.amount, balance.decimals, 5)
+      this.formatBalance(balance.amount, balance.decimals, 5).replace(' ', '')
     );
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
@@ -1693,7 +1693,7 @@ export default class extends Vue {
       if (!state.balanceShown)
         return state.currencySymbol + '***'
 
-      return state.currencySymbol + (val * rate).toFixed(1);
+      return state.currencySymbol + this.formatNumber((val * rate).toFixed(1));
     }
     return "";
   }
@@ -1703,7 +1703,7 @@ export default class extends Vue {
   }
 
   getKcalUnclaimed() {
-    return this.formatBalance(this.account!.data.unclaimed, 10);
+    return this.formatBalance(this.account!.data.unclaimed, 10).replace(' ', '');
   }
 
   noKcal() {
@@ -1719,7 +1719,7 @@ export default class extends Vue {
 
   getStackedSoul() {
     if (!this.account) return "0";
-    return this.formatBalance(this.account.data.stake, 8);
+    return this.formatBalance(this.account.data.stake, 8).replace(' ', '');
   }
 
   getUnstackedSoul() {
@@ -1730,7 +1730,7 @@ export default class extends Vue {
       (b) => b.symbol == "SOUL"
     );
     if (!soulBalance) return "0";
-    return this.formatBalance(soulBalance!.amount, 8);
+    return this.formatBalance(soulBalance!.amount, 8).replace(' ', '');
   }
 
   getSecondLine(item: Balance) {
@@ -1776,20 +1776,20 @@ export default class extends Vue {
       balance.symbol == "SOUL"
         ? this.account.data.stake
         : this.account.data.unclaimed;
-    const val = parseFloat(this.formatBalance(amount, balance.decimals));
+    const val = parseFloat(this.formatBalance(amount, balance.decimals).replace(' ', ''));
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
 
       if (!state.balanceShown)
         return state.currencySymbol + '***'
 
-      return state.currencySymbol + (val * rate).toFixed(1);
+      return state.currencySymbol + this.formatNumber((val * rate).toFixed(1))
     }
     return "";
   }
 
   formatBalance(amount: string, decimals: number, decimalsToShow = 2): string {
-    if (decimals == 0) return amount;
+    if (decimals == 0) return this.formatNumber(amount);
     while (amount.length < decimals + 1) amount = "0" + amount;
 
     const intPart = amount.substring(0, amount.length - decimals);
@@ -1797,14 +1797,18 @@ export default class extends Vue {
       amount.length - decimals,
       amount.length
     );
-    if (parseInt(decimalPart) == 0) return intPart;
+    if (parseInt(decimalPart) == 0) return this.formatNumber(intPart);
     return (
-      intPart +
+      this.formatNumber(intPart) +
       "." +
       (decimalPart.length >= decimalsToShow
         ? decimalPart.substring(0, decimalsToShow)
         : decimalPart)
     );
+  }
+
+  formatNumber(num: any) {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
   }
 
   isSwappable(symbol: string, swapToChain: string) {
@@ -2019,7 +2023,7 @@ export default class extends Vue {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "eth";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), this.decimals(bal.symbol))
+      this.formatBalance(bal.amount.toString(), this.decimals(bal.symbol)).replace(' ', '')
     ) as number;
     this.swapAmountDialog = true;
 
@@ -2038,7 +2042,7 @@ export default class extends Vue {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "neo";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), this.decimals(bal.symbol))
+      this.formatBalance(bal.amount.toString(), this.decimals(bal.symbol)).replace(' ', '')
     ) as number;
     this.swapAmountDialog = true;
   }
@@ -2306,7 +2310,7 @@ export default class extends Vue {
     this.sendSymbol = item.symbol;
     this.sendDecimals = item.decimals;
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(item.amount, item.decimals)
+      this.formatBalance(item.amount, item.decimals).replace(' ', '')
     );
     if (this.sendSymbol == "KCAL")
       this.sendMaxAmount = this.sendMaxAmount - 0.01;
@@ -2455,7 +2459,7 @@ export default class extends Vue {
     this.selectAssetToSwapDialog = false;
     this.sendSymbol = bal.symbol;
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount, bal.decimals, bal.symbol == "ETH" ? 3 : 2)
+      this.formatBalance(bal.amount, bal.decimals, bal.symbol == "ETH" ? 3 : 2).replace(' ', '')
     );
     this.swapAmountDialog = true;
   }
