@@ -976,6 +976,10 @@
             v-model="nameToRegister"
             :label="$t('home.labelPick')"
           ></v-text-field>
+
+          <span>
+            {{ $t("home.registerHints") }}
+          </span>
         </v-card-text>
 
         <v-card-actions>
@@ -988,7 +992,8 @@
           <v-btn
             color="blue darken-1"
             text
-            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15"
+            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15 || nameToRegister == 'anonymous' || nameToRegister == 
+            'genesis' || nameToRegister.toUpperCase() != nameToRegister || isCharNumber(nameToRegister.charAt(0))"
             @click="askRegisterName"
           >
             {{ $t("home.next") }}
@@ -1604,6 +1609,10 @@ export default class extends Vue {
       "..." +
       hash.substring(hash.length - 6, hash.length)
     );
+  }
+
+  isCharNumber(c: string) {
+    return c >= '0' && c <= '9';
   }
 
   getExplorerLink(hash: string) {

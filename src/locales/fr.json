@@ -102,6 +102,7 @@
     "sign": "Signer",
     "register": "Enregistrer nom",
     "registerDescription": "Votre nom peut-être utilisé comme adresse publique. Cependant, il faut garder au moins 2 SOUL staké ou vous perdrez votre nom enregistré.",
+    "registerHints": "Note: le nom doit avoir entre 3 et 15 caractères, en minuscule et ne peut pas commencer par un chiffre.",
     "registerDescription2": "Stake SOUL pour enregistrer un nom et recevoir du KCAL tous les jours. Minimum période de stake de 24 heures.",
     "registerDescription3": "Allez chercher des SOUL maintenant :)",
     "registerTitle": "enregistrer un nom",
