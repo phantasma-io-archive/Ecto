@@ -24,6 +24,6 @@ export const LOCALES = [
 { value: Locales.TR, caption: 'Türkçe' },
 { value: Locales.RU, caption: 'Русский' },
 { value: Locales.VN, caption: 'Tiếng Việt' },
-{ value: Locales.NB, caption: 'Norwegian' },
+{ value: Locales.NB, caption: 'Norsk' },
 { value: Locales.PT, caption: 'Português' }
 ]
