@@ -313,13 +313,18 @@ export class PhantasmaAPI {
     fetch(peersUrlJson + "?_=" + new Date().getTime()).then(async (res) => {
       const data = await res.json();
       for (var i = 0; i < data.length; i++) {
-        const msecs = await this.pingAsync(data[i].url);
-        data[i].info = data[i].location + " • " + msecs + " ms";
-        data[i].msecs = msecs;
-        console.log(
-          data[i].location + " • " + msecs + " ms • " + data[i].url + "/rpc"
-        );
-        this.availableHosts.push(data[i]);
+        console.log("Checking RPC: ", data[i]);
+        try {
+          const msecs = await this.pingAsync(data[i].url);
+          data[i].info = data[i].location + " • " + msecs + " ms";
+          data[i].msecs = msecs;
+          console.log(
+            data[i].location + " • " + msecs + " ms • " + data[i].url + "/rpc"
+          );
+          this.availableHosts.push(data[i]);
+        } catch (err) {
+          console.log("Error with RPC: " + data[i]);
+        }
       }
       this.availableHosts.sort((a, b) => a.msecs - b.msecs);
       this.updateRpc();

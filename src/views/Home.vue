@@ -305,16 +305,15 @@
             <div
               v-if="
                 phaSwaps.length > 0 ||
-                  ethSwaps.lenght > 0 ||
+                  ethSwaps.length > 0 ||
                   neoSwaps.length > 0
               "
               class="pa-4"
             >
               <div
-                style="font-size:1rem;text-decoration:underline;margin-bottom:0.5rem;"
+                style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
               >
-                {{ $t("home.pendingSwaps")
-                }}<v-badge
+                <v-badge
                   v-if="
                     phaSwaps &&
                       !phaSwaps.error &&
@@ -325,7 +324,8 @@
                   :content="phaSwaps.concat(neoSwaps, ethSwaps).length"
                   color="#17b1e8"
                   style="margin-left:0.5rem;"
-                ></v-badge>
+                  >{{ $t("home.pendingSwaps") }}</v-badge
+                >
               </div>
               <div
                 v-for="(swap, idx) in phaSwaps.concat(neoSwaps, ethSwaps)"
@@ -1214,7 +1214,7 @@
             {{ $t("home.cancel") }}
           </v-btn>
 
-          <v-btn color="blue darken-1" text @click="askSendWhere">
+          <v-btn color="blue darken-1" text @click="onSwapAmountClick">
             {{ $t("home.next") }}
           </v-btn>
         </v-card-actions>
@@ -1277,7 +1277,10 @@
         <v-card-text>
           {{ $t("home.swapBeingProcessed") }}
           {{ swapFromChain == "ethereum" ? $t("home.needsConfirmations") : "" }}
-          {{ $t("home.checkTransaction") }} <a href="#">{{ "home.here" }}</a>
+          {{ $t("home.checkTransaction") }}
+          <a :href="lastSwapTxUrl" target="_blank" rel="noopener noreferrer">{{
+            $t("home.here")
+          }}</a>
 
           <v-spacer />
         </v-card-text>
@@ -1382,14 +1385,14 @@ import {
   Swap,
 } from "@/phan-js";
 
-import { hexToByteArray, byteArrayToHex } from "@/phan-js/utils";
+import { hexToByteArray, byteArrayToHex, reverseHex } from "@/phan-js/utils";
 
 import { state, TxArgsData, PopupState } from "@/popup/PopupState";
 import { Script } from "vm";
 import ErrorDialogVue from "@/components/ErrorDialog.vue";
 import TransactionComponent from "@/components/TransactionComponent.vue";
 import { Watch } from "vue-property-decorator";
-import { getNeoBalances } from "@/neo";
+import { getNeoBalances, getScriptHashFromAddress, sendNeo } from "@/neo";
 import { JSONRPC, getEthBalances } from "@/ethereum";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
 
@@ -1439,6 +1442,9 @@ export default class extends Vue {
   swapToChain = "";
   swapFromChain = "";
 
+  lastSwapTx = "";
+  lastSwapTxUrl = "";
+
   errorDialog = false;
   errorMessage = "";
 
@@ -1464,40 +1470,40 @@ export default class extends Vue {
   wif = "";
   password = "";
 
-  async mounted() {
-    (window as any).state = state;
-    await state.check(this.$parent.$i18n);
-    await Promise.all([
-      this.state.refreshCurrentAccount(),
-      this.state.fetchRates(),
-    ]);
-    this.isLoading = false;
-
-    console.log("all loaded with " + JSON.stringify(this.account));
-
+  async refreshSwapInfo() {
     const neoAddress = this.account!.neoAddress;
     const ethAddress = this.account!.ethAddress;
 
+    const isMainnet = state.isMainnet;
+
     if (neoAddress) {
-      this.neoBalances = await getNeoBalances(neoAddress); //this.account.neoAddress);
-      this.neoSwaps = await this.state.api.getSwapsForAddress(neoAddress);
-      console.log("neoBals", this.neoBalances);
-      console.log("neoSwaps", this.neoSwaps);
-      this.neoSwaps = this.neoSwaps.filter(
-        (s) => s.destinationHash === "pending"
-      );
-      console.log("neoSwaps", this.neoSwaps);
+      try {
+        this.neoBalances = await getNeoBalances(neoAddress, isMainnet);
+        this.neoSwaps = await this.state.api.getSwapsForAddress(neoAddress);
+        console.log("neoBals", this.neoBalances);
+        console.log("neoSwaps", this.neoSwaps);
+        this.neoSwaps = this.neoSwaps.filter(
+          (s) => s.destinationHash === "pending"
+        );
+        console.log("neoSwaps", this.neoSwaps);
+      } catch (err) {
+        console.log("error in neo balances and swaps", err);
+      }
     }
 
     if (ethAddress) {
-      this.ethBalances = await getEthBalances(ethAddress);
-      this.ethSwaps = await this.state.api.getSwapsForAddress(ethAddress);
-      console.log("ethBals", this.ethBalances);
-      console.log("ethSwaps", this.ethSwaps);
-      this.ethSwaps = this.ethSwaps.filter(
-        (s) => s.destinationHash === "pending"
-      );
-      console.log("ethSwaps", this.ethSwaps);
+      try {
+        this.ethBalances = await getEthBalances(ethAddress, isMainnet);
+        this.ethSwaps = await this.state.api.getSwapsForAddress(ethAddress);
+        console.log("ethBals", this.ethBalances);
+        console.log("ethSwaps", this.ethSwaps);
+        this.ethSwaps = this.ethSwaps.filter(
+          (s) => s.destinationHash === "pending"
+        );
+        console.log("ethSwaps", this.ethSwaps);
+      } catch (err) {
+        console.log("error in eth balances and swaps", err);
+      }
     }
 
     this.phaSwaps = await this.state.api.getSwapsForAddress(
@@ -1508,6 +1514,21 @@ export default class extends Vue {
       (s) => s.destinationHash === "pending"
     );
     console.log("phaSwaps", this.phaSwaps);
+
+    this.isLoading = false;
+  }
+
+  async mounted() {
+    (window as any).state = state;
+    await state.check(this.$parent.$i18n);
+    await Promise.all([
+      this.state.refreshCurrentAccount(),
+      this.state.fetchRates(),
+    ]);
+    this.isLoading = false;
+
+    await this.refreshSwapInfo();
+    console.log("all loaded with " + JSON.stringify(this.account));
 
     this.$root.$on("loading", (value: boolean) => {
       this.isLoading = value;
@@ -1635,27 +1656,6 @@ export default class extends Vue {
     );
   }
 
-  decimals(symbol: string) {
-    switch (symbol) {
-      case "KCAL":
-        return 10;
-      case "SOUL":
-        return 8;
-      case "NEO":
-        return 0;
-      case "GAS":
-        return 8;
-      case "GOATI":
-        return 3;
-      case "ETH":
-        return 18;
-      case "MKNI":
-        return 0;
-      default:
-        return 0;
-    }
-  }
-
   formatSymbol(amount: number | string, symbol: string) {
     const value = amount.toString();
 
@@ -1669,7 +1669,7 @@ export default class extends Vue {
     return (
       this.formatBalance(
         value,
-        this.decimals(symbol),
+        state.decimals(symbol),
         symbol == "ETH" ? 3 : 2
       ) +
       " " +
@@ -1863,6 +1863,46 @@ export default class extends Vue {
     this.signTxCallback = this.registerName;
   }
 
+  onSwapAmountClick() {
+    this.swapAmountDialog = false;
+    console.log(
+      "onSwapAmountClick",
+      this.sendAmount,
+      this.sendSymbol,
+      "from",
+      this.swapFromChain,
+      "to",
+      this.swapToChain
+    );
+    if (this.swapFromChain == "eth") {
+      console.log("next => sendFromEth");
+      this.signTxDialog = true;
+      this.signTxCallback = this.sendFromEth;
+    } else if (this.swapFromChain == "neo") {
+      console.log("next => sendFromNeo");
+      this.signTxDialog = true;
+      this.signTxCallback = this.sendFromNeo;
+    } else if (this.swapToChain == "eth") {
+      console.log("swap to eth");
+      if (this.swapToCustomDest || !this.account!.ethAddress) {
+        this.destinationSwapDialog = true;
+      } else {
+        this.signTxDialog = true;
+        this.sendDestination = this.account!.ethAddress;
+        this.signTxCallback = this.swapToEth;
+      }
+    } else if (this.swapToChain == "neo") {
+      console.log("swap to neo");
+      if (this.swapToCustomDest || !this.account!.neoAddress) {
+        this.destinationSwapDialog = true;
+      } else {
+        this.signTxDialog = true;
+        this.sendDestination = this.account!.neoAddress;
+        this.signTxCallback = this.swapToNeo;
+      }
+    }
+  }
+
   closeSignTx() {
     this.wif = "";
     this.password = "";
@@ -1877,30 +1917,43 @@ export default class extends Vue {
   }
 
   doGenerateSwapAddress() {
-    if (this.needsWif) state.addSwapAddress(this.wif);
-    else state.addSwapAddressWithPassword(this.password);
-    this.generateSwapAddressDialog = false;
+    try {
+      if (this.needsWif) state.addSwapAddress(this.wif);
+      else state.addSwapAddressWithPassword(this.password);
+      this.generateSwapAddressDialog = false;
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
   }
 
   async claimSwap(swap: Swap) {
     console.log("claim swap", swap);
     if (
       swap.destinationPlatform == "neo" ||
-      swap.destinationPlatform == "ethereum"
+      swap.destinationPlatform == "ethereum" ||
+      (swap.destinationPlatform == "phantasma" && swap.sourcePlatform == "neo")
     ) {
+      this.isLoading = true;
       let res = await state.api.settleSwap(
         swap.sourcePlatform,
         swap.destinationPlatform,
         swap.sourceHash
       );
+      console.log("settleSwap", res);
       if ((res as any).error) {
         this.$root.$emit("errorMessage", {
           msg: this.$t("app.errorMessage"),
           details: (res as any).error,
         });
+      } else {
+        setTimeout(async () => {
+          await this.refreshSwapInfo();
+        }, 2500);
       }
     } else if (swap.destinationPlatform == "phantasma") {
       if (swap.sourcePlatform == "ethereum") {
+        this.swapToClaim = swap;
         this.signTxDialog = true;
         this.signTxCallback = this.settleFromEthereumTx;
       }
@@ -1908,65 +1961,50 @@ export default class extends Vue {
   }
 
   async settleFromEthereumTx() {
-    console.log("settle from ethereum tx");
+    console.log("settle from ethereum tx", this.swapToClaim);
     if (!this.swapToClaim || !this.account) return;
 
     const swapTxHash = this.swapToClaim.sourceHash;
 
-    const symbol = "SOUL";
-
-    // this.sendDestination = this.neoInteropBytes;
+    const symbol = this.swapToClaim.symbol;
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1200;
 
     let transcodeAddress = "";
 
-    if (this.needsWif) transcodeAddress = state.getTranscodeAddress(this.wif);
-    else
-      transcodeAddress = state.getTranscodeAddressWithPassword(this.password);
-
-    // console.log("trans visible", transcodeAddrStr);
-    /*
-    let transAddrBytes: any = [0x22, 0x01].concat(
-      hexToByteArray(transcodeAddr)
-    );
-    // const transAddrBytes = "P2LCxYX2nFqb4Z3GxDgSHbb1571yMXaSEHU2tJXq9CatCii";
-
-    console.log("transAddr", transAddrBytes);
-    transAddrBytes = transcodeAddrStr;
-    console.log("transAddr", transAddrBytes); // ok
+    try {
+      if (this.needsWif) transcodeAddress = state.getTranscodeAddress(this.wif);
+      else
+        transcodeAddress = state.getTranscodeAddressWithPassword(this.password);
+      console.log("transcodeAddr", transcodeAddress);
+    } catch (err) {
+      this.closeSignTx();
+      this.errorDialog = true;
+      this.errorMessage = err;
+      return;
+    }
 
     let sb = new ScriptBuilder();
 
     sb.beginScript();
     sb.callContract("interop", "SettleTransaction", [
-      transAddrBytes,
+      transcodeAddress,
       "ethereum",
       "ethereum",
       hexToByteArray(reverseHex(swapTxHash)),
     ]);
 
-    sb.callContract("swap", "SwapFee", [transAddrBytes, symbol, 1000000000]);
-
-    sb.allowGas(
-      transAddrBytes,
-      hexToByteArray(
-        "00000000000000000000000000000000000000000000000000000000000000000000"
-      ),
-      gasPrice,
-      800
-    );
-
-    // sb.TransferBalance(symbol, transcodeAddr, phantasmaKeys.Address)
+    sb.callContract("swap", "SwapFee", [transcodeAddress, symbol, 1000000000]);
+    sb.allowGas(transcodeAddress, sb.nullAddress, gasPrice, minGasLimit);
     sb.callInterop("Runtime.TransferBalance", [
-      transAddrBytes,
+      transcodeAddress,
       address,
       symbol,
     ]);
 
-    sb.spendGas(transAddrBytes);
+    sb.spendGas(transcodeAddress);
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
@@ -1980,60 +2018,37 @@ export default class extends Vue {
 
     try {
       this.isLoading = true;
+      this.signTxDialog = false;
       let tx = "";
-      // if (this.needsWif) {
-      tx = await state.signTxSettleEth(
-        txdata,
-        getPrivateKeyFrom WIF,
-        (msgHex, pkHex) => {
-          const sha256Msg = createHash("sha256")
-            .update(msgHex, "hex")
-            .digest();
-
-          console.log("msgToSign", msgHex);
-
-          const privateKey = Secp256k1.uint256(pkHex, 16);
-          const digest = Secp256k1.uint256(ba2hex(sha256Msg), 16);
-
-          console.log("pk to sign", pkHex, privateKey);
-
-          const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(
-            privateKey
-          );
-          console.log("public", publicKey);
-
-          const sig = Secp256k1.ecsign(privateKey, digest);
-
-          console.log(sig);
-          console.log("sign-concat", sig.r + sig.s);
-          return sig.r + sig.s;
-        }
-      );
-      // } else if (this.needsPass) {
-      //   tx = await state.signTxWithPassword(txdata, address, this.password);
-      // }
+      if (this.needsWif) {
+        tx = await state.signTxEth(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxEthWithPassword(txdata, this.password);
+      }
       console.log("tx successful: " + tx);
-      // this.$root.$emit("checkTx", tx);
+      setTimeout(() => this.$root.$emit("checkTx", tx), 2000);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
     }
-*/
+
     // close dialog when it's done
     this.closeSignTx();
 
     // refresh balances in 2.5 secs
     setTimeout(async () => {
       await this.state.refreshCurrentAccount();
+      await this.refreshSwapInfo();
       this.isLoading = false;
-    }, 2500);
+    }, 2850);
   }
 
   async askSwapFromEth(bal: ISymbolAmount) {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "eth";
+    this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), this.decimals(bal.symbol)).replace(' ', '')
+      this.formatBalance(bal.amount.toString(), state.decimals(bal.symbol))
     ) as number;
     this.swapAmountDialog = true;
 
@@ -2051,20 +2066,56 @@ export default class extends Vue {
   askSwapFromNeo(bal: ISymbolAmount) {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "neo";
-    this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), this.decimals(bal.symbol)).replace(' ', '')
-    ) as number;
+    this.swapToChain = "phantasma";
+    this.sendMaxAmount = parseFloat(bal.amount.toString());
     this.swapAmountDialog = true;
   }
 
-  async swapFromNeo() {}
+  async sendFromNeo() {
+    const platforms = await state.api.getPlatforms();
+    const interopAddr = platforms.find((p) => p.platform == "neo")?.interop[0];
 
-  async swapFromEth() {
+    this.sendDestination = interopAddr!.external;
+
+    console.log(
+      "swap from neo to pha",
+      this.sendAmount,
+      this.sendSymbol,
+      this.sendDestination
+    );
+
+    let wif = this.wif;
+
+    try {
+      if (!this.needsWif) wif = state.getWifFromPassword(this.password);
+    } catch (err) {
+      this.closeSignTx();
+      this.errorDialog = true;
+      this.errorMessage = err;
+      return;
+    }
+
+    const hash = await sendNeo(
+      wif,
+      this.sendAmount,
+      this.sendSymbol,
+      this.sendDestination,
+      this.account!.address,
+      this.neoGasPrices[this.swapGasIndex]
+    );
+    console.log("hash from sendNeo", hash);
+
+    this.lastSwapTxUrl = "https://neoscan.io/transaction/" + hash;
+    this.swapInProgressDialog = true;
+  }
+
+  async sendFromEth() {
     if (!this.account || !this.account.ethAddress) {
       console.log("error");
       return;
     }
 
+    console.log("Sending from ETH", this.sendAmount, this.sendSymbol);
     console.log("Ethereum Address", this.account.ethAddress);
 
     const nonceRes = await JSONRPC(
@@ -2075,14 +2126,25 @@ export default class extends Vue {
 
     console.log("nonce", nonceRes);
 
-    const privateKey = Buffer.from(
-      getPrivateKeyFromWif(
-        this.needsWif ? this.wif : state.getWifFromPassword(this.password)
-      ),
-      "hex"
-    );
+    let privateKey: Buffer;
 
-    const amount = 1 * 10 ** 8; // amount erc-20
+    try {
+      privateKey = Buffer.from(
+        getPrivateKeyFromWif(
+          this.needsWif ? this.wif : state.getWifFromPassword(this.password)
+        ),
+        "hex"
+      );
+    } catch (err) {
+      this.closeSignTx();
+      this.errorDialog = true;
+      this.errorMessage = err;
+      return;
+    }
+
+    const decimals = state.decimals(this.sendSymbol);
+
+    const amount = this.sendAmount * 10 ** decimals; // amount erc-20
     const gasPrice = this.ethGasPrices[this.swapGasIndex] * 10 ** 9; //100000000000;
     const gasLimit = this.sendSymbol == "ETH" ? 21000 : 100000;
 
@@ -2096,6 +2158,8 @@ export default class extends Vue {
       throw new Error("No available interop address for swap");
     }
 
+    console.log("Interop address is ", interopAddr.external);
+
     const destAddr = interopAddr.external //"0x259D17A3E6658B79CE7F6F87CAC614A696056E79"
       .substring(2)
       .padStart(64, "0")
@@ -2108,8 +2172,8 @@ export default class extends Vue {
         nonce: nonceRes,
         gasPrice: "0x" + gasPrice.toString(16), //"0x09184e72a000",
         gasLimit: "0x" + gasLimit.toString(16), //"0x2710",
-        to: destAddr,
-        value: "0x" + this.sendAmount.toString(16),
+        to: interopAddr.external,
+        value: "0x" + amount.toString(16),
       };
     } else {
       txParams = {
@@ -2135,12 +2199,207 @@ export default class extends Vue {
     console.log("%c" + serializedTx, "color:blue;font-size:20px");
 
     const txRes = await JSONRPC(
-      "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
+      "https://" +
+        (isMainnet ? "mainnet" : "ropsten") +
+        ".infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
       "eth_sendRawTransaction",
       ["0x" + serializedTx]
     );
 
+    this.closeSignTx();
+    this.swapInProgressDialog = true;
+
+    this.lastSwapTx = txRes;
+    this.lastSwapTxUrl =
+      (isMainnet
+        ? "https://etherscan.io/tx/"
+        : "https://ropsten.etherscan.io/tx/") + txRes;
+
     console.log("%c" + txRes, "color:green;font-size:20px");
+  }
+
+  async swapToEth() {
+    console.log(
+      "swap from pha to eth",
+      this.sendAmount,
+      this.sendSymbol,
+      this.sendDestination
+    );
+
+    if (!this.account) return;
+
+    if (typeof this.sendDestination == "object") {
+      this.sendDestination = (this.sendDestination as any).value;
+    }
+
+    this.sendDecimals = state.decimals(this.sendSymbol);
+
+    const ethHexBytes = "04" + this.sendDestination.substring(2).toUpperCase();
+
+    let ethInteropBytes = [0x22];
+    for (let i = 0; i < 34 * 2; i += 2) {
+      const hexdig = ethHexBytes.substr(i, 2);
+      if (hexdig == "") {
+        ethInteropBytes.push(0);
+      } else ethInteropBytes.push(parseInt(hexdig, 16));
+    }
+
+    console.log("ethInteropBytes", ethInteropBytes);
+
+    console.log(
+      "sending",
+      Math.floor(this.sendAmount * 10 ** this.sendDecimals),
+      "of",
+      this.sendSymbol,
+      "to",
+      ethInteropBytes
+    );
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 800;
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    sb.callInterop("Runtime.TransferTokens", [
+      address,
+      ethInteropBytes,
+      this.sendSymbol,
+      Math.floor(this.sendAmount * 10 ** this.sendDecimals),
+    ]);
+    sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    console.log("script", script);
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      this.signTxDialog = false;
+      if (this.needsWif) {
+        tx = await state.signTx(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxWithPassword(txdata, address, this.password);
+      }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      await this.refreshSwapInfo();
+      this.isLoading = false;
+    }, 2700);
+  }
+
+  async swapToNeo() {
+    console.log(
+      "swap from pha to neo",
+      this.sendAmount,
+      this.sendSymbol,
+      this.sendDestination
+    );
+
+    this.signTxDialog = false;
+
+    console.log("Going to swap to", this.sendDestination);
+
+    if (!this.account) return;
+
+    if (typeof this.sendDestination == "object") {
+      this.sendDestination = (this.sendDestination as any).value;
+    }
+
+    this.sendDecimals = state.decimals(this.sendSymbol);
+
+    const sh = getScriptHashFromAddress(this.sendDestination);
+    const hexBytes = "0317" + reverseHex(sh).toUpperCase();
+
+    let neoInteropBytes = [0x22];
+    for (let i = 0; i < 34 * 2; i += 2) {
+      const hexdig = hexBytes.substr(i, 2);
+
+      // console.log(i, hexdig);
+      if (hexdig == "") {
+        // console.log("empty bytes - push 0");
+        neoInteropBytes.push(0);
+      } else neoInteropBytes.push(parseInt(hexdig, 16));
+    }
+
+    console.log(
+      "sending",
+      Math.floor(this.sendAmount * 10 ** this.sendDecimals),
+      "of",
+      this.sendSymbol,
+      "to",
+      neoInteropBytes
+    );
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 800;
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    sb.callInterop("Runtime.TransferTokens", [
+      address,
+      neoInteropBytes,
+      this.sendSymbol,
+      Math.floor(this.sendAmount * 10 ** this.sendDecimals),
+    ]);
+    sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    console.log("script", script);
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      if (this.needsWif) {
+        tx = await state.signTx(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxWithPassword(txdata, address, this.password);
+      }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2500);
   }
 
   async claimKcal() {

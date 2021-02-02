@@ -32,7 +32,7 @@ export class Transaction {
     this.signatures.unshift(signature);
   }
 
-  public toString(withSignature: boolean): string {
+  public toString(withSignature: boolean, signatureType: number = 1): string {
     const utc = Date.UTC(
       this.expiration.getUTCFullYear(),
       this.expiration.getUTCMonth(),
@@ -62,9 +62,16 @@ export class Transaction {
     if (withSignature) {
       sb.emitVarInt(this.signatures.length);
       this.signatures.forEach((sig) => {
-        sb.appendByte(1); // Signature Type
-        sb.emitVarInt(sig.length / 2);
-        sb.appendHexEncoded(sig);
+        if (signatureType == 1) {
+          sb.appendByte(1); // Signature Type
+          sb.emitVarInt(sig.length / 2);
+          sb.appendHexEncoded(sig);
+        } else if (signatureType == 2) {
+          sb.appendByte(2); // ECDSA Signature
+          sb.appendByte(1); // Curve type secp256k1
+          sb.emitVarInt(sig.length / 2);
+          sb.appendHexEncoded(sig);
+        }
       });
     }
     return sb.str;
