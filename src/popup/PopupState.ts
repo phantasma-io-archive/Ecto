@@ -20,6 +20,7 @@ import { rejects } from "assert";
 import { getNeoAddressFromWif } from "@/neo";
 import { getEthAddressFromWif, getEthContract } from "@/ethereum";
 import base58 from "bs58";
+import { byteArrayToHex } from "@/phan-js/utils";
 
 interface IAuthorization {
   dapp: string;
@@ -707,6 +708,67 @@ export class PopupState {
     return signData(data, privateKey);
   }
 
+  async signTxEth(txdata: TxArgsData, wif: string): Promise<string> {
+    const account = this.currentAccount;
+    if (!account) throw new Error("Account not valid");
+
+    const address = account.address;
+
+    const pkHex = getPrivateKeyFromWif(wif);
+
+    const dt = new Date();
+    dt.setMinutes(dt.getMinutes() + 5);
+    console.log(dt);
+    const tx = new Transaction(
+      txdata.nexus,
+      txdata.chain,
+      txdata.script,
+      dt,
+      txdata.payload
+    );
+
+    // Do custom signature
+    const msgHex = tx.toString(false);
+    const sha256Msg = createHash("sha256")
+      .update(msgHex, "hex")
+      .digest();
+
+    console.log("msgToSign", msgHex);
+
+    const privateKey = Secp256k1.uint256(pkHex, 16);
+    const digest = Secp256k1.uint256(byteArrayToHex(sha256Msg), 16);
+
+    console.log("pk to sign", pkHex, privateKey);
+
+    const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
+    console.log("public", publicKey);
+
+    const sig = Secp256k1.ecsign(privateKey, digest);
+    console.log(sig);
+
+    const signature = sig.r + sig.s;
+    console.log("signature", signature);
+
+    tx.signatures.unshift(signature);
+
+    const rawTx = tx.toString(true, 2);
+
+    console.log("%c" + rawTx, "color:red");
+
+    const hash = await this.api.sendRawTransaction(rawTx);
+    console.log("Returned from sendRawTransaction with res: ", hash);
+
+    return hash;
+  }
+
+  async signTxEthWithPassword(txdata: TxArgsData, password: string) {
+    const hash = await this.signTxEth(
+      txdata,
+      this.getWifFromPassword(password)
+    );
+    return hash;
+  }
+
   getEthContract(symbol: string) {
     return getEthContract(symbol, this.isMainnet);
   }
@@ -746,30 +808,29 @@ export class PopupState {
     return wif;
   }
 
-  formatBalance(symbol: string, amount: string): string {
-    let decimals = 0;
+  decimals(symbol: string) {
     switch (symbol) {
       case "KCAL":
-        decimals = 10;
-        break;
+        return 10;
       case "SOUL":
-        decimals = 8;
-        break;
+        return 8;
       case "NEO":
-        decimals = 0;
-        break;
+        return 0;
       case "GAS":
-        decimals = 8;
-        break;
+        return 8;
       case "GOATI":
-        decimals = 3;
-        break;
+        return 3;
       case "ETH":
-        decimals = 18;
-        break;
+        return 18;
+      case "MKNI":
+        return 0;
       default:
-        decimals = 0;
+        return 0;
     }
+  }
+
+  formatBalance(symbol: string, amount: string): string {
+    const decimals = this.decimals(symbol);
 
     switch (symbol) {
       case "TTRS":

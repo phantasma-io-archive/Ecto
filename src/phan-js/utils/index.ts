@@ -22,3 +22,11 @@ export function byteArrayToHex(arr: ArrayBuffer | ArrayLike<number>): string {
   }
   return result;
 }
+
+export function reverseHex(hex: string): string {
+  let out = "";
+  for (let i = hex.length - 2; i >= 0; i -= 2) {
+    out += hex.substr(i, 2);
+  }
+  return out;
+}

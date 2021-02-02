@@ -63,14 +63,18 @@ export function getEthAddressFromWif(wif: string): string {
   return ethWallet.getAddressString();
 }
 
-export async function getEthBalances(ethAddress: string) {
+export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
   const balances = [];
 
-  const ethBalance = await JSONRPC(
-    "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
-    "eth_getBalance",
-    [ethAddress, "latest"]
-  );
+  const rpcUrl =
+    "https://" +
+    (isMainnet ? "mainnet" : "ropsten") +
+    ".infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8";
+
+  const ethBalance = await JSONRPC(rpcUrl, "eth_getBalance", [
+    ethAddress,
+    "latest",
+  ]);
 
   const ethVal = parseInt(ethBalance.slice(2), 16);
   console.log("ethBalance", ethVal);
@@ -78,22 +82,20 @@ export async function getEthBalances(ethAddress: string) {
   const ethDataAddr =
     "0x70a08231000000000000000000000000" + ethAddress.substring(2);
 
-  const soulErcBalance = await JSONRPC(
-    "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
-    "eth_call",
-    [{ to: "0x" + contractsRopsten.SOUL, data: ethDataAddr }, "latest"]
-  );
+  const soulErcBalance = await JSONRPC(rpcUrl, "eth_call", [
+    { to: "0x" + contractsRopsten.SOUL, data: ethDataAddr },
+    "latest",
+  ]);
 
-  const soulVal = parseInt(soulErcBalance.slice(2), 16);
+  const soulVal = parseInt("0" + soulErcBalance.slice(2), 16);
   console.log("soul balance", soulVal);
 
-  const kcalBalance = await JSONRPC(
-    "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
-    "eth_call",
-    [{ to: "0x" + contractsRopsten.KCAL, data: ethDataAddr }, "latest"]
-  );
+  const kcalBalance = await JSONRPC(rpcUrl, "eth_call", [
+    { to: "0x" + contractsRopsten.KCAL, data: ethDataAddr },
+    "latest",
+  ]);
 
-  const kcalVal = parseInt(kcalBalance.slice(2), 16);
+  const kcalVal = parseInt("0" + kcalBalance.slice(2), 16);
   console.log("kcal balance", kcalVal);
 
   if (ethVal !== 0) balances.push({ symbol: "ETH", amount: ethVal });
