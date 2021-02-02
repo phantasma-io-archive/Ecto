@@ -618,7 +618,7 @@ export class PopupState {
     return this._authorizations.find((a) => a.token == token)!.dapp;
   }
 
-  async addSwapAddressWithPassword(password: string) {
+  addSwapAddressWithPassword(password: string) {
     const account = this.currentAccount;
     if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
 
@@ -637,19 +637,17 @@ export class PopupState {
     if (!this.isWifValidForAccount(wif))
       throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
-    return await this.addSwapAddress(wif);
+    this.addSwapAddress(wif);
   }
 
-  async addSwapAddress(wif: string): Promise<void> {
+  addSwapAddress(wif: string) {
     const ethAddress = getEthAddressFromWif(wif);
     const neoAddress = getNeoAddressFromWif(wif);
 
     this._accounts[this._currentAccountIndex].ethAddress = ethAddress;
     this._accounts[this._currentAccountIndex].neoAddress = neoAddress;
 
-    return new Promise((resolve, reject) => {
-      chrome.storage.local.set({ accounts: this._accounts }, () => resolve());
-    });
+    chrome.storage.local.set({ accounts: this._accounts });
   }
 
   async signTxWithPassword(
