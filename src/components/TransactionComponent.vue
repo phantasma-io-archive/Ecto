@@ -102,6 +102,10 @@ function decimals(symbol: string) {
   }
 }
 
+function formatNumber(num: any) {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
+}
+
 function formatBalance(amount: string, decimals: number): string {
   if (decimals == 0) return formatNumber(amount);
   while (amount.length < decimals + 1) amount = "0" + amount;
@@ -114,10 +118,6 @@ function formatBalance(amount: string, decimals: number): string {
     "." +
     (decimalPart.length >= 4 ? decimalPart.substring(0, 4) : decimalPart)
   );
-}
-
-function formatNumber(num: any) {
-  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
 }
 
 function formatSymbol(amount: string, symbol: string): string {
@@ -434,7 +434,15 @@ export default class extends Vue {
               iconColor: "blue",
               postIcon: "mdi-eye-outline",
               postIconColor: "gray",
-              text: this.txBid + ' ' + data.type + ' ' + this.txAuction + ' (' + data.baseSymbol + ')',
+              text:
+                this.txBid +
+                " " +
+                data.type +
+                " " +
+                this.txAuction +
+                " (" +
+                data.baseSymbol +
+                ")",
               tooltip:
                 this.txFor +
                 " " +
