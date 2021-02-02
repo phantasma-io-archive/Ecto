@@ -65,6 +65,7 @@
         "description": "muốn kết nối với Phantasma Link. Mỗi giao dịch sẽ yêu cầu sự cho phép của bạn. Bạn có muốn cho phép nó không?",
         "request": "Yêu cầu ủy quyền",
         "label": "Ủy quyền cho",
+        "labelAccount": "Account",
         "refuse": "Từ chối",
         "connect": "Kết nối",
         "periodCurrent": "Phiên hiện tại",

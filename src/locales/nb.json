@@ -65,6 +65,7 @@
         "description": "ønsker å koble til Phantasma Link. Hver transaksjon vil kreve din bekreftelse. Ønsker du å tillate dette?",
         "request": "Autorisasjonsforespørsel",
         "label": "Autoriser for",
+        "labelAccount": "Account",
         "refuse": "Avvis",
         "connect": "Koble til",
         "periodCurrent": "Nåværende økt",

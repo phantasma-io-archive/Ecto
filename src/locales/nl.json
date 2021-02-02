@@ -65,6 +65,7 @@
         "description": "wil koppelen met Phantasma Link. Elke transactie vraagt om jouw toestemming. Wil je dit toestaan?",
         "request": "Toestemmingsverzoek",
         "label": "Toestemming voor",
+        "labelAccount": "Account",
         "refuse": "Weiger",
         "connect": "Koppel",
         "periodCurrent": "Huidige sessie",

@@ -65,6 +65,7 @@
       "description": "Phantasma Link'e bağlanmak istiyor. Her işlem izninizi isteyecek. izin vermek istiyor musunuz?",
       "request": "Yetki verme isteği",
       "label": "Bu süre kadar",
+      "labelAccount": "Account",
       "refuse": "Reddet",
       "connect": "Bağlan",
       "periodCurrent": "Geçerli oturum",

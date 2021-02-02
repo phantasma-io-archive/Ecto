@@ -65,6 +65,7 @@
         "description": "wants to connect to Phantasma Link. Each transaction will request your permission. Do you want to allow it?",
         "request": "Authorization request",
         "label": "Authorize for",
+        "labelAccount": "Account",
         "refuse": "Refuse",
         "connect": "Connect",
         "periodCurrent": "Current session",

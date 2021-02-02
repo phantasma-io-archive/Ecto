@@ -65,6 +65,7 @@
         "description": "Quiere conectarse al enlace Phantasma. Cada transacción requerirá su autorización. ¿Desea permitirlo?",
         "request": "Solicitud de autorización",
         "label": "Autorizado para",
+        "labelAccount": "Account",
         "refuse": "Cancelar",
         "connect": "Conectar",
         "periodCurrent": "Sesión activa",

@@ -65,6 +65,7 @@
         "description": "想要连接到Phantasma链接。 每笔交易都会请求您的许可。 您允许吗？",
         "request": "授权请求",
         "label": "授权",
+        "labelAccount": "Account",
         "refuse": "拒绝",
         "connect": "连接",
         "periodCurrent": "当前进程",
