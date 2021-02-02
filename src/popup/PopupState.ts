@@ -58,6 +58,7 @@ export class PopupState {
   private _authorizations: IAuthorization[] = [];
   private _currency: string = "USD";
   private _language: string = "English";
+  private _balanceShown: boolean = true;
   private _currenciesRate: any;
   private _nexus: string = "MainNet";
   private _simnetRpc = "http://localhost:7077/rpc";
@@ -91,6 +92,10 @@ export class PopupState {
 
   get currency() {
     return this._currency;
+  }
+
+  get balanceShown() {
+    return this._balanceShown;
   }
 
   get language() {
@@ -141,6 +146,10 @@ export class PopupState {
           return "tr";
         case "Tiếng Việt":
           return "vn";
+        case "Norwegian":
+          return "nb";
+        case "Português":
+          return "pt";
       }
     }
     return "en";
@@ -277,6 +286,7 @@ export class PopupState {
         this._authorizations = items.authorizations ? items.authorizations : [];
         this._currency = items.currency ? items.currency : "USD";
         this._language = items.language ? items.language : "English";
+        this._balanceShown = items.balanceShown ? true : false;
         this.nfts = items.nfts ? items.nfts : {};
 
         $i18n.locale = this.locale;
@@ -345,6 +355,18 @@ export class PopupState {
     });
   }
 
+  async toggleBalance(balanceShown: boolean): Promise<void>  {
+    this._balanceShown = balanceShown;
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          balanceShown: this._balanceShown,
+        },
+        () => resolve()
+      );
+    });
+  }
+
   async fetchRates() {
     const res = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
@@ -382,11 +404,16 @@ export class PopupState {
     }
 
     const accountData = await this.getAccountData(address);
-    const len = this._accounts.push({
-      address: accountData.address,
-      type: "unverified",
-      data: accountData,
-    });
+    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
+    let len = 0;
+    if (!alreadyExisting) {
+      len = this._accounts.push({
+        address: accountData.address,
+        type: "unverified",
+        data: accountData,
+      });
+    }
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.set(
@@ -410,8 +437,10 @@ export class PopupState {
     let neoAddress = getNeoAddressFromWif(wif);
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
+    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
 
-    if (hasPass) {
+    if (hasPass && !alreadyExisting) {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
       this._accounts.push({
         address: accountData.address,
@@ -421,7 +450,7 @@ export class PopupState {
         encKey,
         data: accountData,
       });
-    } else {
+    } else if (!alreadyExisting) {
       this._accounts.push({
         address: accountData.address,
         ethAddress,
@@ -449,10 +478,12 @@ export class PopupState {
     let address = getAddressFromWif(wif);
     let ethAddress = getEthAddressFromWif(wif);
     let neoAddress = getNeoAddressFromWif(wif);
+    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
 
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
-    if (hasPass) {
+    if (hasPass && !alreadyExisting) {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
       this._accounts.push({
         address: accountData.address,
@@ -462,7 +493,7 @@ export class PopupState {
         encKey,
         data: accountData,
       });
-    } else {
+    } else if (!alreadyExisting) {
       this._accounts.push({
         address: accountData.address,
         ethAddress,

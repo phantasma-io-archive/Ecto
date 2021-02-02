@@ -3,7 +3,11 @@
     <v-app-bar key="appbar" app color="primary" dark style="font-size:16px">
       <v-icon>mdi-wallet</v-icon><v-spacer />
       <v-list-item link @click="goto('/wallets')">
-        <v-list-item-content>
+        <v-list-item-content v-if="!state.balanceShown">
+          <v-list-item-title>***</v-list-item-title>
+          <v-list-item-subtitle>***</v-list-item-subtitle>
+        </v-list-item-content>
+        <v-list-item-content v-else>
           <v-list-item-title>{{ shorterAddress }}</v-list-item-title>
           <v-list-item-subtitle>{{ shortAddress }}</v-list-item-subtitle>
         </v-list-item-content>
@@ -29,8 +33,8 @@
           style="width:148px; height:148px; margin: 20px auto;"
         ></v-skeleton-loader>
         <img v-else :src="imgSrc" />
-
-        {{ account.address }}
+        <span v-if="!state.balanceShown">************************************</span>
+        <span v-else>{{ account.address }}</span>
         <br />
         <a href="" @click.prevent="copyAddressToClipboard()">{{
           $t("qr.copy")

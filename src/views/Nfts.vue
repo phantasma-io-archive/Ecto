@@ -3,7 +3,11 @@
     <v-app-bar key="appbar" app color="primary" dark style="font-size:16px">
       <v-icon>mdi-wallet</v-icon><v-spacer />
       <v-list-item link @click="goto('/wallets')">
-        <v-list-item-content>
+        <v-list-item-content v-if="!state.balanceShown">
+          <v-list-item-title>***</v-list-item-title>
+          <v-list-item-subtitle>***</v-list-item-subtitle>
+        </v-list-item-content>
+        <v-list-item-content v-else>
           <v-list-item-title>{{ shorterAddress }}</v-list-item-title>
           <v-list-item-subtitle>{{ shortAddress }}</v-list-item-subtitle>
         </v-list-item-content>
@@ -61,6 +65,17 @@
                 @click="askSendWhere"
                 :disabled="sendNFTsDisabled"
                 >{{ $t("nfts.send") }}</v-btn
+              ></span
+            >
+            <span v-if="viewModeBurn"
+              >- {{ selectedNum }} {{ $t("nfts.selected") }}
+              <v-btn
+                dense
+                text
+                style="height:25px; color:#17b1e8; margin-top:-2px"
+                @click="askBurnWhere"
+                :disabled="burnNFTsDisabled"
+                >{{ $t("nfts.burn") }}</v-btn
               ></span
             >
           </p>
@@ -222,6 +237,35 @@
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askSend">
+            {{ $t("nfts.next") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="burnWhereDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">{{
+          $t("nfts.burnTitle")
+        }}</v-card-title>
+
+        <v-card-text>
+          <span>
+            {{ $t("nfts.confirmBurn") }} {{ nftsToBurn.length }}
+            {{ burnSymbol }} NFTs. {{ $t("nfts.confirmBurnSecond") }}
+          </span>
+          <br />
+          <v-spacer />
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="burnWhereDialog = false">
+            {{ $t("nfts.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="askBurn">
             {{ $t("nfts.next") }}
           </v-btn>
         </v-card-actions>
@@ -409,6 +453,8 @@ export default class extends Vue {
 
   sendDialog = false;
   sendWhereDialog = false;
+  burnDialog = false;
+  burnWhereDialog = false;
 
   sortDialog = false;
   filtersDialog = false;
@@ -420,11 +466,16 @@ export default class extends Vue {
   sendSymbol = "";
   sendDecimals = 0;
   sendDestination = "";
+  burnAmount = 0;
+  burnMaxAmount = 0;
+  burnSymbol = "";
+  burnDecimals = 0;
 
   errorDialog = false;
   errorMessage = "";
 
   nftsToSend: any[] = [];
+  nftsToBurn: any[] = [];
 
   signTxDialog = false;
   signTxCallback: (() => void) | null = null;
@@ -435,11 +486,15 @@ export default class extends Vue {
   password = "";
 
   viewModeSend = false;
+  viewModeBurn = false;
 
   async mounted() {
     this.viewModeSend = this.$route.params.mode == "send";
+    this.viewModeBurn = this.$route.params.mode == "burn";
     this.sendSymbol = this.$route.params.symbol;
+    this.burnSymbol = this.$route.params.symbol;
     console.log("sendSymbol", this.sendSymbol);
+    console.log("burnSymbol", this.burnSymbol);
 
     await state.check(this.$parent.$i18n);
     this.isLoading = false;
@@ -460,6 +515,11 @@ export default class extends Vue {
   }
 
   get sendNFTsDisabled() {
+    const num = this.selectedNum;
+    return num === 0 || num > 100;
+  }
+
+  get burnNFTsDisabled() {
     const num = this.selectedNum;
     return num === 0 || num > 100;
   }
@@ -661,6 +721,18 @@ export default class extends Vue {
     this.signTxCallback = this.sendNFTs;
   }
 
+  askBurnWhere() {
+    this.nftsToBurn = this.nftArray.filter((n) => n.isSelected);
+    this.burnDialog = false;
+    this.burnWhereDialog = true;
+  }
+
+  askBurn() {
+    this.burnWhereDialog = false;
+    this.signTxDialog = true;
+    this.signTxCallback = this.burnNFTs;
+  }
+
   closeSignTx() {
     this.wif = "";
     this.password = "";
@@ -712,6 +784,73 @@ export default class extends Vue {
         this.sendSymbol,
         "for",
         this.sendDestination
+      );
+    });
+    sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      if (this.needsWif) {
+        tx = await state.signTx(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxWithPassword(txdata, address, this.password);
+      }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2500);
+  }
+
+  async burnNFTs() {
+    if (!this.account) return;
+
+    console.log(
+      "burning",
+      this.burnAmount * 10 ** this.burnDecimals,
+      "of",
+      this.burnSymbol
+    );
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 800 * this.nftsToBurn.length;
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    this.nftsToBurn.forEach((nft) => {
+      sb.callInterop("Runtime.BurnToken", [
+        address,
+        this.sendSymbol,
+        nft.id,
+      ]);
+
+      console.log(
+        "nft to burn",
+        nft.id,
+        "of",
+        this.sendSymbol
       );
     });
     sb.spendGas(address);

@@ -3,7 +3,11 @@
     <v-app-bar key="appbar" app color="primary" dark style="font-size:16px">
       <v-icon>mdi-wallet</v-icon><v-spacer />
       <v-list-item link @click="goto('/wallets')">
-        <v-list-item-content>
+        <v-list-item-content v-if="!state.balanceShown">
+          <v-list-item-title>***</v-list-item-title>
+          <v-list-item-subtitle>***</v-list-item-subtitle>
+        </v-list-item-content>
+        <v-list-item-content v-else>
           <v-list-item-title>{{ shorterAddress }}</v-list-item-title>
           <v-list-item-subtitle>{{ shortAddress }}</v-list-item-subtitle>
         </v-list-item-content>
@@ -121,13 +125,15 @@
                     "
                     style="font-size: 10px; color:#42b3f4; position: absolute; bottom: 9px; left: 13px;"
                   >
-                    SOULMASTER
+                    <span v-if="!state.balanceShown"></span>
+                    <span v-else>SOULMASTER</span>
                   </div>
                   <v-img :src="getAssetIcon(item)" max-width="40px"></v-img>
                   <div
                     style="margin:10px 1px 10px 15px;width:160px;font-size:16px"
                   >
-                    <span>{{ getAmount(item) }} </span>
+                    <span v-if="!state.balanceShown">*** </span>
+                    <span v-else>{{ getAmount(item) }} </span>
                     <span>{{ item.symbol }}</span
                     ><br /><span
                       style="font-size:12px; color:gray;"
@@ -135,7 +141,14 @@
                       >{{ getSecondLine(item) }}</span
                     >
                   </div>
-                  <div style="margin:10px 1px;width:80px;font-size:16px">
+                  <div v-if="!state.balanceShown" style="margin:10px 1px;width:80px;font-size:16px">
+                    {{ getCurrencyValue(item) }}<br /><span
+                      style="font-size:12px; color:gray;"
+                      v-if="isSecondLineVisible(item)"
+                      >{{ getSecondLineValue(item) }}</span
+                    >
+                  </div>
+                  <div v-else style="margin:10px 1px;width:80px;font-size:16px">
                     {{ getCurrencyValue(item) }}<br /><span
                       style="font-size:12px; color:gray;"
                       v-if="isSecondLineVisible(item)"
@@ -205,6 +218,15 @@
                       small
                       text
                       style="padding: 0 6px;"
+                      v-if="item.symbol == 'GHOST' || item.symbol == 'CROWN' || item.symbol == 'TTRS'"
+                      @click="burnAsset($event, item)"
+                      :disabled="item.amount == 0"
+                      ><v-icon>mdi-fire</v-icon> {{ $t("home.burn") }}</v-btn
+                    >
+                    <v-btn
+                      small
+                      text
+                      style="padding: 0 6px;"
                       @click="transferAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-export</v-icon> {{ $t("home.send") }}</v-btn
@@ -227,7 +249,10 @@
                         getDate(item.timestamp)
                       }}</strong>
                     </td>
-                    <td style="font-size:11px; padding: 6px">
+                    <td v-if="!state.balanceShown" style="font-size:11px; padding: 6px">
+                      *****
+                    </td>
+                    <td v-else style="font-size:11px; padding: 6px">
                       <TransactionComponent
                         :tx="item"
                         :address="account.address"
@@ -307,7 +332,8 @@
                 :key="swap.sourceHash + idx"
                 class="pa-1"
               >
-                {{ formatSymbol(swap.value, swap.symbol) }}
+                <span v-if="!state.balanceShown">***</span>
+                <span v-else>{{ formatSymbol(swap.value, swap.symbol) }}</span>
                 {{ $t("home.from") }} {{ formatChain(swap.sourcePlatform) }}
                 {{ $t("home.to") }}
                 {{ formatChain(swap.destinationPlatform) }}
@@ -343,7 +369,8 @@
                     <div v-if="!neoBalances || neoBalances.length === 0">
                       {{ $t("home.noSwapsNEO") }}<br />
                       <br />{{ $t("home.sendAssetsSwap") }}
-                      <strong>{{ account.neoAddress }}</strong
+                      <strong v-if="!state.balanceShown">************************************</strong
+                      ><strong v-else>{{ account.neoAddress }}</strong
                       ><br />
                       <v-btn
                         icon
@@ -354,7 +381,9 @@
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
-                      <strong>{{ account.neoAddress }}</strong
+                      <strong v-if="!state.balanceShown">************************************</strong
+                      >
+                      <strong v-else>{{ account.neoAddress }}</strong
                       ><br /><v-btn
                         icon
                         x-small
@@ -373,7 +402,7 @@
                                 :src="getAssetIcon(bal)"
                                 max-width="24px"
                               ></v-img
-                              >{{ bal.amount }} {{ bal.symbol }}
+                              ><span v-if="!state.balanceShown" style="display:contents;">***</span><span v-else style="display:contents;">{{ bal.amount }}</span> {{ bal.symbol }}
                             </v-list-item-content>
                             <v-list-item-action>
                               <a
@@ -413,7 +442,9 @@
                     <div v-if="!ethBalances || ethBalances.length === 0">
                       {{ $t("home.noSwapsETH") }}<br /><br />
                       {{ $t("home.sendAssetsSwap") }}
-                      <strong>{{ account.ethAddress }}</strong
+                      <strong v-if="!state.balanceShown">************************************</strong
+                      >
+                      <strong v-else>{{ account.ethAddress }}</strong
                       ><br /><v-btn
                         icon
                         x-small
@@ -423,7 +454,9 @@
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
-                      <strong>{{ account.ethAddress }}</strong
+                      <strong v-if="!state.balanceShown">************************************</strong
+                      >
+                      <strong v-else>{{ account.ethAddress }}</strong
                       ><br /><v-btn
                         icon
                         x-small
@@ -943,6 +976,10 @@
             v-model="nameToRegister"
             :label="$t('home.labelPick')"
           ></v-text-field>
+
+          <span>
+            {{ $t("home.registerHints") }}
+          </span>
         </v-card-text>
 
         <v-card-actions>
@@ -955,7 +992,8 @@
           <v-btn
             color="blue darken-1"
             text
-            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15"
+            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15 || nameToRegister == 'anonymous' || nameToRegister == 
+            'genesis' || nameToRegister.toUpperCase() != nameToRegister || isCharNumber(nameToRegister.charAt(0))"
             @click="askRegisterName"
           >
             {{ $t("home.next") }}
@@ -1594,6 +1632,10 @@ export default class extends Vue {
     );
   }
 
+  isCharNumber(c: string) {
+    return c >= '0' && c <= '9';
+  }
+
   getExplorerLink(hash: string) {
     return (
       (state.nexus == "testnet"
@@ -1616,6 +1658,14 @@ export default class extends Vue {
 
   formatSymbol(amount: number | string, symbol: string) {
     const value = amount.toString();
+
+    if (!this.state.balanceShown)
+      return (
+        '***' +
+        " " +
+        symbol
+    );
+    
     return (
       this.formatBalance(
         value,
@@ -1644,11 +1694,15 @@ export default class extends Vue {
     if (!balance) return "";
 
     const val = parseFloat(
-      this.formatBalance(balance.amount, balance.decimals, 5)
+      this.formatBalance(balance.amount, balance.decimals, 5).replace(' ', '')
     );
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
-      return state.currencySymbol + (val * rate).toFixed(1);
+
+      if (!state.balanceShown)
+        return state.currencySymbol + '***'
+
+      return state.currencySymbol + this.formatNumber((val * rate).toFixed(1));
     }
     return "";
   }
@@ -1658,7 +1712,7 @@ export default class extends Vue {
   }
 
   getKcalUnclaimed() {
-    return this.formatBalance(this.account!.data.unclaimed, 10);
+    return this.formatBalance(this.account!.data.unclaimed, 10).replace(' ', '');
   }
 
   noKcal() {
@@ -1674,7 +1728,7 @@ export default class extends Vue {
 
   getStackedSoul() {
     if (!this.account) return "0";
-    return this.formatBalance(this.account.data.stake, 8);
+    return this.formatBalance(this.account.data.stake, 8).replace(' ', '');
   }
 
   getUnstackedSoul() {
@@ -1685,11 +1739,28 @@ export default class extends Vue {
       (b) => b.symbol == "SOUL"
     );
     if (!soulBalance) return "0";
-    return this.formatBalance(soulBalance!.amount, 8);
+    return this.formatBalance(soulBalance!.amount, 8).replace(' ', '');
   }
 
   getSecondLine(item: Balance) {
     if (!this.account) return "";
+
+    if (!state.balanceShown && (item.symbol == "SOUL"))
+      return (
+        this.$t("home.secondLine1").toString() +
+        " " +
+        '***' +
+        " SOUL"
+      );
+
+    if (!state.balanceShown && (item.symbol == "KCAL"))
+      return (
+        this.$t("home.secondLine2").toString() +
+        " " +
+        '***' +
+        " KCAL"
+      );
+
 
     if (item.symbol == "SOUL")
       return (
@@ -1714,16 +1785,20 @@ export default class extends Vue {
       balance.symbol == "SOUL"
         ? this.account.data.stake
         : this.account.data.unclaimed;
-    const val = parseFloat(this.formatBalance(amount, balance.decimals));
+    const val = parseFloat(this.formatBalance(amount, balance.decimals).replace(' ', ''));
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
-      return state.currencySymbol + (val * rate).toFixed(1);
+
+      if (!state.balanceShown)
+        return state.currencySymbol + '***'
+
+      return state.currencySymbol + this.formatNumber((val * rate).toFixed(1))
     }
     return "";
   }
 
   formatBalance(amount: string, decimals: number, decimalsToShow = 2): string {
-    if (decimals == 0) return amount;
+    if (decimals == 0) return this.formatNumber(amount);
     while (amount.length < decimals + 1) amount = "0" + amount;
 
     const intPart = amount.substring(0, amount.length - decimals);
@@ -1731,14 +1806,18 @@ export default class extends Vue {
       amount.length - decimals,
       amount.length
     );
-    if (parseInt(decimalPart) == 0) return intPart;
+    if (parseInt(decimalPart) == 0) return this.formatNumber(intPart);
     return (
-      intPart +
+      this.formatNumber(intPart) +
       "." +
       (decimalPart.length >= decimalsToShow
         ? decimalPart.substring(0, decimalsToShow)
         : decimalPart)
     );
+  }
+
+  formatNumber(num: any) {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
   }
 
   isSwappable(symbol: string, swapToChain: string) {
@@ -1829,6 +1908,7 @@ export default class extends Vue {
     this.password = "";
     this.signTxCallback = null;
     this.signTxDialog = false;
+    this.generateSwapAddressDialog = false;
   }
 
   doSignTx() {
@@ -2499,11 +2579,26 @@ export default class extends Vue {
     this.sendSymbol = item.symbol;
     this.sendDecimals = item.decimals;
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(item.amount, item.decimals)
+      this.formatBalance(item.amount, item.decimals).replace(' ', '')
     );
     if (this.sendSymbol == "KCAL")
       this.sendMaxAmount = this.sendMaxAmount - 0.01;
     this.sendDialog = true;
+  }
+
+
+  burnAsset(event: Event, item: Balance) {
+    event.stopImmediatePropagation();
+    console.log("Going to burn: " + item.symbol);
+
+    if (
+      item.symbol == "TTRS" ||
+      item.symbol == "CROWN" ||
+      item.symbol == "GHOST"
+    ) {
+      this.goto("/nfts/" + item.symbol + "/burn");
+      return;
+    }
   }
 
   async sendFT() {
@@ -2633,7 +2728,7 @@ export default class extends Vue {
     this.selectAssetToSwapDialog = false;
     this.sendSymbol = bal.symbol;
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount, bal.decimals, bal.symbol == "ETH" ? 3 : 2)
+      this.formatBalance(bal.amount, bal.decimals, bal.symbol == "ETH" ? 3 : 2).replace(' ', '')
     );
     this.swapAmountDialog = true;
   }
