@@ -19,7 +19,7 @@ import {
 import { rejects } from "assert";
 
 import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
-import { getEthAddressFromWif, getEthContract } from "@/ethereum";
+import { getEthAddressFromWif, getEthBalances, getEthContract } from "@/ethereum";
 import base58 from "bs58";
 import { byteArrayToHex } from "@/phan-js/utils";
 
@@ -628,7 +628,7 @@ export class PopupState {
 
     if (ethAddress) {
       try {
-        this.ethBalances = await getNeoBalances(ethAddress, isMainnet);
+        this.ethBalances = await getEthBalances(ethAddress, isMainnet);
         let ethSwaps = await this.api.getSwapsForAddress(ethAddress);
         console.log("ethBals", this.ethBalances);
         console.log("ethSwaps", ethSwaps);
