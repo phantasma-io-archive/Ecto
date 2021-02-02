@@ -1804,6 +1804,7 @@ export default class extends Vue {
       amount.length
     );
     if (parseInt(decimalPart) == 0) return this.formatNumber(intPart);
+    if (decimals == 18) decimalsToShow = 3
     return (
       this.formatNumber(intPart) +
       "." +
