@@ -1144,7 +1144,7 @@
                 <v-icon class="ml-2">mdi-rabbit</v-icon>
               </div>
               <br />
-              <div class="mx-auto" style="font-size:12px">
+              <div class="mx-auto" style="font-size:13px">
                 {{
                   swapGasIndex == 0
                     ? $t("home.feeSlow")
@@ -1181,7 +1181,7 @@
                 <v-icon class="ml-2">mdi-rabbit</v-icon>
               </div>
               <br />
-              <div class="mx-auto" style="font-size:12px">
+              <div class="mx-auto" style="font-size:13px">
                 {{
                   swapGasIndex == 0
                     ? $t("home.feeSlow")
@@ -1202,7 +1202,7 @@
               v-if="(swapToChain === 'eth') & (swapFromChain !== 'neo')"
               class="mx-auto"
             >
-              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} ETH
+              {{ $t("home.swapNeed") }} {{ ethFeeAmount }} ETH
             </div>
           </v-row>
         </v-card-text>
@@ -1237,7 +1237,7 @@
 
           <v-text-field
             v-model="nameToRegister"
-            :label="swapToChain + ' ' + $t('home.destinationAddress')"
+            :label="formatChain(swapToChain) + ' ' + $t('home.destinationAddress')"
           ></v-text-field>
         </v-card-text>
 
@@ -1463,6 +1463,7 @@ export default class extends Vue {
   ethGasPrices: number[] = [50, 70, 100];
   neoGasPrices: number[] = [0.0, 0.0011, 0.1];
   swapGasIndex = 1;
+  ethFeeAmount = "0.001";
   gasFeeAmount = "0.1";
 
   state = state;
@@ -1640,7 +1641,9 @@ export default class extends Vue {
     return (
       (state.nexus == "testnet"
         ? "http://testnet.phantasma.io/tx/"
-        : "https://explorer.phantasma.io/tx/") + hash
+        : state.nexus == "simnet"
+          ? "https://localhost:7088/"
+          : "https://explorer.phantasma.io/tx/" ) + hash
     );
   }
 
@@ -1865,6 +1868,9 @@ export default class extends Vue {
 
   onSwapAmountClick() {
     this.swapAmountDialog = false;
+    if (this.swapToChain == "neo" || this.swapToChain == "eth") {
+      this.swapFromChain = 'phantasma'
+    }
     console.log(
       "onSwapAmountClick",
       this.sendAmount,
