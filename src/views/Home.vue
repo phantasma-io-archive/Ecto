@@ -38,16 +38,7 @@
         <v-tab>{{ $t("home.assets") }}</v-tab>
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
         <v-tab
-          ><v-badge
-            v-if="
-              phaSwaps &&
-                !phaSwaps.error &&
-                (neoSwaps || ethSwaps) &&
-                phaSwaps.concat(neoSwaps, ethSwaps).length > 0
-            "
-            dot
-            color="#17b1e8"
-          >
+          ><v-badge v-if="allSwaps && allSwaps.length > 0" dot color="#17b1e8">
             {{ $t("home.swaps") }}</v-badge
           ><span v-else>{{ $t("home.swaps") }}</span></v-tab
         >
@@ -312,33 +303,20 @@
             v-if="account && account.neoAddress && account.ethAddress"
             style="overflow: auto; height: 459px"
           >
-            <div
-              v-if="
-                phaSwaps.length > 0 ||
-                  ethSwaps.length > 0 ||
-                  neoSwaps.length > 0
-              "
-              class="pa-4"
-            >
+            <div v-if="allSwaps.length > 0" class="pa-4">
               <div
                 style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
               >
                 <v-badge
-                  v-if="
-                    phaSwaps &&
-                      !phaSwaps.error &&
-                      neoSwaps &&
-                      ethSwaps &&
-                      phaSwaps.concat(neoSwaps, ethSwaps).length > 0
-                  "
-                  :content="phaSwaps.concat(neoSwaps, ethSwaps).length"
+                  v-if="allSwaps.length > 0"
+                  :content="allSwaps.length"
                   color="#17b1e8"
                   style="margin-left:0.5rem;"
                   >{{ $t("home.pendingSwaps") }}</v-badge
                 >
               </div>
               <div
-                v-for="(swap, idx) in phaSwaps.concat(neoSwaps, ethSwaps)"
+                v-for="(swap, idx) in allSwaps"
                 :key="swap.sourceHash + idx"
                 class="pa-1"
               >
@@ -1483,9 +1461,7 @@ export default class extends Vue {
   ethBalances: ISymbolAmount[] = [];
   neoBalances: ISymbolAmount[] = [];
 
-  ethSwaps: Swap[] = [];
-  neoSwaps: Swap[] = [];
-  phaSwaps: Swap[] = [];
+  allSwaps: Swap[] = [];
 
   swapToClaim: Swap | null = null;
 
@@ -1506,16 +1482,16 @@ export default class extends Vue {
 
     const isMainnet = state.isMainnet;
 
+    this.allSwaps = [];
     if (neoAddress) {
       try {
         this.neoBalances = await getNeoBalances(neoAddress, isMainnet);
-        this.neoSwaps = await this.state.api.getSwapsForAddress(neoAddress);
+        let neoSwaps = await this.state.api.getSwapsForAddress(neoAddress);
         console.log("neoBals", this.neoBalances);
-        console.log("neoSwaps", this.neoSwaps);
-        this.neoSwaps = this.neoSwaps.filter(
-          (s) => s.destinationHash === "pending"
-        );
-        console.log("neoSwaps", this.neoSwaps);
+        console.log("neoSwaps", neoSwaps);
+        neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
+        console.log("neoSwaps", neoSwaps);
+        if (!(neoSwaps as any).error) this.allSwaps = neoSwaps;
       } catch (err) {
         console.log("error in neo balances and swaps", err);
       }
@@ -1524,26 +1500,30 @@ export default class extends Vue {
     if (ethAddress) {
       try {
         this.ethBalances = await getEthBalances(ethAddress, isMainnet);
-        this.ethSwaps = await this.state.api.getSwapsForAddress(ethAddress);
+        let ethSwaps = await this.state.api.getSwapsForAddress(ethAddress);
         console.log("ethBals", this.ethBalances);
-        console.log("ethSwaps", this.ethSwaps);
-        this.ethSwaps = this.ethSwaps.filter(
-          (s) => s.destinationHash === "pending"
-        );
-        console.log("ethSwaps", this.ethSwaps);
+        console.log("ethSwaps", ethSwaps);
+        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending");
+        console.log("ethSwaps", ethSwaps);
+        if (!(ethSwaps as any).error)
+          this.allSwaps = this.allSwaps.concat(ethSwaps);
       } catch (err) {
         console.log("error in eth balances and swaps", err);
       }
     }
 
-    this.phaSwaps = await this.state.api.getSwapsForAddress(
+    let phaSwaps = await this.state.api.getSwapsForAddress(
       this.account!.address
     );
-    console.log("phaSwaps", this.phaSwaps);
-    this.phaSwaps = this.phaSwaps.filter(
-      (s) => s.destinationHash === "pending"
+    console.log("phaSwaps", phaSwaps);
+    phaSwaps = phaSwaps.filter(
+      (s) =>
+        s.destinationHash === "pending" &&
+        this.allSwaps.findIndex(
+          (p) => p.sourceHash == s.sourceHash && p.symbol == s.symbol
+        ) < 0
     );
-    console.log("phaSwaps", this.phaSwaps);
+    console.log("allSwaps", this.allSwaps);
 
     this.isLoading = false;
   }
