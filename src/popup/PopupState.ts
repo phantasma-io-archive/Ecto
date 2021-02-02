@@ -426,9 +426,16 @@ export class PopupState {
     });
   }
 
-  isWifValidForAccount(wif: string): boolean {
+  isWifValidForAccount(
+    wif: string,
+    account: WalletAccount | undefined = undefined
+  ): boolean {
     try {
-      return this.currentAccount?.address === getAddressFromWif(wif);
+      return (
+        (account !== undefined
+          ? account.address
+          : this.currentAccount?.address) === getAddressFromWif(wif)
+      );
     } catch {
       return false;
     }
@@ -822,8 +829,11 @@ export class PopupState {
     return this.getTranscodeAddress(this.getWifFromPassword(password));
   }
 
-  getWifFromPassword(password: string) {
-    const account = this.currentAccount;
+  getWifFromPassword(
+    password: string,
+    acc: WalletAccount | undefined = undefined
+  ) {
+    const account = acc !== undefined ? acc : this.currentAccount;
     if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
 
     let wif = "";
@@ -838,7 +848,7 @@ export class PopupState {
         wif += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     }
 
-    if (!this.isWifValidForAccount(wif))
+    if (!this.isWifValidForAccount(wif, account))
       throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
     return wif;
