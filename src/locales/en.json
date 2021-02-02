@@ -233,9 +233,17 @@
         "select": "SELECT WALLET",
         "title": "Remove account",
         "subtitle": "Removes account",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Requires password",
         "unverified": "Read-only unverified account",
-        "verified": "Requires WIF"
+        "verified": "Requires WIF",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
     },
     "error": {
         "malformed": "Malformed request",

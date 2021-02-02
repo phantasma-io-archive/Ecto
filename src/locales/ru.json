@@ -233,9 +233,17 @@
         "select": "ВЫБРАТЬ КОШЕЛЕК",
         "title": "Удалить кошелек",
         "subtitle": "Удаляет кошелек",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Требует пароль",
         "unverified": "Непроверенный кошелек с доступом на просмотр",
-        "verified": "Требует WIF"
+        "verified": "Требует WIF",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
     },
     "error": {
         "malformed": "Некорректный запрос",

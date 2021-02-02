@@ -233,9 +233,17 @@
         "select": "VELG LOMMEBOK",
         "title": "Fjern lommebok",
         "subtitle": "Fjerner lommebok",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Krever passord",
         "unverified": "Kun lesetilgang, ubekreftet konto",
-        "verified": "Krever WIF"
+        "verified": "Krever WIF",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
     },
     "error": {
         "malformed": "Feil ved forespørsel",

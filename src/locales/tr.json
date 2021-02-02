@@ -233,9 +233,17 @@
       "select": "CÜZDAN SEÇ",
       "title": "Hesabı Sil",
       "subtitle": "Hesabı siler",
+      "titleKey": "Export private key",
+      "subtitleKey": "WIF and HEX format",
       "encKey": "Şifre Gerektirir",
       "unverified": "Salt okunur, doğrulanmamış hesap",
-      "verified": "WIF gerektirir"
+      "verified": "WIF gerektirir",
+      "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+      "titlePrivateKey": "Private Key",
+      "labelWIF": "Private key (WIF format)",
+      "labelHEX": "Private key (HEX format)",
+      "enterPassword": "Enter password",
+      "enterPasswordDecrypt": "Enter your password to decrypt the private key"
   },
   "error": {
       "malformed": "Hatalı istek",

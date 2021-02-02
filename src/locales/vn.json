@@ -233,9 +233,17 @@
         "select": "Chọn ví",
         "title": "Xoá tài khoản",
         "subtitle": "Xoá tài khoản",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Yêu cầu mật khẩu",
         "unverified": "Tài khoản chưa được xác minh chỉ đọc",
-        "verified": "Yêu cầu WIF"
+        "verified": "Yêu cầu WIF",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
     },
     "error": {
         "malformed": "Yêu cầu không đúng định dạng",

@@ -233,9 +233,17 @@
         "select": "BRIEFTASCHE AUSWÄHLEN",
         "title": "Konto entfernen",
         "subtitle": "Entfernt das Konto",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Benötigt Passwort",
         "unverified": "Schreibgeschütztes, nicht verifiziertes Konto",
-        "verified": "Benötigt WIF"
+        "verified": "Benötigt WIF",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
     },
     "error": {
         "malformed": "Fehlerhafte Anfrage",

@@ -286,7 +286,8 @@ export class PopupState {
         this._authorizations = items.authorizations ? items.authorizations : [];
         this._currency = items.currency ? items.currency : "USD";
         this._language = items.language ? items.language : "English";
-        this._balanceShown = items.balanceShown ? true : false;
+        this._balanceShown =
+          items.balanceShown === undefined || items.balanceShown;
         this.nfts = items.nfts ? items.nfts : {};
 
         $i18n.locale = this.locale;
@@ -355,7 +356,7 @@ export class PopupState {
     });
   }
 
-  async toggleBalance(balanceShown: boolean): Promise<void>  {
+  async toggleBalance(balanceShown: boolean): Promise<void> {
     this._balanceShown = balanceShown;
     return new Promise((resolve, reject) => {
       chrome.storage.local.set(
@@ -404,7 +405,9 @@ export class PopupState {
     }
 
     const accountData = await this.getAccountData(address);
-    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const matchAccount = this.accounts.filter(
+      (a) => a.address == accountData.address
+    );
     const alreadyExisting = matchAccount.length > 0 ? true : false;
     let len = 0;
     if (!alreadyExisting) {
@@ -423,9 +426,16 @@ export class PopupState {
     });
   }
 
-  isWifValidForAccount(wif: string): boolean {
+  isWifValidForAccount(
+    wif: string,
+    account: WalletAccount | undefined = undefined
+  ): boolean {
     try {
-      return this.currentAccount?.address === getAddressFromWif(wif);
+      return (
+        (account !== undefined
+          ? account.address
+          : this.currentAccount?.address) === getAddressFromWif(wif)
+      );
     } catch {
       return false;
     }
@@ -437,7 +447,9 @@ export class PopupState {
     let neoAddress = getNeoAddressFromWif(wif);
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
-    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const matchAccount = this.accounts.filter(
+      (a) => a.address == accountData.address
+    );
     const alreadyExisting = matchAccount.length > 0 ? true : false;
 
     if (hasPass && !alreadyExisting) {
@@ -478,10 +490,12 @@ export class PopupState {
     let address = getAddressFromWif(wif);
     let ethAddress = getEthAddressFromWif(wif);
     let neoAddress = getNeoAddressFromWif(wif);
-    const matchAccount = this.accounts.filter((a) => a.address == accountData.address);
+    const accountData = await this.getAccountData(address);
+    const matchAccount = this.accounts.filter(
+      (a) => a.address == accountData.address
+    );
     const alreadyExisting = matchAccount.length > 0 ? true : false;
 
-    const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
     if (hasPass && !alreadyExisting) {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
@@ -611,7 +625,7 @@ export class PopupState {
     return this._authorizations.find((a) => a.token == token)!.dapp;
   }
 
-  async addSwapAddressWithPassword(password: string) {
+  addSwapAddressWithPassword(password: string) {
     const account = this.currentAccount;
     if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
 
@@ -630,19 +644,17 @@ export class PopupState {
     if (!this.isWifValidForAccount(wif))
       throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
-    return await this.addSwapAddress(wif);
+    this.addSwapAddress(wif);
   }
 
-  async addSwapAddress(wif: string): Promise<void> {
+  addSwapAddress(wif: string) {
     const ethAddress = getEthAddressFromWif(wif);
     const neoAddress = getNeoAddressFromWif(wif);
 
     this._accounts[this._currentAccountIndex].ethAddress = ethAddress;
     this._accounts[this._currentAccountIndex].neoAddress = neoAddress;
 
-    return new Promise((resolve, reject) => {
-      chrome.storage.local.set({ accounts: this._accounts }, () => resolve());
-    });
+    chrome.storage.local.set({ accounts: this._accounts });
   }
 
   async signTxWithPassword(
@@ -817,8 +829,11 @@ export class PopupState {
     return this.getTranscodeAddress(this.getWifFromPassword(password));
   }
 
-  getWifFromPassword(password: string) {
-    const account = this.currentAccount;
+  getWifFromPassword(
+    password: string,
+    acc: WalletAccount | undefined = undefined
+  ) {
+    const account = acc !== undefined ? acc : this.currentAccount;
     if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
 
     let wif = "";
@@ -833,7 +848,7 @@ export class PopupState {
         wif += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     }
 
-    if (!this.isWifValidForAccount(wif))
+    if (!this.isWifValidForAccount(wif, account))
       throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
     return wif;

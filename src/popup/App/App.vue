@@ -197,7 +197,7 @@ export default class extends Vue {
     "Türkçe",
     "Tiếng Việt",
     "Norwegian",
-	  "Português"
+    "Português",
   ];
   language = "en";
   balanceShown = true;
@@ -304,7 +304,7 @@ export default class extends Vue {
   }
 
   async toggleBalance() {
-    this.balanceShown = !this.balanceShown
+    this.balanceShown = !this.balanceShown;
     console.log("setting balance toggle", this.balanceShown);
     await this.state.toggleBalance(this.balanceShown);
   }
