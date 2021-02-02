@@ -38,16 +38,7 @@
         <v-tab>{{ $t("home.assets") }}</v-tab>
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
         <v-tab
-          ><v-badge
-            v-if="
-              phaSwaps &&
-                !phaSwaps.error &&
-                (neoSwaps || ethSwaps) &&
-                phaSwaps.concat(neoSwaps, ethSwaps).length > 0
-            "
-            dot
-            color="#17b1e8"
-          >
+          ><v-badge v-if="allSwaps && allSwaps.length > 0" dot color="#17b1e8">
             {{ $t("home.swaps") }}</v-badge
           ><span v-else>{{ $t("home.swaps") }}</span></v-tab
         >
@@ -141,7 +132,10 @@
                       >{{ getSecondLine(item) }}</span
                     >
                   </div>
-                  <div v-if="!state.balanceShown" style="margin:10px 1px;width:80px;font-size:16px">
+                  <div
+                    v-if="!state.balanceShown"
+                    style="margin:10px 1px;width:80px;font-size:16px"
+                  >
                     {{ getCurrencyValue(item) }}<br /><span
                       style="font-size:12px; color:gray;"
                       v-if="isSecondLineVisible(item)"
@@ -218,7 +212,11 @@
                       small
                       text
                       style="padding: 0 6px;"
-                      v-if="item.symbol == 'GHOST' || item.symbol == 'CROWN' || item.symbol == 'TTRS'"
+                      v-if="
+                        item.symbol == 'GHOST' ||
+                          item.symbol == 'CROWN' ||
+                          item.symbol == 'TTRS'
+                      "
                       @click="burnAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-fire</v-icon> {{ $t("home.burn") }}</v-btn
@@ -249,7 +247,10 @@
                         getDate(item.timestamp)
                       }}</strong>
                     </td>
-                    <td v-if="!state.balanceShown" style="font-size:11px; padding: 6px">
+                    <td
+                      v-if="!state.balanceShown"
+                      style="font-size:11px; padding: 6px"
+                    >
                       *****
                     </td>
                     <td v-else style="font-size:11px; padding: 6px">
@@ -302,33 +303,20 @@
             v-if="account && account.neoAddress && account.ethAddress"
             style="overflow: auto; height: 459px"
           >
-            <div
-              v-if="
-                phaSwaps.length > 0 ||
-                  ethSwaps.length > 0 ||
-                  neoSwaps.length > 0
-              "
-              class="pa-4"
-            >
+            <div v-if="allSwaps.length > 0" class="pa-4">
               <div
                 style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
               >
                 <v-badge
-                  v-if="
-                    phaSwaps &&
-                      !phaSwaps.error &&
-                      neoSwaps &&
-                      ethSwaps &&
-                      phaSwaps.concat(neoSwaps, ethSwaps).length > 0
-                  "
-                  :content="phaSwaps.concat(neoSwaps, ethSwaps).length"
+                  v-if="allSwaps.length > 0"
+                  :content="allSwaps.length"
                   color="#17b1e8"
                   style="margin-left:0.5rem;"
                   >{{ $t("home.pendingSwaps") }}</v-badge
                 >
               </div>
               <div
-                v-for="(swap, idx) in phaSwaps.concat(neoSwaps, ethSwaps)"
+                v-for="(swap, idx) in allSwaps"
                 :key="swap.sourceHash + idx"
                 class="pa-1"
               >
@@ -369,7 +357,8 @@
                     <div v-if="!neoBalances || neoBalances.length === 0">
                       {{ $t("home.noSwapsNEO") }}<br />
                       <br />{{ $t("home.sendAssetsSwap") }}
-                      <strong v-if="!state.balanceShown">************************************</strong
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
                       ><strong v-else>{{ account.neoAddress }}</strong
                       ><br />
                       <v-btn
@@ -381,7 +370,8 @@
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
-                      <strong v-if="!state.balanceShown">************************************</strong
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
                       >
                       <strong v-else>{{ account.neoAddress }}</strong
                       ><br /><v-btn
@@ -402,7 +392,14 @@
                                 :src="getAssetIcon(bal)"
                                 max-width="24px"
                               ></v-img
-                              ><span v-if="!state.balanceShown" style="display:contents;">***</span><span v-else style="display:contents;">{{ bal.amount }}</span> {{ bal.symbol }}
+                              ><span
+                                v-if="!state.balanceShown"
+                                style="display:contents;"
+                                >***</span
+                              ><span v-else style="display:contents;">{{
+                                bal.amount
+                              }}</span>
+                              {{ bal.symbol }}
                             </v-list-item-content>
                             <v-list-item-action>
                               <a
@@ -442,7 +439,8 @@
                     <div v-if="!ethBalances || ethBalances.length === 0">
                       {{ $t("home.noSwapsETH") }}<br /><br />
                       {{ $t("home.sendAssetsSwap") }}
-                      <strong v-if="!state.balanceShown">************************************</strong
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
                       >
                       <strong v-else>{{ account.ethAddress }}</strong
                       ><br /><v-btn
@@ -454,7 +452,8 @@
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
-                      <strong v-if="!state.balanceShown">************************************</strong
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
                       >
                       <strong v-else>{{ account.ethAddress }}</strong
                       ><br /><v-btn
@@ -992,8 +991,14 @@
           <v-btn
             color="blue darken-1"
             text
-            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15 || nameToRegister == 'anonymous' || nameToRegister == 
-            'genesis' || nameToRegister.toUpperCase() != nameToRegister || isCharNumber(nameToRegister.charAt(0))"
+            :disabled="
+              nameToRegister.length < 3 ||
+                nameToRegister.length > 15 ||
+                nameToRegister == 'anonymous' ||
+                nameToRegister == 'genesis' ||
+                nameToRegister.toUpperCase() != nameToRegister ||
+                isCharNumber(nameToRegister.charAt(0))
+            "
             @click="askRegisterName"
           >
             {{ $t("home.next") }}
@@ -1237,7 +1242,9 @@
 
           <v-text-field
             v-model="nameToRegister"
-            :label="formatChain(swapToChain) + ' ' + $t('home.destinationAddress')"
+            :label="
+              formatChain(swapToChain) + ' ' + $t('home.destinationAddress')
+            "
           ></v-text-field>
         </v-card-text>
 
@@ -1454,9 +1461,7 @@ export default class extends Vue {
   ethBalances: ISymbolAmount[] = [];
   neoBalances: ISymbolAmount[] = [];
 
-  ethSwaps: Swap[] = [];
-  neoSwaps: Swap[] = [];
-  phaSwaps: Swap[] = [];
+  allSwaps: Swap[] = [];
 
   swapToClaim: Swap | null = null;
 
@@ -1477,16 +1482,16 @@ export default class extends Vue {
 
     const isMainnet = state.isMainnet;
 
+    this.allSwaps = [];
     if (neoAddress) {
       try {
         this.neoBalances = await getNeoBalances(neoAddress, isMainnet);
-        this.neoSwaps = await this.state.api.getSwapsForAddress(neoAddress);
+        let neoSwaps = await this.state.api.getSwapsForAddress(neoAddress);
         console.log("neoBals", this.neoBalances);
-        console.log("neoSwaps", this.neoSwaps);
-        this.neoSwaps = this.neoSwaps.filter(
-          (s) => s.destinationHash === "pending"
-        );
-        console.log("neoSwaps", this.neoSwaps);
+        console.log("neoSwaps", neoSwaps);
+        neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
+        console.log("neoSwaps", neoSwaps);
+        if (!(neoSwaps as any).error) this.allSwaps = neoSwaps;
       } catch (err) {
         console.log("error in neo balances and swaps", err);
       }
@@ -1495,26 +1500,30 @@ export default class extends Vue {
     if (ethAddress) {
       try {
         this.ethBalances = await getEthBalances(ethAddress, isMainnet);
-        this.ethSwaps = await this.state.api.getSwapsForAddress(ethAddress);
+        let ethSwaps = await this.state.api.getSwapsForAddress(ethAddress);
         console.log("ethBals", this.ethBalances);
-        console.log("ethSwaps", this.ethSwaps);
-        this.ethSwaps = this.ethSwaps.filter(
-          (s) => s.destinationHash === "pending"
-        );
-        console.log("ethSwaps", this.ethSwaps);
+        console.log("ethSwaps", ethSwaps);
+        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending");
+        console.log("ethSwaps", ethSwaps);
+        if (!(ethSwaps as any).error)
+          this.allSwaps = this.allSwaps.concat(ethSwaps);
       } catch (err) {
         console.log("error in eth balances and swaps", err);
       }
     }
 
-    this.phaSwaps = await this.state.api.getSwapsForAddress(
+    let phaSwaps = await this.state.api.getSwapsForAddress(
       this.account!.address
     );
-    console.log("phaSwaps", this.phaSwaps);
-    this.phaSwaps = this.phaSwaps.filter(
-      (s) => s.destinationHash === "pending"
+    console.log("phaSwaps", phaSwaps);
+    phaSwaps = phaSwaps.filter(
+      (s) =>
+        s.destinationHash === "pending" &&
+        this.allSwaps.findIndex(
+          (p) => p.sourceHash == s.sourceHash && p.symbol == s.symbol
+        ) < 0
     );
-    console.log("phaSwaps", this.phaSwaps);
+    console.log("allSwaps", this.allSwaps);
 
     this.isLoading = false;
   }
@@ -1634,7 +1643,7 @@ export default class extends Vue {
   }
 
   isCharNumber(c: string) {
-    return c >= '0' && c <= '9';
+    return c >= "0" && c <= "9";
   }
 
   getExplorerLink(hash: string) {
@@ -1642,8 +1651,8 @@ export default class extends Vue {
       (state.nexus == "testnet"
         ? "http://testnet.phantasma.io/tx/"
         : state.nexus == "simnet"
-          ? "https://localhost:7088/"
-          : "https://explorer.phantasma.io/tx/" ) + hash
+        ? "https://localhost:7088/"
+        : "https://explorer.phantasma.io/tx/") + hash
     );
   }
 
@@ -1662,13 +1671,8 @@ export default class extends Vue {
   formatSymbol(amount: number | string, symbol: string) {
     const value = amount.toString();
 
-    if (!this.state.balanceShown)
-      return (
-        '***' +
-        " " +
-        symbol
-    );
-    
+    if (!this.state.balanceShown) return "***" + " " + symbol;
+
     return (
       this.formatBalance(
         value,
@@ -1697,13 +1701,11 @@ export default class extends Vue {
     if (!balance) return "";
 
     const val = parseFloat(
-      this.formatBalance(balance.amount, balance.decimals, 5).replace(' ', '')
+      this.formatBalance(balance.amount, balance.decimals, 5).replace(" ", "")
     );
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
-
-      if (!state.balanceShown)
-        return state.currencySymbol + '***'
+      if (!state.balanceShown) return state.currencySymbol + "***";
 
       return state.currencySymbol + this.formatNumber((val * rate).toFixed(1));
     }
@@ -1715,7 +1717,10 @@ export default class extends Vue {
   }
 
   getKcalUnclaimed() {
-    return this.formatBalance(this.account!.data.unclaimed, 10).replace(' ', '');
+    return this.formatBalance(this.account!.data.unclaimed, 10).replace(
+      " ",
+      ""
+    );
   }
 
   noKcal() {
@@ -1731,7 +1736,7 @@ export default class extends Vue {
 
   getStackedSoul() {
     if (!this.account) return "0";
-    return this.formatBalance(this.account.data.stake, 8).replace(' ', '');
+    return this.formatBalance(this.account.data.stake, 8).replace(" ", "");
   }
 
   getUnstackedSoul() {
@@ -1742,28 +1747,17 @@ export default class extends Vue {
       (b) => b.symbol == "SOUL"
     );
     if (!soulBalance) return "0";
-    return this.formatBalance(soulBalance!.amount, 8).replace(' ', '');
+    return this.formatBalance(soulBalance!.amount, 8).replace(" ", "");
   }
 
   getSecondLine(item: Balance) {
     if (!this.account) return "";
 
-    if (!state.balanceShown && (item.symbol == "SOUL"))
-      return (
-        this.$t("home.secondLine1").toString() +
-        " " +
-        '***' +
-        " SOUL"
-      );
+    if (!state.balanceShown && item.symbol == "SOUL")
+      return this.$t("home.secondLine1").toString() + " " + "***" + " SOUL";
 
-    if (!state.balanceShown && (item.symbol == "KCAL"))
-      return (
-        this.$t("home.secondLine2").toString() +
-        " " +
-        '***' +
-        " KCAL"
-      );
-
+    if (!state.balanceShown && item.symbol == "KCAL")
+      return this.$t("home.secondLine2").toString() + " " + "***" + " KCAL";
 
     if (item.symbol == "SOUL")
       return (
@@ -1788,14 +1782,14 @@ export default class extends Vue {
       balance.symbol == "SOUL"
         ? this.account.data.stake
         : this.account.data.unclaimed;
-    const val = parseFloat(this.formatBalance(amount, balance.decimals).replace(' ', ''));
+    const val = parseFloat(
+      this.formatBalance(amount, balance.decimals).replace(" ", "")
+    );
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
+      if (!state.balanceShown) return state.currencySymbol + "***";
 
-      if (!state.balanceShown)
-        return state.currencySymbol + '***'
-
-      return state.currencySymbol + this.formatNumber((val * rate).toFixed(1))
+      return state.currencySymbol + this.formatNumber((val * rate).toFixed(1));
     }
     return "";
   }
@@ -1820,7 +1814,7 @@ export default class extends Vue {
   }
 
   formatNumber(num: any) {
-    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
   }
 
   isSwappable(symbol: string, swapToChain: string) {
@@ -1869,7 +1863,7 @@ export default class extends Vue {
   onSwapAmountClick() {
     this.swapAmountDialog = false;
     if (this.swapToChain == "neo" || this.swapToChain == "eth") {
-      this.swapFromChain = 'phantasma'
+      this.swapFromChain = "phantasma";
     }
     console.log(
       "onSwapAmountClick",
@@ -1928,8 +1922,11 @@ export default class extends Vue {
       else state.addSwapAddressWithPassword(this.password);
       this.generateSwapAddressDialog = false;
     } catch (err) {
-      this.errorDialog = true;
+      this.generateSwapAddressDialog = false;
+      this.wif = "";
+      this.password = "";
       this.errorMessage = err;
+      this.errorDialog = true;
     }
   }
 
@@ -2585,13 +2582,12 @@ export default class extends Vue {
     this.sendSymbol = item.symbol;
     this.sendDecimals = item.decimals;
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(item.amount, item.decimals).replace(' ', '')
+      this.formatBalance(item.amount, item.decimals).replace(" ", "")
     );
     if (this.sendSymbol == "KCAL")
       this.sendMaxAmount = this.sendMaxAmount - 0.01;
     this.sendDialog = true;
   }
-
 
   burnAsset(event: Event, item: Balance) {
     event.stopImmediatePropagation();
@@ -2734,7 +2730,11 @@ export default class extends Vue {
     this.selectAssetToSwapDialog = false;
     this.sendSymbol = bal.symbol;
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount, bal.decimals, bal.symbol == "ETH" ? 3 : 2).replace(' ', '')
+      this.formatBalance(
+        bal.amount,
+        bal.decimals,
+        bal.symbol == "ETH" ? 3 : 2
+      ).replace(" ", "")
     );
     this.swapAmountDialog = true;
   }
