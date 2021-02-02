@@ -14,13 +14,19 @@ import {
   AccountTransactions,
   Balance,
   signData,
+  Swap,
 } from "@/phan-js";
 import { rejects } from "assert";
 
-import { getNeoAddressFromWif } from "@/neo";
+import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
 import { getEthAddressFromWif, getEthContract } from "@/ethereum";
 import base58 from "bs58";
 import { byteArrayToHex } from "@/phan-js/utils";
+
+export interface ISymbolAmount {
+  symbol: string;
+  amount: string | number;
+}
 
 interface IAuthorization {
   dapp: string;
@@ -67,6 +73,11 @@ export class PopupState {
 
   accountNfts: any[] = [];
   nfts: any = {};
+
+  ethBalances: ISymbolAmount[] = [];
+  neoBalances: ISymbolAmount[] = [];
+
+  allSwaps: Swap[] = [];
 
   payload = "4543542D312E302E30";
 
@@ -583,6 +594,8 @@ export class PopupState {
       )!
     );
 
+    await this.refreshSwapInfo();
+
     console.log(
       "Refreshed account " +
         JSON.stringify(this._accounts[this._currentAccountIndex])
@@ -591,6 +604,55 @@ export class PopupState {
     return new Promise((resolve, reject) => {
       chrome.storage.local.set({ accounts: this._accounts }, () => resolve());
     });
+  }
+
+  async refreshSwapInfo() {
+    const neoAddress = this.currentAccount!.neoAddress;
+    const ethAddress = this.currentAccount!.ethAddress;
+    const isMainnet = this.isMainnet;
+
+    this.allSwaps = [];
+    if (neoAddress) {
+      try {
+        this.neoBalances = await getNeoBalances(neoAddress, isMainnet);
+        let neoSwaps = await this.api.getSwapsForAddress(neoAddress);
+        console.log("neoBals", this.neoBalances);
+        console.log("neoSwaps", neoSwaps);
+        neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
+        console.log("neoSwaps", neoSwaps);
+        if (!(neoSwaps as any).error) this.allSwaps = neoSwaps;
+      } catch (err) {
+        console.log("error in neo balances and swaps", err);
+      }
+    }
+
+    if (ethAddress) {
+      try {
+        this.ethBalances = await getNeoBalances(ethAddress, isMainnet);
+        let ethSwaps = await this.api.getSwapsForAddress(ethAddress);
+        console.log("ethBals", this.ethBalances);
+        console.log("ethSwaps", ethSwaps);
+        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending");
+        console.log("ethSwaps", ethSwaps);
+        if (!(ethSwaps as any).error)
+          this.allSwaps = this.allSwaps.concat(ethSwaps);
+      } catch (err) {
+        console.log("error in eth balances and swaps", err);
+      }
+    }
+
+    let phaSwaps = await this.api.getSwapsForAddress(
+      this.currentAccount!.address
+    );
+    console.log("phaSwaps", phaSwaps);
+    phaSwaps = phaSwaps.filter(
+      (s) =>
+        s.destinationHash === "pending" &&
+        this.allSwaps.findIndex(
+          (p) => p.sourceHash == s.sourceHash && p.symbol == s.symbol
+        ) < 0
+    );
+    console.log("allSwaps", this.allSwaps);
   }
 
   async authorizeDapp(
