@@ -996,7 +996,7 @@
                 nameToRegister.length > 15 ||
                 nameToRegister == 'anonymous' ||
                 nameToRegister == 'genesis' ||
-                nameToRegister.toUpperCase() != nameToRegister ||
+                nameToRegister.toLowerCase() != nameToRegister ||
                 isCharNumber(nameToRegister.charAt(0))
             "
             @click="askRegisterName"
