@@ -233,9 +233,17 @@
         "select": "SELECCIONAR BILLETERA",
         "title": "Remover cuenta",
         "subtitle": "Remueve la cuenta",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Require contraseña",
         "unverified": "Solo-lectura cuenta sin verificar",
-        "verified": "Require WIF"
+        "verified": "Require WIF",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
    },
     "error": {
         "malformed": "Solicitud malformada",

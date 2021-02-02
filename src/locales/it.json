@@ -233,9 +233,17 @@
         "select": "SELEZIONA PORTAFOGLIO",
         "title": "Rimuovi account",
         "subtitle": "Rimuove un account",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Password richiesta",
         "unverified": "Account non verificato in sola lettura",
-        "verified": "Chiave WIF richiesta"
+        "verified": "Chiave WIF richiesta",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
     },
     "error": {
         "malformed": "Richiesta non formata correttamente",

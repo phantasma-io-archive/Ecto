@@ -52,11 +52,11 @@
 
     <v-dialog v-model="requestPasswordDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ "Enter password" }}</v-card-title>
+        <v-card-title class="headline">{{ $t("wallets.enterPassword") }}</v-card-title>
 
         <v-card-text>
           <span>
-            {{ "Enter your password to decrypt the private key" }}
+            {{ $t("wallets.enterPasswordDecrypt") }}
           </span>
           <v-spacer class="ma-4" />
 
@@ -99,26 +99,24 @@
 
     <v-dialog v-model="showPrivateKeyDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ "Private key" }}</v-card-title>
+        <v-card-title class="headline">{{ $t("wallets.titlePrivateKey") }}</v-card-title>
 
         <v-card-text>
           <span>
-            {{
-              "The private key is the only thing required to allow access to your funds. Keep it safe."
-            }}
+            {{ $t("wallets.keyExplanation") }}
           </span>
           <v-spacer class="ma-4" />
 
           <v-textarea
             v-model="wif"
             readonly
-            label="Private key (WIF format)"
+            :label="$t('wallets.labelWIF')"
             rows="3"
           ></v-textarea>
           <v-textarea
             v-model="hexPk"
             readonly
-            label="Private key (Hex format)"
+            :label="$t('wallets.labelHEX')"
             rows="3"
           ></v-textarea>
         </v-card-text>
@@ -209,8 +207,8 @@ export default class extends Vue {
     this.popupActionsWif = [
       {
         icon: "mdi-home-export-outline",
-        title: "Export private key",
-        subtitle: "WIF and Hex format",
+        title: this.$i18n.t("wallets.titleKey").toString(),
+        subtitle: this.$i18n.t("wallets.subtitleKey").toString(),
         action: this.askPasswordToExport,
       },
       { divider: true },

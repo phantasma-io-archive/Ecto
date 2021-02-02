@@ -233,9 +233,17 @@
     "select": "SÉLECTIONNER PORTEFEUILLE",
     "title": "Supprimer Compte",
     "subtitle": "Supprime le compte",
+    "titleKey": "Exporter clé privée",
+    "subtitleKey": "Format WIF et HEX",
     "encKey": "Requiert mot de passe",
     "unverified": "Compte non vérifié en lecture seule",
-    "verified": "Requiert WIF"
+    "verified": "Requiert WIF",
+    "keyExplanation": "Votre clé privé est la seule chose requise pour accéder à vos fonds. Garder la en sécurité.",
+    "titlePrivateKey": "Clé privée",
+    "labelWIF": "Clé privée (format WIF)",
+    "labelHEX": "Clé privée (format HEX)",
+    "enterPassword": "Mot de passe",
+    "enterPasswordDecrypt": "Entrer votre mot de passe pour décrypter la clé privée"
   },
   "error": {
     "malformed": "Requête incorrecte",

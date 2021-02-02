@@ -1295,8 +1295,8 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn color="blue darken-1" text @click="askClaimKcal">
-            {{ $t("home.agree") }}
+          <v-btn color="blue darken-1" text @click="swapInProgressDialog = false">
+            {{ $t("home.continue") }}
           </v-btn>
         </v-card-actions>
       </v-card>
