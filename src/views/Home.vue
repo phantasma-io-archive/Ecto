@@ -1098,7 +1098,7 @@
 
           <v-slider
             v-model="sendAmount"
-            :min="0.001"
+            :min="0.01"
             :max="sendMaxAmount"
             :value="1"
             step="0.01"
@@ -1501,7 +1501,8 @@ export default class extends Vue {
   swapToClaim: Swap | null = null;
 
   ethGasPrices: number[] = [50, 70, 100];
-  neoGasPrices: number[] = [0.0, 0.0011, 0.1];
+  // neoGasPrices: number[] = [0.0, 0.0011, 0.1];
+  neoGasPrices: number[] = [0.0, 0.0, 0.0];
   swapGasIndex = 1;
   ethFeeAmount = "0.001";
   gasFeeAmount = "0.1";
@@ -2056,8 +2057,8 @@ export default class extends Vue {
     this.swapFromChain = "neo";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(bal.amount.toString());
-    if (this.sendSymbol == "GAS") {
-    }
+    // if (this.sendSymbol == "GAS") {
+    // }
     this.swapAmountDialog = true;
   }
 
