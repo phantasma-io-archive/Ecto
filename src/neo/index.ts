@@ -49,16 +49,16 @@ export async function getNeoBalances(
   neoAddress: string,
   isMainnet: boolean
 ): Promise<any> {
-  if (!isMainnet) console.log("%cNEO Testnet not supported", "font-size:20px");
+  const neoRpc = isMainnet ? 'http://seed.neoeconomy.io:10332' : 'http://mankinighost.phantasma.io:30333'
   const account = await rpc.Query.getAccountState(neoAddress).execute(
-    "http://seed.neoeconomy.io:10332"
+    neoRpc
   );
 
   console.log("neo account", account);
 
   const balances = [];
   const soulFixed = await nep5.getTokenBalance(
-    "http://seed.neoeconomy.io:10332",
+    neoRpc,
     tokens.SOUL,
     neoAddress
   );
@@ -86,7 +86,8 @@ async function sendNep5(
   symbol: string,
   dest: string,
   desc: string,
-  gasFee: number
+  gasFee: number,
+  isMainnet: boolean
 ) {
   const contractScriptHash = "ed07cffad18f1308db51920d99a2af60ac66a7b3";
   const myAccount = new wallet.Account(wif);
@@ -139,7 +140,8 @@ async function sendNep5(
   );
 
   // Send raw transaction
-  const client = new rpc.RPCClient("http://seed.neoeconomy.io:10332");
+  const neoRpc = isMainnet ? 'http://seed.neoeconomy.io:10332' : 'http://mankinighost.phantasma.io:30333'
+  const client = new rpc.RPCClient(neoRpc);
   const res = await client.sendRawTransaction(rawTransaction);
   console.log("sendNep5 Raw Tx", res, rawTransaction);
   return rawTransaction.hash;
@@ -151,12 +153,14 @@ async function sendNative(
   symbol: string,
   dest: string,
   desc: string,
-  gasFee: number
+  gasFee: number,
+  isMainnet: boolean
 ) {
   const myAccount = new wallet.Account(wif);
 
+  const neoApi = isMainnet ? 'https://api.neoscan.io/api/main_net' : 'http://mankinighost.phantasma.io:4000/api/main_net'
   const apiProvider = new api.neoscan.instance(
-    "https://api.neoscan.io/api/main_net"
+    neoApi
   );
 
   // Create contract transaction using Neoscan API
@@ -173,7 +177,8 @@ async function sendNative(
   }
 
   // Send raw transaction
-  const client = new rpc.RPCClient("http://seed.neoeconomy.io:10332");
+  const neoRpc = isMainnet ? 'http://seed.neoeconomy.io:10332' : 'http://mankinighost.phantasma.io:30333'
+  const client = new rpc.RPCClient(neoRpc);
 
   const transaction = await createTxWithNeoScan();
   console.log(transaction);
@@ -189,13 +194,14 @@ export async function sendNeo(
   symbol: string,
   dest: string,
   desc: string,
-  gasFee: number
+  gasFee: number,
+  isMainnet: boolean
 ) {
   let hash = "";
   if (symbol == "SOUL") {
-    hash = await sendNep5(wif, amount, symbol, dest, desc, gasFee);
+    hash = await sendNep5(wif, amount, symbol, dest, desc, gasFee, isMainnet);
   } else {
-    hash = await sendNative(wif, amount, symbol, dest, desc, gasFee);
+    hash = await sendNative(wif, amount, symbol, dest, desc, gasFee, isMainnet);
   }
   return hash;
 }
