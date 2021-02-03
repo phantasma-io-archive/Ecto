@@ -581,7 +581,13 @@
                     >
                     <br />
                     <br />
-                    {{ $t("home.needEthToSwap", [0.001]) }}
+                    {{
+                      $t("home.needEthToSwap", [
+                        (
+                          Math.round(100000 * ethGasPrices[1] * 1.2) / 1e9
+                        ).toFixed(4),
+                      ])
+                    }}
                     <!-- Each swap costs 0.001 ETH -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -1219,7 +1225,13 @@
               v-if="(swapToChain === 'eth') & (swapFromChain !== 'neo')"
               class="mx-auto"
             >
-              {{ $t("home.swapNeed") }} {{ ethFeeAmount }} ETH
+              {{ $t("home.swapNeed") }}
+              {{
+                (Math.round(
+                  (sendSymbol == "ETH" ? 21000 : 100000) * ethGasPrices[1] * 1.2
+                ) / 1e9).toFixed(4)
+              }}
+              ETH
             </div>
           </v-row>
         </v-card-text>
