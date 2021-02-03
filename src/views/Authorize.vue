@@ -44,7 +44,7 @@
           {{ domain }}
         </div>
 
-        <v-row style="margin: 5px">
+        <v-row style="margin: 5px;display:none;">
           <v-select
             :items="authorizeAccounts"
             v-model="authorizeAccount"
@@ -188,8 +188,8 @@ export default class extends Vue {
   @Watch("authorizeAccount")
   onWatchauthorizeAccount(oldValue: string, newValue: string) {
 
-    const matchAccount = this.state.accounts.filter((a) => a.address == newValue);
-    this.selectAccount(matchAccount[0]);
+    // const matchAccount = this.state.accounts.filter((a) => a.address == newValue);
+    // this.selectAccount(matchAccount[0]);
 
   }
 
