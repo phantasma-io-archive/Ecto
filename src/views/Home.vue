@@ -1141,7 +1141,7 @@
                 disabled
               ></v-text-field>
             </v-col> -->
-            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth'">
+            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth' && swapToChain !== 'neo'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1178,9 +1178,7 @@
                 {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
-            <template
-              v-if="false && swapFromChain === 'neo' && swapToChain !== 'neo'"
-            >
+            <template v-if="false && swapFromChain === 'neo' && swapToChain !== 'eth' && swapToChain !== 'neo'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -2087,18 +2085,27 @@ export default class extends Vue {
       return;
     }
 
-    const hash = await sendNeo(
-      wif,
-      this.sendAmount,
-      this.sendSymbol,
-      this.sendDestination,
-      this.account!.address,
-      this.neoGasPrices[this.swapGasIndex]
-    );
-    console.log("hash from sendNeo", hash);
+    const isMainnet = state.isMainnet;
+    try {
+      const hash = await sendNeo(
+        wif,
+        this.sendAmount,
+        this.sendSymbol,
+        this.sendDestination,
+        this.account!.address,
+        this.neoGasPrices[this.swapGasIndex],
+        isMainnet
+      );
+      console.log("hash from sendNeo", hash);
 
-    this.lastSwapTxUrl = "https://neoscan.io/transaction/" + hash;
-    this.swapInProgressDialog = true;
+      const neoApi = isMainnet ? 'https://neoscan.io/transaction/' : 'http://mankinighost.phantasma.io:4000/transaction/'
+      this.lastSwapTxUrl = neoApi + hash;
+      this.swapInProgressDialog = true;
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+      return;
+    }
   }
 
   async sendFromEth() {
