@@ -38,7 +38,11 @@
         <v-tab>{{ $t("home.assets") }}</v-tab>
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
         <v-tab
-          ><v-badge v-if="allSwaps && allSwaps.length > 0" dot color="#17b1e8">
+          ><v-badge
+            v-if="state.allSwaps && state.allSwaps.length > 0"
+            dot
+            color="#17b1e8"
+          >
             {{ $t("home.swaps") }}</v-badge
           ><span v-else>{{ $t("home.swaps") }}</span></v-tab
         >
@@ -303,20 +307,20 @@
             v-if="account && account.neoAddress && account.ethAddress"
             style="overflow: auto; height: 459px"
           >
-            <div v-if="allSwaps.length > 0" class="pa-4">
+            <div v-if="state.allSwaps.length > 0" class="pa-4">
               <div
                 style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
               >
                 <v-badge
-                  v-if="allSwaps.length > 0"
-                  :content="allSwaps.length"
+                  v-if="state.allSwaps.length > 0"
+                  :content="state.allSwaps.length"
                   color="#17b1e8"
                   style="margin-left:0.5rem;"
                   >{{ $t("home.pendingSwaps") }}</v-badge
                 >
               </div>
               <div
-                v-for="(swap, idx) in allSwaps"
+                v-for="(swap, idx) in state.allSwaps"
                 :key="swap.sourceHash + idx"
                 class="pa-1"
               >
@@ -354,7 +358,11 @@
                     </v-row>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content class="pa-2">
-                    <div v-if="!neoBalances || neoBalances.length === 0">
+                    <div
+                      v-if="
+                        !state.neoBalances || state.neoBalances.length === 0
+                      "
+                    >
                       {{ $t("home.noSwapsNEO") }}<br />
                       <br />{{ $t("home.sendAssetsSwap") }}
                       <strong v-if="!state.balanceShown"
@@ -383,7 +391,7 @@
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
-                            v-for="bal in neoBalances"
+                            v-for="bal in state.neoBalances"
                             :key="bal.symbol"
                           >
                             <v-list-item-content>
@@ -436,7 +444,11 @@
                     </v-row>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content class="pa-3">
-                    <div v-if="!ethBalances || ethBalances.length === 0">
+                    <div
+                      v-if="
+                        !state.ethBalances || state.ethBalances.length === 0
+                      "
+                    >
                       {{ $t("home.noSwapsETH") }}<br /><br />
                       {{ $t("home.sendAssetsSwap") }}
                       <strong v-if="!state.balanceShown"
@@ -465,7 +477,7 @@
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
-                            v-for="bal in ethBalances"
+                            v-for="bal in state.ethBalances"
                             :key="bal.symbol"
                           >
                             <v-list-item-content>
@@ -569,7 +581,13 @@
                     >
                     <br />
                     <br />
-                    {{ $t("home.needEthToSwap", [0.001]) }}
+                    {{
+                      $t("home.needEthToSwap", [
+                        (
+                          Math.round(100000 * ethGasPrices[1] * 1.2) / 1e9
+                        ).toFixed(4),
+                      ])
+                    }}
                     <!-- Each swap costs 0.001 ETH -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -1123,7 +1141,7 @@
                 disabled
               ></v-text-field>
             </v-col> -->
-            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth'">
+            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth' && swapToChain !== 'neo'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1160,7 +1178,7 @@
                 {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
-            <template v-if="swapFromChain === 'neo' && swapToChain !== 'neo'">
+            <template v-if="swapFromChain === 'neo' && swapToChain !== 'eth' && swapToChain !== 'neo'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1207,7 +1225,13 @@
               v-if="(swapToChain === 'eth') & (swapFromChain !== 'neo')"
               class="mx-auto"
             >
-              {{ $t("home.swapNeed") }} {{ ethFeeAmount }} ETH
+              {{ $t("home.swapNeed") }}
+              {{
+                (Math.round(
+                  (sendSymbol == "ETH" ? 21000 : 100000) * ethGasPrices[1] * 1.2
+                ) / 1e9).toFixed(4)
+              }}
+              ETH
             </div>
           </v-row>
         </v-card-text>
@@ -1295,7 +1319,11 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn color="blue darken-1" text @click="swapInProgressDialog = false">
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="swapInProgressDialog = false"
+          >
             {{ $t("home.continue") }}
           </v-btn>
         </v-card-actions>
@@ -1394,19 +1422,19 @@ import {
 
 import { hexToByteArray, byteArrayToHex, reverseHex } from "@/phan-js/utils";
 
-import { state, TxArgsData, PopupState } from "@/popup/PopupState";
+import {
+  state,
+  TxArgsData,
+  PopupState,
+  ISymbolAmount,
+} from "@/popup/PopupState";
 import { Script } from "vm";
 import ErrorDialogVue from "@/components/ErrorDialog.vue";
 import TransactionComponent from "@/components/TransactionComponent.vue";
 import { Watch } from "vue-property-decorator";
-import { getNeoBalances, getScriptHashFromAddress, sendNeo } from "@/neo";
-import { JSONRPC, getEthBalances } from "@/ethereum";
+import { getScriptHashFromAddress, sendNeo } from "@/neo";
+import { JSONRPC } from "@/ethereum";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
-
-interface ISymbolAmount {
-  symbol: string;
-  amount: string | number;
-}
 
 @Component({
   components: { ErrorDialog: ErrorDialogVue, TransactionComponent },
@@ -1458,11 +1486,6 @@ export default class extends Vue {
   signTxDialog = false;
   signTxCallback: (() => void) | null = null;
 
-  ethBalances: ISymbolAmount[] = [];
-  neoBalances: ISymbolAmount[] = [];
-
-  allSwaps: Swap[] = [];
-
   swapToClaim: Swap | null = null;
 
   ethGasPrices: number[] = [50, 70, 100];
@@ -1476,58 +1499,6 @@ export default class extends Vue {
   wif = "";
   password = "";
 
-  async refreshSwapInfo() {
-    const neoAddress = this.account!.neoAddress;
-    const ethAddress = this.account!.ethAddress;
-
-    const isMainnet = state.isMainnet;
-
-    this.allSwaps = [];
-    if (neoAddress) {
-      try {
-        this.neoBalances = await getNeoBalances(neoAddress, isMainnet);
-        let neoSwaps = await this.state.api.getSwapsForAddress(neoAddress);
-        console.log("neoBals", this.neoBalances);
-        console.log("neoSwaps", neoSwaps);
-        neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
-        console.log("neoSwaps", neoSwaps);
-        if (!(neoSwaps as any).error) this.allSwaps = neoSwaps;
-      } catch (err) {
-        console.log("error in neo balances and swaps", err);
-      }
-    }
-
-    if (ethAddress) {
-      try {
-        this.ethBalances = await getEthBalances(ethAddress, isMainnet);
-        let ethSwaps = await this.state.api.getSwapsForAddress(ethAddress);
-        console.log("ethBals", this.ethBalances);
-        console.log("ethSwaps", ethSwaps);
-        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending");
-        console.log("ethSwaps", ethSwaps);
-        if (!(ethSwaps as any).error)
-          this.allSwaps = this.allSwaps.concat(ethSwaps);
-      } catch (err) {
-        console.log("error in eth balances and swaps", err);
-      }
-    }
-
-    let phaSwaps = await this.state.api.getSwapsForAddress(
-      this.account!.address
-    );
-    console.log("phaSwaps", phaSwaps);
-    phaSwaps = phaSwaps.filter(
-      (s) =>
-        s.destinationHash === "pending" &&
-        this.allSwaps.findIndex(
-          (p) => p.sourceHash == s.sourceHash && p.symbol == s.symbol
-        ) < 0
-    );
-    console.log("allSwaps", this.allSwaps);
-
-    this.isLoading = false;
-  }
-
   async mounted() {
     (window as any).state = state;
     await state.check(this.$parent.$i18n);
@@ -1537,7 +1508,6 @@ export default class extends Vue {
     ]);
     this.isLoading = false;
 
-    await this.refreshSwapInfo();
     console.log("all loaded with " + JSON.stringify(this.account));
 
     this.$root.$on("loading", (value: boolean) => {
@@ -1804,6 +1774,7 @@ export default class extends Vue {
       amount.length
     );
     if (parseInt(decimalPart) == 0) return this.formatNumber(intPart);
+    if (decimals == 18) decimalsToShow = 3;
     return (
       this.formatNumber(intPart) +
       "." +
@@ -1951,7 +1922,7 @@ export default class extends Vue {
         });
       } else {
         setTimeout(async () => {
-          await this.refreshSwapInfo();
+          await state.refreshCurrentAccount();
         }, 2500);
       }
     } else if (swap.destinationPlatform == "phantasma") {
@@ -2041,7 +2012,6 @@ export default class extends Vue {
     // refresh balances in 2.5 secs
     setTimeout(async () => {
       await this.state.refreshCurrentAccount();
-      await this.refreshSwapInfo();
       this.isLoading = false;
     }, 2850);
   }
@@ -2306,7 +2276,6 @@ export default class extends Vue {
     // refresh balances in 2.5 secs
     setTimeout(async () => {
       await this.state.refreshCurrentAccount();
-      await this.refreshSwapInfo();
       this.isLoading = false;
     }, 2700);
   }
