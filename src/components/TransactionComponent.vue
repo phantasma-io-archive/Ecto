@@ -261,7 +261,7 @@ export default class extends Vue {
         case "TokenClaim": {
           const data = getTokenEventData(ev.data);
           if (ev.address != this.address) break;
-          if (data.symbol == "SOUL") {
+          if (isFungible(data.symbol) && data.symbol != "KCAL") {
             const amount = data.value;
             res.push({
               icon: "mdi-star-outline",
