@@ -923,7 +923,7 @@
           <span v-if="needsPass">
             {{ $t("home.insertPassword") }}
           </span>
-          <v-spacer />
+          <v-spacer class="ma-4" />
 
           <v-form
             class="mt-3"
@@ -1178,7 +1178,9 @@
                 {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
-            <template v-if="swapFromChain === 'neo' && swapToChain !== 'neo'">
+            <template
+              v-if="false && swapFromChain === 'neo' && swapToChain !== 'neo'"
+            >
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1227,9 +1229,13 @@
             >
               {{ $t("home.swapNeed") }}
               {{
-                (Math.round(
-                  (sendSymbol == "ETH" ? 21000 : 100000) * ethGasPrices[1] * 1.2
-                ) / 1e9).toFixed(4)
+                (
+                  Math.round(
+                    (sendSymbol == "ETH" ? 21000 : 100000) *
+                      ethGasPrices[1] *
+                      1.2
+                  ) / 1e9
+                ).toFixed(4)
               }}
               ETH
             </div>
@@ -1265,7 +1271,7 @@
           <v-spacer class="ma-4" />
 
           <v-text-field
-            v-model="nameToRegister"
+            v-model="sendDestination"
             :label="
               formatChain(swapToChain) + ' ' + $t('home.destinationAddress')
             "
@@ -1286,8 +1292,16 @@
           <v-btn
             color="blue darken-1"
             text
-            :disabled="nameToRegister.length < 3 || nameToRegister.length > 15"
-            @click="askRegisterName"
+            :disabled="
+              (swapToChain == 'neo' && !sendDestination.startsWith('A')) ||
+                (swapToChain == 'eth' &&
+                  (!sendDestination.startsWith('0x') ||
+                    sendDestination.length != 42))
+            "
+            @click="
+              destinationSwapDialog = false;
+              signTxDialog = true;
+            "
           >
             {{ $t("home.next") }}
           </v-btn>
@@ -1855,21 +1869,23 @@ export default class extends Vue {
       this.signTxCallback = this.sendFromNeo;
     } else if (this.swapToChain == "eth") {
       console.log("swap to eth");
+      this.signTxCallback = this.swapToEth;
       if (this.swapToCustomDest || !this.account!.ethAddress) {
         this.destinationSwapDialog = true;
+        this.sendDestination = "";
       } else {
         this.signTxDialog = true;
         this.sendDestination = this.account!.ethAddress;
-        this.signTxCallback = this.swapToEth;
       }
     } else if (this.swapToChain == "neo") {
       console.log("swap to neo");
+      this.signTxCallback = this.swapToNeo;
       if (this.swapToCustomDest || !this.account!.neoAddress) {
         this.destinationSwapDialog = true;
+        this.sendDestination = "";
       } else {
         this.signTxDialog = true;
         this.sendDestination = this.account!.neoAddress;
-        this.signTxCallback = this.swapToNeo;
       }
     }
   }
@@ -1923,6 +1939,7 @@ export default class extends Vue {
       } else {
         setTimeout(async () => {
           await state.refreshCurrentAccount();
+          this.isLoading = false;
         }, 2500);
       }
     } else if (swap.destinationPlatform == "phantasma") {
@@ -2041,6 +2058,8 @@ export default class extends Vue {
     this.swapFromChain = "neo";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(bal.amount.toString());
+    if (this.sendSymbol == "GAS") {
+    }
     this.swapAmountDialog = true;
   }
 
@@ -2705,6 +2724,10 @@ export default class extends Vue {
         bal.symbol == "ETH" ? 3 : 2
       ).replace(" ", "")
     );
+    if (this.sendSymbol == "GAS") {
+      this.sendMaxAmount -= 0.1;
+      // TODO: check if there is enough
+    }
     this.swapAmountDialog = true;
   }
 
