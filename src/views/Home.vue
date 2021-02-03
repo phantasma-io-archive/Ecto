@@ -1141,7 +1141,7 @@
                 disabled
               ></v-text-field>
             </v-col> -->
-            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth'">
+            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth' && swapToChain !== 'neo'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1178,7 +1178,7 @@
                 {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
-            <template v-if="swapFromChain === 'neo' && swapToChain !== 'neo'">
+            <template v-if="swapFromChain === 'neo' && swapToChain !== 'eth' && swapToChain !== 'neo'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
