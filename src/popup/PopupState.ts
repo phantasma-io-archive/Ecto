@@ -19,7 +19,11 @@ import {
 import { rejects } from "assert";
 
 import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
-import { getEthAddressFromWif, getEthBalances, getEthContract } from "@/ethereum";
+import {
+  getEthAddressFromWif,
+  getEthBalances,
+  getEthContract,
+} from "@/ethereum";
 import base58 from "bs58";
 import { byteArrayToHex } from "@/phan-js/utils";
 
@@ -883,7 +887,11 @@ export class PopupState {
     const privateKey = Secp256k1.uint256(pkHex, 16);
     const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
     console.log("public", publicKey);
-    var addressHex = Buffer.from("0103" + publicKey.x, "hex");
+    var lastBit = parseInt(publicKey.y[63], 16) & 1;
+    var addressHex = Buffer.from(
+      (lastBit == 1 ? "0103" : "0102") + publicKey.x,
+      "hex"
+    );
     return "P" + base58.encode(addressHex);
   }
 
