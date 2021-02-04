@@ -1140,7 +1140,13 @@
                 disabled
               ></v-text-field>
             </v-col> -->
-            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth' && swapToChain !== 'neo'">
+            <template
+              v-if="
+                swapFromChain === 'eth' &&
+                  swapToChain !== 'eth' &&
+                  swapToChain !== 'neo'
+              "
+            >
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1177,7 +1183,13 @@
                 {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
-            <template v-if="swapFromChain === 'neo' && swapToChain !== 'eth' && swapToChain !== 'neo'">
+            <template
+              v-if="
+                swapFromChain === 'neo' &&
+                  swapToChain !== 'eth' &&
+                  swapToChain !== 'neo'
+              "
+            >
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -2094,14 +2106,16 @@ export default class extends Vue {
       );
       console.log("hash from sendNeo", hash);
 
-      const neoApi = isMainnet ? 'https://neoscan.io/transaction/' : 'http://mankinighost.phantasma.io:4000/transaction/'
+      const neoApi = isMainnet
+        ? "https://neoscan.io/transaction/"
+        : "http://mankinighost.phantasma.io:4000/transaction/";
       this.lastSwapTxUrl = neoApi + hash;
       this.swapInProgressDialog = true;
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
-      return;
     }
+    this.closeSignTx();
   }
 
   async sendFromEth() {
@@ -2720,6 +2734,7 @@ export default class extends Vue {
   askAmountToSwap(bal: Balance) {
     this.selectAssetToSwapDialog = false;
     this.sendSymbol = bal.symbol;
+    this.sendAmount = 0;
     this.sendMaxAmount = parseFloat(
       this.formatBalance(
         bal.amount,
