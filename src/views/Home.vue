@@ -532,17 +532,16 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherNEO") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >
+                    >-->
                     <br />
                     <br />
                     {{ $t("home.needGasToSwap", [0.1]) }}
-                    <!-- Each swap costs 0.1 GAS -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
@@ -572,13 +571,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherETH") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >
+                    >-->
                     <br />
                     <br />
                     {{
@@ -1098,10 +1097,10 @@
 
           <v-slider
             v-model="sendAmount"
-            :min="0.01"
+            :min="sendSymbol === 'ETH' ? 0.0001 : 0.01"
             :max="sendMaxAmount"
             :value="1"
-            step="0.01"
+            :step="sendSymbol === 'ETH' ? 0.0001 : 0.01"
             thumb-label="always"
             style="margin-top:40px"
           >
@@ -1141,7 +1140,13 @@
                 disabled
               ></v-text-field>
             </v-col> -->
-            <template v-if="swapFromChain === 'eth' && swapToChain !== 'eth' && swapToChain !== 'neo'">
+            <template
+              v-if="
+                swapFromChain === 'eth' &&
+                  swapToChain !== 'eth' &&
+                  swapToChain !== 'neo'
+              "
+            >
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1178,7 +1183,13 @@
                 {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
-            <template v-if="false && swapFromChain === 'neo' && swapToChain !== 'eth' && swapToChain !== 'neo'">
+            <template
+              v-if="
+                swapFromChain === 'neo' &&
+                  swapToChain !== 'eth' &&
+                  swapToChain !== 'neo'
+              "
+            >
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1501,10 +1512,8 @@ export default class extends Vue {
   swapToClaim: Swap | null = null;
 
   ethGasPrices: number[] = [50, 70, 100];
-  // neoGasPrices: number[] = [0.0, 0.0011, 0.1];
-  neoGasPrices: number[] = [0.0, 0.0, 0.0];
+  neoGasPrices: number[] = [0.0, 0.0011, 0.1];
   swapGasIndex = 1;
-  ethFeeAmount = "0.001";
   gasFeeAmount = "0.1";
 
   state = state;
@@ -2057,8 +2066,6 @@ export default class extends Vue {
     this.swapFromChain = "neo";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(bal.amount.toString());
-    // if (this.sendSymbol == "GAS") {
-    // }
     this.swapAmountDialog = true;
   }
 
@@ -2099,14 +2106,16 @@ export default class extends Vue {
       );
       console.log("hash from sendNeo", hash);
 
-      const neoApi = isMainnet ? 'https://neoscan.io/transaction/' : 'http://mankinighost.phantasma.io:4000/transaction/'
+      const neoApi = isMainnet
+        ? "https://neoscan.io/transaction/"
+        : "http://mankinighost.phantasma.io:4000/transaction/";
       this.lastSwapTxUrl = neoApi + hash;
       this.swapInProgressDialog = true;
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
-      return;
     }
+    this.closeSignTx();
   }
 
   async sendFromEth() {
@@ -2725,6 +2734,7 @@ export default class extends Vue {
   askAmountToSwap(bal: Balance) {
     this.selectAssetToSwapDialog = false;
     this.sendSymbol = bal.symbol;
+    this.sendAmount = 0;
     this.sendMaxAmount = parseFloat(
       this.formatBalance(
         bal.amount,
@@ -2734,8 +2744,12 @@ export default class extends Vue {
     );
     if (this.sendSymbol == "GAS") {
       this.sendMaxAmount -= 0.1;
-      // TODO: check if there is enough
     }
+    if (this.sendSymbol == "ETH") {
+      const ethFee = (Math.round(100000 * this.ethGasPrices[1] * 1.2) / 1e9).toFixed(4)
+      this.sendMaxAmount -= parseFloat((parseFloat(ethFee)).toFixed(4));
+    }
+    if (this.sendMaxAmount < 0) this.sendMaxAmount = 0
     this.swapAmountDialog = true;
   }
 

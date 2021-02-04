@@ -121,12 +121,28 @@ async function sendNep5(
     u.reverseHex(wallet.getScriptHashFromAddress(myAccount.address))
   );
 
+  // add date remark to simulate nonce
+  const date = new Date()
+  rawTransaction.addRemark("Sent on " + date)
+
+  // query neoscan balance
+  const neoApi = isMainnet ? 'https://api.neoscan.io/api/main_net' : 'http://mankinighost.phantasma.io:4000/api/main_net'
+  const apiProvider = new api.neoscan.instance(
+    neoApi
+  );
+  async function queryBalanceNeoScan() {
+    let balance = await apiProvider.getBalance(myAccount.address);
+    return balance;
+  }
+
+  // attach netwok fees
+  const balance = await queryBalanceNeoScan();
+  rawTransaction.calculate(balance, undefined, gasFee);
+
   rawTransaction.addAttribute(
     tx.TxAttrUsage.Description,
     u.str2hexstring(desc)
   );
-
-  // rawTransaction.gas = new u.Fixed8(0.1);
 
   // Sign transaction with sender's private key
   const signature = wallet.sign(
@@ -170,7 +186,7 @@ async function sendNative(
     transaction
       .addIntent(symbol, amount, dest)
       .addAttribute(tx.TxAttrUsage.Description, u.str2hexstring(desc))
-      .calculate(balance)
+      .calculate(balance, undefined, gasFee)
       .sign(myAccount.privateKey);
 
     return transaction;
