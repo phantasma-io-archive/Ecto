@@ -1177,7 +1177,7 @@
                 {{ ethGasPrices[swapGasIndex] }} Gwei
               </div>
             </template>
-            <template v-if="false && swapFromChain === 'neo' && swapToChain !== 'eth' && swapToChain !== 'neo'">
+            <template v-if="swapFromChain === 'neo' && swapToChain !== 'eth' && swapToChain !== 'neo'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
                 <div
@@ -1500,10 +1500,8 @@ export default class extends Vue {
   swapToClaim: Swap | null = null;
 
   ethGasPrices: number[] = [50, 70, 100];
-  // neoGasPrices: number[] = [0.0, 0.0011, 0.1];
-  neoGasPrices: number[] = [0.0, 0.0, 0.0];
+  neoGasPrices: number[] = [0.0, 0.0011, 0.1];
   swapGasIndex = 1;
-  ethFeeAmount = "0.001";
   gasFeeAmount = "0.1";
 
   state = state;
