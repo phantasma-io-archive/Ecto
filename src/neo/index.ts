@@ -124,10 +124,10 @@ async function sendNep5(
   const date = new Date()
   rawTransaction.addRemark("Sent on " + date)
 
-  /* rawTransaction.addAttribute(
+  rawTransaction.addAttribute(
     tx.TxAttrUsage.Description,
     u.str2hexstring(desc)
-  ); */
+  );
 
   // rawTransaction.gas = new u.Fixed8(0.1);
 
