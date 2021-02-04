@@ -121,10 +121,13 @@ async function sendNep5(
     u.reverseHex(wallet.getScriptHashFromAddress(myAccount.address))
   );
 
-  rawTransaction.addAttribute(
+  const date = new Date()
+  rawTransaction.addRemark("Sent on " + date)
+
+  /* rawTransaction.addAttribute(
     tx.TxAttrUsage.Description,
     u.str2hexstring(desc)
-  );
+  ); */
 
   // rawTransaction.gas = new u.Fixed8(0.1);
 
