@@ -313,13 +313,18 @@ export class PhantasmaAPI {
     fetch(peersUrlJson + "?_=" + new Date().getTime()).then(async (res) => {
       const data = await res.json();
       for (var i = 0; i < data.length; i++) {
-        const msecs = await this.pingAsync(data[i].url);
-        data[i].info = data[i].location + " • " + msecs + " ms";
-        data[i].msecs = msecs;
-        console.log(
-          data[i].location + " • " + msecs + " ms • " + data[i].url + "/rpc"
-        );
-        this.availableHosts.push(data[i]);
+        console.log("Checking RPC: ", data[i]);
+        try {
+          const msecs = await this.pingAsync(data[i].url);
+          data[i].info = data[i].location + " • " + msecs + " ms";
+          data[i].msecs = msecs;
+          console.log(
+            data[i].location + " • " + msecs + " ms • " + data[i].url + "/rpc"
+          );
+          this.availableHosts.push(data[i]);
+        } catch (err) {
+          console.log("Error with RPC: " + data[i]);
+        }
       }
       this.availableHosts.sort((a, b) => a.msecs - b.msecs);
       this.updateRpc();
@@ -625,9 +630,9 @@ export class PhantasmaAPI {
   }
 
   //Returns an array of available interop platforms.
-  async getPlatforms(): Promise<Platform> {
+  async getPlatforms(): Promise<Platform[]> {
     let params: Array<any> = [];
-    return (await this.JSONRPC("getPlatforms", params)) as Platform;
+    return (await this.JSONRPC("getPlatforms", params)) as Platform[];
   }
 
   //Returns an array of available validators.
@@ -647,9 +652,9 @@ export class PhantasmaAPI {
   }
 
   //Returns platform swaps for a specific address.
-  async getSwapsForAddress(account: string): Promise<Swap> {
+  async getSwapsForAddress(account: string): Promise<Swap[]> {
     let params: Array<any> = [account];
-    return (await this.JSONRPC("getSwapsForAddress", params)) as Swap;
+    return (await this.JSONRPC("getSwapsForAddress", params)) as Swap[];
   }
 
   //Returns info of a nft.

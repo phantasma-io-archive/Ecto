@@ -3,7 +3,11 @@
     <v-app-bar key="appbar" app color="primary" dark style="font-size:16px">
       <v-icon>mdi-wallet</v-icon><v-spacer />
       <v-list-item link @click="goto('/wallets')">
-        <v-list-item-content>
+        <v-list-item-content v-if="!state.balanceShown">
+          <v-list-item-title>***</v-list-item-title>
+          <v-list-item-subtitle>***</v-list-item-subtitle>
+        </v-list-item-content>
+        <v-list-item-content v-else>
           <v-list-item-title>{{ shorterAddress }}</v-list-item-title>
           <v-list-item-subtitle>{{ shortAddress }}</v-list-item-subtitle>
         </v-list-item-content>
@@ -53,14 +57,25 @@
           <p class="pa-0 ma-0" style="margin-top:-20px !important">
             {{ nftArray.length }} {{ sendSymbol }} NFTs
             <span v-if="viewModeSend"
-              >- {{ selectedNum }} selected
+              >- {{ selectedNum }} {{ $t("nfts.selected") }}
               <v-btn
                 dense
                 text
                 style="height:25px; color:#17b1e8; margin-top:-2px"
                 @click="askSendWhere"
                 :disabled="sendNFTsDisabled"
-                >send nfts</v-btn
+                >{{ $t("nfts.send") }}</v-btn
+              ></span
+            >
+            <span v-if="viewModeBurn"
+              >- {{ selectedNum }} {{ $t("nfts.selected") }}
+              <v-btn
+                dense
+                text
+                style="height:25px; color:#17b1e8; margin-top:-2px"
+                @click="askBurnWhere"
+                :disabled="burnNFTsDisabled"
+                >{{ $t("nfts.burn") }}</v-btn
               ></span
             >
           </p>
@@ -127,7 +142,7 @@
                             class="overline"
                             style="color:#17b1e8; font-size: 11px !important;text-shadow: 1px 1px 20px #000000, 1px 1px 2px #000000;"
                           >
-                            Infused assets
+                            {{ $t("nfts.infused") }}
                           </div>
                           <div
                             style="text-shadow: 1px 1px 10px #000000, 1px 1px 2px #000000;"
@@ -146,8 +161,11 @@
                   >
                     <v-img
                       contain
-                      :src="item.img"
-                      :lazy-src="item.img"
+                      :class="{
+                        placeholder: item.img.startsWith('placeholder'),
+                      }"
+                      :src="getResource(item.img)"
+                      :lazy-src="getResource(item.img)"
                       height="84px"
                     ></v-img>
                   </v-avatar>
@@ -170,11 +188,13 @@
 
     <v-dialog v-model="sendWhereDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Destination</v-card-title>
+        <v-card-title class="headline">{{
+          $t("nfts.destination")
+        }}</v-card-title>
 
         <v-card-text>
           <span>
-            Select where do you want to send {{ nftsToSend.length }}
+            {{ $t("nfts.select") }} {{ nftsToSend.length }}
             {{ sendSymbol }} NFTs
           </span>
           <br />
@@ -183,7 +203,7 @@
           <v-form class="mt-5" @submit.prevent>
             <v-combobox
               :items="accountSendList"
-              label="Dest address or name"
+              :label="$t('nfts.labelDest')"
               v-model="sendDestination"
               required
               autocorrect="off"
@@ -213,11 +233,40 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="sendWhereDialog = false">
-            Cancel
+            {{ $t("nfts.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="askSend">
-            Next
+            {{ $t("nfts.next") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="burnWhereDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">{{
+          $t("nfts.burnTitle")
+        }}</v-card-title>
+
+        <v-card-text>
+          <span>
+            {{ $t("nfts.confirmBurn") }} {{ nftsToBurn.length }}
+            {{ burnSymbol }} NFTs. {{ $t("nfts.confirmBurnSecond") }}
+          </span>
+          <br />
+          <v-spacer />
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="burnWhereDialog = false">
+            {{ $t("nfts.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="askBurn">
+            {{ $t("nfts.next") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -225,14 +274,14 @@
 
     <v-dialog v-model="signTxDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">Authorize TX</v-card-title>
+        <v-card-title class="headline">{{ $t("nfts.authorize") }}</v-card-title>
 
         <v-card-text>
           <span v-if="needsWif">
-            Insert your WIF to sign transaction.
+            {{ $t("nfts.insertWIF") }}
           </span>
           <span v-if="needsPass">
-            Insert your password to sign transaction.
+            {{ $t("nfts.insertPassword") }}
           </span>
           <v-spacer />
 
@@ -263,7 +312,7 @@
             <v-text-field
               tabindex="1"
               type="password"
-              label="Password"
+              :label="$t('nfts.labelPassword')"
               v-model="password"
               required
               autocorrect="off"
@@ -278,11 +327,11 @@
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="closeSignTx">
-            Cancel
+            {{ $t("nfts.cancel") }}
           </v-btn>
 
           <v-btn color="blue darken-1" text @click="doSignTx">
-            Sign TX
+            {{ $t("nfts.sign") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -290,20 +339,20 @@
 
     <v-dialog v-model="filtersDialog" max-width="290">
       <v-card>
-        <v-card-title class="overline">filters</v-card-title>
+        <v-card-title class="overline">{{ $t("nfts.filters") }}</v-card-title>
         <v-card-text class="pb-0">
           <v-form>
             <v-select
               v-model="filterType"
               class="pa-0"
               :items="filterTypeOptions"
-              label="Types"
+              :label="$t('nfts.labeTypes')"
             ></v-select>
             <v-select
               v-model="filterRarity"
               class="pa-0"
               :items="filterRarityOptions"
-              label="Rarity"
+              :label="$t('nfts.labelRarity')"
             ></v-select>
             <!-- <v-select v-model="filterMinted" class="pa-0" :items="filterMintedOptions" label="Minted"></v-select> -->
           </v-form>
@@ -312,7 +361,7 @@
         <v-card-actions class="pt-0">
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="filtersDialog = false">
-            Close
+            {{ $t("nfts.close") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -320,20 +369,20 @@
 
     <v-dialog v-model="sortDialog" max-width="290">
       <v-card>
-        <v-card-title class="overline">sort</v-card-title>
+        <v-card-title class="overline">{{ $t("nfts.sort") }}</v-card-title>
         <v-card-text class="pb-0">
           <v-form>
             <v-select
               v-model="sortDir"
               class="pa-0"
               :items="sortDirOptions"
-              label="Direction"
+              :label="$t('nfts.labelDirection')"
             ></v-select>
             <v-select
               v-model="sortParam"
               class="pa-0"
               :items="sortParamOptions"
-              label="Parameters"
+              :label="$t('nfts.labelParameters')"
             ></v-select>
           </v-form>
         </v-card-text>
@@ -341,7 +390,7 @@
         <v-card-actions class="pt-0">
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="sortDialog = false">
-            Close
+            {{ $t("nfts.close") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -392,8 +441,10 @@ export default class extends Vue {
     "Unique",
   ];
 
-  sortDir = "Ascendant";
-  sortDirOptions = ["Ascendant", "Descendant"];
+  sortDir = "";
+  sortDirOptions: string[] = [];
+
+  messageNoWallet = "";
 
   sortParam = "Mint #";
   sortParamOptions = ["Mint #"];
@@ -402,6 +453,8 @@ export default class extends Vue {
 
   sendDialog = false;
   sendWhereDialog = false;
+  burnDialog = false;
+  burnWhereDialog = false;
 
   sortDialog = false;
   filtersDialog = false;
@@ -413,11 +466,16 @@ export default class extends Vue {
   sendSymbol = "";
   sendDecimals = 0;
   sendDestination = "";
+  burnAmount = 0;
+  burnMaxAmount = 0;
+  burnSymbol = "";
+  burnDecimals = 0;
 
   errorDialog = false;
   errorMessage = "";
 
   nftsToSend: any[] = [];
+  nftsToBurn: any[] = [];
 
   signTxDialog = false;
   signTxCallback: (() => void) | null = null;
@@ -428,18 +486,28 @@ export default class extends Vue {
   password = "";
 
   viewModeSend = false;
+  viewModeBurn = false;
 
   async mounted() {
     this.viewModeSend = this.$route.params.mode == "send";
+    this.viewModeBurn = this.$route.params.mode == "burn";
     this.sendSymbol = this.$route.params.symbol;
+    this.burnSymbol = this.$route.params.symbol;
     console.log("sendSymbol", this.sendSymbol);
+    console.log("burnSymbol", this.burnSymbol);
 
-    await this.state.check();
+    await state.check(this.$parent.$i18n);
     this.isLoading = false;
 
     this.$root.$on("loading", (value: boolean) => {
       this.isLoading = value;
     });
+
+    this.sortDir = this.$i18n.t("nfts.sortDirOptionsAsc").toString();
+    this.sortDirOptions = [
+      this.$i18n.t("nfts.sortDirOptionsAsc").toString(),
+      this.$i18n.t("nfts.sortDirOptionsDesc").toString(),
+    ];
   }
 
   goto(route: string) {
@@ -451,12 +519,20 @@ export default class extends Vue {
     return num === 0 || num > 100;
   }
 
+  get burnNFTsDisabled() {
+    const num = this.selectedNum;
+    return num === 0 || num > 100;
+  }
+
   get nftArray() {
     const unit = (k: any) => k;
     const sortAsc = (k: any[]) => k.sort((a, b) => a.mint - b.mint);
     const sortDesc = (k: any[]) => k.sort((a, b) => b.mint - a.mint);
 
-    const sort = this.sortDir == "Ascendant" ? sortAsc : sortDesc;
+    const sort =
+      this.sortDir == this.$i18n.t("nfts.sortDirOptionsAsc").toString()
+        ? sortAsc
+        : sortDesc;
 
     const searchText = this.searchText.toLowerCase();
 
@@ -551,7 +627,8 @@ export default class extends Vue {
   }
 
   get shorterAddress(): string {
-    if (!this.account) return "<no wallet>";
+    this.messageNoWallet = this.$i18n.t("nfts.noWallet").toString();
+    if (!this.account) return this.messageNoWallet;
 
     if (this.account.data.name && this.account.data.name != "")
       return this.account.data.name;
@@ -565,7 +642,8 @@ export default class extends Vue {
   }
 
   get shortAddress(): string {
-    if (!this.account) return "<no wallet>";
+    this.messageNoWallet = this.$i18n.t("nfts.noWallet").toString();
+    if (!this.account) return this.messageNoWallet;
 
     let addr = this.account.address;
     return (
@@ -586,6 +664,19 @@ export default class extends Vue {
     //   : true;
     // this.state.nfts = Object.assign({}, this.state.nfts);
     console.log("switched item", JSON.stringify(item, null, 2));
+  }
+
+  getResource(image: any) {
+    let resource = "";
+    if (
+      image.startsWith("placeholder-nft-img") ||
+      image.startsWith("placeholder-nft-video")
+    ) {
+      resource = chrome.extension.getURL(image);
+    } else {
+      resource = image;
+    }
+    return resource;
   }
 
   getOverline(item: any) {
@@ -628,6 +719,18 @@ export default class extends Vue {
     this.sendWhereDialog = false;
     this.signTxDialog = true;
     this.signTxCallback = this.sendNFTs;
+  }
+
+  askBurnWhere() {
+    this.nftsToBurn = this.nftArray.filter((n) => n.isSelected);
+    this.burnDialog = false;
+    this.burnWhereDialog = true;
+  }
+
+  askBurn() {
+    this.burnWhereDialog = false;
+    this.signTxDialog = true;
+    this.signTxCallback = this.burnNFTs;
   }
 
   closeSignTx() {
@@ -717,7 +820,78 @@ export default class extends Vue {
       this.isLoading = false;
     }, 2500);
   }
+
+  async burnNFTs() {
+    if (!this.account) return;
+
+    console.log(
+      "burning",
+      this.burnAmount * 10 ** this.burnDecimals,
+      "of",
+      this.burnSymbol
+    );
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 800 * this.nftsToBurn.length;
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    this.nftsToBurn.forEach((nft) => {
+      sb.callInterop("Runtime.BurnToken", [
+        address,
+        this.sendSymbol,
+        nft.id,
+      ]);
+
+      console.log(
+        "nft to burn",
+        nft.id,
+        "of",
+        this.sendSymbol
+      );
+    });
+    sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      if (this.needsWif) {
+        tx = await state.signTx(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxWithPassword(txdata, address, this.password);
+      }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2500);
+  }
 }
 </script>
 
-<style></style>
+<style>
+.placeholder {
+  filter: invert(100%);
+}
+</style>

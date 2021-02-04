@@ -1,6 +1,8 @@
 import WIF from "wif";
 import fetch from "cross-fetch";
 import * as CryptoJS from "crypto-js";
+import createHash from "create-hash";
+import * as Secp256k1 from "@enumatech/secp256k1-js";
 
 import {
   PhantasmaAPI,
@@ -12,7 +14,23 @@ import {
   AccountTransactions,
   Balance,
   signData,
+  Swap,
 } from "@/phan-js";
+import { rejects } from "assert";
+
+import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
+import {
+  getEthAddressFromWif,
+  getEthBalances,
+  getEthContract,
+} from "@/ethereum";
+import base58 from "bs58";
+import { byteArrayToHex } from "@/phan-js/utils";
+
+export interface ISymbolAmount {
+  symbol: string;
+  amount: string | number;
+}
 
 interface IAuthorization {
   dapp: string;
@@ -24,6 +42,8 @@ interface IAuthorization {
 
 export interface WalletAccount {
   address: string;
+  ethAddress?: string;
+  neoAddress?: string;
   type: string;
   data: Account;
   wif?: string;
@@ -47,6 +67,8 @@ export class PopupState {
   private _accounts: WalletAccount[] = [];
   private _authorizations: IAuthorization[] = [];
   private _currency: string = "USD";
+  private _language: string = "English";
+  private _balanceShown: boolean = true;
   private _currenciesRate: any;
   private _nexus: string = "MainNet";
   private _simnetRpc = "http://localhost:7077/rpc";
@@ -56,7 +78,16 @@ export class PopupState {
   accountNfts: any[] = [];
   nfts: any = {};
 
-  payload = "4543542D302E312E32";
+  ethBalances: ISymbolAmount[] = [];
+  neoBalances: ISymbolAmount[] = [];
+
+  allSwaps: Swap[] = [];
+
+  payload = "4543542D312E302E30";
+
+  $i18n: any = {
+    t: (s: string) => s,
+  };
 
   constructor() {}
 
@@ -78,6 +109,18 @@ export class PopupState {
     return this._currency;
   }
 
+  get balanceShown() {
+    return this._balanceShown;
+  }
+
+  get language() {
+    return this._language;
+  }
+
+  get locale() {
+    return this.getLocaleFromLanguage(this._language);
+  }
+
   get nexus() {
     return this._nexus.toLowerCase();
   }
@@ -94,7 +137,40 @@ export class PopupState {
     return this._mainnetRpc;
   }
 
-  async setNexus(value: string) {
+  getLocaleFromLanguage(language: string) {
+    if (language) {
+      switch (language) {
+        default:
+        case "English":
+          return "en";
+        case "Français":
+          return "fr";
+        case "Italiano":
+          return "it";
+        case "Spanish":
+          return "es";
+        case "Русский":
+          return "ru";
+        case "中文":
+          return "cn";
+        case "Nederlands":
+          return "nl";
+        case "Deutsch":
+          return "de";
+        case "Türkçe":
+          return "tr";
+        case "Tiếng Việt":
+          return "vn";
+        case "Norwegian":
+          return "nb";
+        case "Português":
+          return "pt";
+      }
+    }
+    return "en";
+  }
+
+  async setNexus(value: string): Promise<void> {
     this._nexus = value;
     this.api.setNexus(value);
     if (this._nexus == "MainNet") this.api.setRpcByName(this._mainnetRpc);
@@ -111,7 +187,7 @@ export class PopupState {
     });
   }
 
-  async setSimnetRpc(value: string) {
+  async setSimnetRpc(value: string): Promise<void> {
     this._simnetRpc = value;
     if (this._nexus == "SimNet") this.api.setRpcHost(this._simnetRpc);
     return new Promise((resolve, reject) => {
@@ -124,7 +200,7 @@ export class PopupState {
     });
   }
 
-  async setTestnetRpc(value: string) {
+  async setTestnetRpc(value: string): Promise<void> {
     this._testnetRpc = value;
     if (this._nexus == "TestNet") this.api.setRpcHost(this._testnetRpc);
     return new Promise((resolve, reject) => {
@@ -137,7 +213,7 @@ export class PopupState {
     });
   }
 
-  async setMainnetRpc(value: string) {
+  async setMainnetRpc(value: string): Promise<void> {
     console.log("Saving to storage mainnet rpc", this._mainnetRpc);
     this._mainnetRpc = value;
     this.api.setRpcByName(this._mainnetRpc);
@@ -153,6 +229,10 @@ export class PopupState {
 
   get nexusName() {
     return this._nexus;
+  }
+
+  get isMainnet() {
+    return this.nexus == "mainnet";
   }
 
   get mainnetRpcList() {
@@ -207,7 +287,8 @@ export class PopupState {
     return -1;
   }
 
-  async check(): Promise<void> {
+  async check($i18n: any): Promise<void> {
+    this.$i18n = $i18n; // save translate method from Vue i18n
     return new Promise((resolve, reject) => {
       chrome.storage.local.get((items) => {
         console.log("[PopupState] Get local storage");
@@ -219,7 +300,12 @@ export class PopupState {
           : [];
         this._authorizations = items.authorizations ? items.authorizations : [];
         this._currency = items.currency ? items.currency : "USD";
+        this._language = items.language ? items.language : "English";
+        this._balanceShown =
+          items.balanceShown === undefined || items.balanceShown;
         this.nfts = items.nfts ? items.nfts : {};
+
+        $i18n.locale = this.locale;
 
         this._accounts = items.accounts
           ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
@@ -272,6 +358,31 @@ export class PopupState {
     });
   }
 
+  async setLanguage(language: string): Promise<void> {
+    this._language = language;
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          language: this._language,
+        },
+        () => resolve()
+      );
+    });
+  }
+
+  async toggleBalance(balanceShown: boolean): Promise<void> {
+    this._balanceShown = balanceShown;
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          balanceShown: this._balanceShown,
+        },
+        () => resolve()
+      );
+    });
+  }
+
   async fetchRates() {
     const res = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
@@ -300,19 +411,27 @@ export class PopupState {
     return data;
   }
 
-  async addAccount(addressOrName: string): Promise<Account> {
+  async addAccount(addressOrName: string): Promise<void> {
     let address = addressOrName;
 
     if (!address.startsWith("P") || address.length != 47) {
       address = await this.api.lookUpName(address);
+      if ((address as any).error) throw new Error("Wallet name not found");
     }
 
     const accountData = await this.getAccountData(address);
-    const len = this._accounts.push({
-      address: accountData.address,
-      type: "unverified",
-      data: accountData,
-    });
+    const matchAccount = this.accounts.filter(
+      (a) => a.address == accountData.address
+    );
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
+    let len = 0;
+    if (!alreadyExisting) {
+      len = this._accounts.push({
+        address: accountData.address,
+        type: "unverified",
+        data: accountData,
+      });
+    }
 
     return new Promise((resolve, reject) => {
       chrome.storage.local.set(
@@ -322,30 +441,47 @@ export class PopupState {
     });
   }
 
-  isWifValidForAccount(wif: string): boolean {
+  isWifValidForAccount(
+    wif: string,
+    account: WalletAccount | undefined = undefined
+  ): boolean {
     try {
-      return this.currentAccount?.address === getAddressFromWif(wif);
+      return (
+        (account !== undefined
+          ? account.address
+          : this.currentAccount?.address) === getAddressFromWif(wif)
+      );
     } catch {
       return false;
     }
   }
 
-  async addAccountWithWif(wif: string, password: string): Promise<Account> {
+  async addAccountWithWif(wif: string, password: string): Promise<void> {
     let address = getAddressFromWif(wif);
+    let ethAddress = getEthAddressFromWif(wif);
+    let neoAddress = getNeoAddressFromWif(wif);
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
+    const matchAccount = this.accounts.filter(
+      (a) => a.address == accountData.address
+    );
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
 
-    if (hasPass) {
+    if (hasPass && !alreadyExisting) {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
       this._accounts.push({
         address: accountData.address,
+        ethAddress,
+        neoAddress,
         type: "encKey",
         encKey,
         data: accountData,
       });
-    } else {
+    } else if (!alreadyExisting) {
       this._accounts.push({
         address: accountData.address,
+        ethAddress,
+        neoAddress,
         type: "wif",
         wif,
         data: accountData,
@@ -363,23 +499,34 @@ export class PopupState {
     });
   }
 
-  async addAccountWithHex(hex: string, password: string): Promise<Account> {
+  async addAccountWithHex(hex: string, password: string): Promise<void> {
     let pk = Buffer.from(hex, "hex");
     const wif = WIF.encode(128, pk, true);
     let address = getAddressFromWif(wif);
+    let ethAddress = getEthAddressFromWif(wif);
+    let neoAddress = getNeoAddressFromWif(wif);
     const accountData = await this.getAccountData(address);
+    const matchAccount = this.accounts.filter(
+      (a) => a.address == accountData.address
+    );
+    const alreadyExisting = matchAccount.length > 0 ? true : false;
+
     const hasPass = password != null && password != "";
-    if (hasPass) {
+    if (hasPass && !alreadyExisting) {
       const encKey = CryptoJS.AES.encrypt(wif, password).toString();
       this._accounts.push({
         address: accountData.address,
+        ethAddress,
+        neoAddress,
         type: "encKey",
         encKey,
         data: accountData,
       });
-    } else {
+    } else if (!alreadyExisting) {
       this._accounts.push({
         address: accountData.address,
+        ethAddress,
+        neoAddress,
         type: "wif",
         wif,
         data: accountData,
@@ -451,6 +598,8 @@ export class PopupState {
       )!
     );
 
+    await this.refreshSwapInfo();
+
     console.log(
       "Refreshed account " +
         JSON.stringify(this._accounts[this._currentAccountIndex])
@@ -459,6 +608,55 @@ export class PopupState {
     return new Promise((resolve, reject) => {
       chrome.storage.local.set({ accounts: this._accounts }, () => resolve());
     });
+  }
+
+  async refreshSwapInfo() {
+    const neoAddress = this.currentAccount!.neoAddress;
+    const ethAddress = this.currentAccount!.ethAddress;
+    const isMainnet = this.isMainnet;
+
+    this.allSwaps = [];
+    if (neoAddress) {
+      try {
+        this.neoBalances = await getNeoBalances(neoAddress, isMainnet);
+        let neoSwaps = await this.api.getSwapsForAddress(neoAddress);
+        console.log("neoBals", this.neoBalances);
+        console.log("neoSwaps", neoSwaps);
+        neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
+        console.log("neoSwaps", neoSwaps);
+        if (!(neoSwaps as any).error) this.allSwaps = neoSwaps;
+      } catch (err) {
+        console.log("error in neo balances and swaps", err);
+      }
+    }
+
+    if (ethAddress) {
+      try {
+        this.ethBalances = await getEthBalances(ethAddress, isMainnet);
+        let ethSwaps = await this.api.getSwapsForAddress(ethAddress);
+        console.log("ethBals", this.ethBalances);
+        console.log("ethSwaps", ethSwaps);
+        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending");
+        console.log("ethSwaps", ethSwaps);
+        if (!(ethSwaps as any).error)
+          this.allSwaps = this.allSwaps.concat(ethSwaps);
+      } catch (err) {
+        console.log("error in eth balances and swaps", err);
+      }
+    }
+
+    let phaSwaps = await this.api.getSwapsForAddress(
+      this.currentAccount!.address
+    );
+    console.log("phaSwaps", phaSwaps);
+    phaSwaps = phaSwaps.filter(
+      (s) =>
+        s.destinationHash === "pending" &&
+        this.allSwaps.findIndex(
+          (p) => p.sourceHash == s.sourceHash && p.symbol == s.symbol
+        ) < 0
+    );
+    console.log("allSwaps", this.allSwaps);
   }
 
   async authorizeDapp(
@@ -493,19 +691,16 @@ export class PopupState {
     return this._authorizations.find((a) => a.token == token)!.dapp;
   }
 
-  async signTxWithPassword(
-    txdata: TxArgsData,
-    address: string,
-    password: string
-  ) {
-    const account = this.accounts.find((a) => a.address == address);
-    if (!account) throw new Error("Cannot find account");
+  addSwapAddressWithPassword(password: string) {
+    const account = this.currentAccount;
+    if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
 
     let wif = "";
     if (password == "") {
       if (account.wif) wif = account.wif;
     } else {
-      if (!account.encKey) throw new Error("Cannot find encrypted key");
+      if (!account.encKey)
+        throw new Error(this.$i18n.t("error.noEncrypted").toString());
 
       const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
       for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
@@ -513,17 +708,53 @@ export class PopupState {
     }
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error("Password does not match");
+      throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
+
+    this.addSwapAddress(wif);
+  }
+
+  addSwapAddress(wif: string) {
+    const ethAddress = getEthAddressFromWif(wif);
+    const neoAddress = getNeoAddressFromWif(wif);
+
+    this._accounts[this._currentAccountIndex].ethAddress = ethAddress;
+    this._accounts[this._currentAccountIndex].neoAddress = neoAddress;
+
+    chrome.storage.local.set({ accounts: this._accounts });
+  }
+
+  async signTxWithPassword(
+    txdata: TxArgsData,
+    address: string,
+    password: string
+  ) {
+    const account = this.accounts.find((a) => a.address == address);
+    if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
+
+    let wif = "";
+    if (password == "") {
+      if (account.wif) wif = account.wif;
+    } else {
+      if (!account.encKey)
+        throw new Error(this.$i18n.t("error.noEncrypted").toString());
+
+      const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
+      for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
+        wif += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    }
+
+    if (!this.isWifValidForAccount(wif))
+      throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
     return await this.signTx(txdata, wif);
   }
 
   async signTx(txdata: TxArgsData, wif: string): Promise<string> {
     const account = this.currentAccount;
-    if (!account) throw new Error("Account not valid");
+    if (!account) throw new Error(this.$i18n.t("error.notValid").toString());
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error("Account does not match");
+      throw new Error(this.$i18n.t("error.noAccountMatch").toString());
 
     const address = account.address;
 
@@ -554,13 +785,14 @@ export class PopupState {
     password: string
   ): string {
     const account = this.accounts.find((a) => a.address == address);
-    if (!account) throw new Error("Cannot find account");
+    if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
 
     let wif = "";
     if (password == "") {
       if (account.wif) wif = account.wif;
     } else {
-      if (!account.encKey) throw new Error("Cannot find encrypted key");
+      if (!account.encKey)
+        throw new Error(this.$i18n.t("error.noEncrypted").toString());
 
       const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
       for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
@@ -568,47 +800,153 @@ export class PopupState {
     }
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error("Password does not match");
+      throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
     return this.signData(data, wif);
   }
 
   signData(data: string, wif: string): string {
     const account = this.currentAccount;
-    if (!account) throw new Error("Account not valid");
+    if (!account) throw new Error(this.$i18n.t("error.notValid").toString());
 
     if (!this.isWifValidForAccount(wif))
-      throw new Error("Account does not match");
+      throw new Error(this.$i18n.t("error.noAccountMatch").toString());
 
     const privateKey = getPrivateKeyFromWif(wif);
 
     return signData(data, privateKey);
   }
 
-  formatBalance(symbol: string, amount: string): string {
-    let decimals = 0;
+  async signTxEth(txdata: TxArgsData, wif: string): Promise<string> {
+    const account = this.currentAccount;
+    if (!account) throw new Error("Account not valid");
+
+    const address = account.address;
+
+    const pkHex = getPrivateKeyFromWif(wif);
+
+    const dt = new Date();
+    dt.setMinutes(dt.getMinutes() + 5);
+    console.log(dt);
+    const tx = new Transaction(
+      txdata.nexus,
+      txdata.chain,
+      txdata.script,
+      dt,
+      txdata.payload
+    );
+
+    // Do custom signature
+    const msgHex = tx.toString(false);
+    const sha256Msg = createHash("sha256")
+      .update(msgHex, "hex")
+      .digest();
+
+    console.log("msgToSign", msgHex);
+
+    const privateKey = Secp256k1.uint256(pkHex, 16);
+    const digest = Secp256k1.uint256(byteArrayToHex(sha256Msg), 16);
+
+    console.log("pk to sign", pkHex, privateKey);
+
+    const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
+    console.log("public", publicKey);
+
+    const sig = Secp256k1.ecsign(privateKey, digest);
+    console.log(sig);
+
+    const signature = sig.r + sig.s;
+    console.log("signature", signature);
+
+    tx.signatures.unshift(signature);
+
+    const rawTx = tx.toString(true, 2);
+
+    console.log("%c" + rawTx, "color:red");
+
+    const hash = await this.api.sendRawTransaction(rawTx);
+    console.log("Returned from sendRawTransaction with res: ", hash);
+
+    return hash;
+  }
+
+  async signTxEthWithPassword(txdata: TxArgsData, password: string) {
+    const hash = await this.signTxEth(
+      txdata,
+      this.getWifFromPassword(password)
+    );
+    return hash;
+  }
+
+  getEthContract(symbol: string) {
+    return getEthContract(symbol, this.isMainnet);
+  }
+
+  getTranscodeAddress(wif: string) {
+    const pkHex = getPrivateKeyFromWif(wif);
+    const privateKey = Secp256k1.uint256(pkHex, 16);
+    const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
+    console.log("public", publicKey);
+    var lastBit = parseInt(publicKey.y[63], 16) & 1;
+    var addressHex = Buffer.from(
+      (lastBit == 1 ? "0103" : "0102") + publicKey.x,
+      "hex"
+    );
+    return "P" + base58.encode(addressHex);
+  }
+
+  getTranscodeAddressWithPassword(password: string) {
+    return this.getTranscodeAddress(this.getWifFromPassword(password));
+  }
+
+  getWifFromPassword(
+    password: string,
+    acc: WalletAccount | undefined = undefined
+  ) {
+    const account = acc !== undefined ? acc : this.currentAccount;
+    if (!account) throw new Error(this.$i18n.t("error.noAccount").toString());
+
+    let wif = "";
+    if (password == "") {
+      if (account.wif) wif = account.wif;
+    } else {
+      if (!account.encKey)
+        throw new Error(this.$i18n.t("error.noEncrypted").toString());
+
+      const hex = CryptoJS.AES.decrypt(account.encKey, password).toString();
+      for (var i = 0; i < hex.length && hex.substr(i, 2) !== "00"; i += 2)
+        wif += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    }
+
+    if (!this.isWifValidForAccount(wif, account))
+      throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
+
+    return wif;
+  }
+
+  decimals(symbol: string) {
     switch (symbol) {
       case "KCAL":
-        decimals = 10;
-        break;
+        return 10;
       case "SOUL":
-        decimals = 8;
-        break;
+        return 8;
       case "NEO":
-        decimals = 0;
-        break;
+        return 0;
       case "GAS":
-        decimals = 8;
-        break;
+        return 8;
       case "GOATI":
-        decimals = 3;
-        break;
+        return 3;
       case "ETH":
-        decimals = 18;
-        break;
+        return 18;
+      case "MKNI":
+        return 0;
       default:
-        decimals = 0;
+        return 0;
     }
+  }
+
+  formatBalance(symbol: string, amount: string): string {
+    const decimals = this.decimals(symbol);
 
     switch (symbol) {
       case "TTRS":
@@ -711,9 +1049,15 @@ export class PopupState {
         const nft = await this.api.getNFT(token, nftId);
         console.log("Got nft", nft);
 
-        const imgUrl = nft.properties
-          .find((kv) => kv.Key == "ImageURL")
-          ?.Value.replace("ipfs://", "https://gateway.ipfs.io/ipfs/");
+        const imgUrlUnformated = nft.properties.find(
+          (kv) => kv.Key == "ImageURL"
+        )?.Value;
+
+        const imgUrl = imgUrlUnformated?.startsWith("ipfs://")
+          ? imgUrlUnformated.replace("ipfs://", "https://gateway.ipfs.io/ipfs/")
+          : imgUrlUnformated?.startsWith("ipfs-video://")
+          ? "placeholder-nft-video.png"
+          : "placeholder-nft-img.png";
 
         console.log("ImageURL", imgUrl);
 

@@ -3,7 +3,11 @@
     <v-app-bar key="appbar" app color="primary" dark style="font-size:16px">
       <v-icon>mdi-wallet</v-icon><v-spacer />
       <v-list-item link @click="goto('/wallets')">
-        <v-list-item-content>
+        <v-list-item-content v-if="!state.balanceShown">
+          <v-list-item-title>***</v-list-item-title>
+          <v-list-item-subtitle>***</v-list-item-subtitle>
+        </v-list-item-content>
+        <v-list-item-content v-else>
           <v-list-item-title>{{ shorterAddress }}</v-list-item-title>
           <v-list-item-subtitle>{{ shortAddress }}</v-list-item-subtitle>
         </v-list-item-content>
@@ -21,7 +25,7 @@
         style="max-height:400px; font-size:10px; text-align:center"
       >
         <div class="text-subtitle-1 mt-4">
-          This is your wallet's public address
+          {{ $t("qr.description") }}
         </div>
         <v-skeleton-loader
           v-if="isLoading"
@@ -29,12 +33,12 @@
           style="width:148px; height:148px; margin: 20px auto;"
         ></v-skeleton-loader>
         <img v-else :src="imgSrc" />
-
-        {{ account.address }}
+        <span v-if="!state.balanceShown">************************************</span>
+        <span v-else>{{ account.address }}</span>
         <br />
-        <a href="" @click.prevent="copyAddressToClipboard()"
-          >copy to clipboard</a
-        >
+        <a href="" @click.prevent="copyAddressToClipboard()">{{
+          $t("qr.copy")
+        }}</a>
       </v-container>
     </v-main>
   </div>
@@ -53,6 +57,8 @@ export default class extends Vue {
   isLoading = true;
   imgSrc = "";
 
+  messageNoWallet = "";
+
   state = state;
 
   goto(route: string) {
@@ -64,7 +70,8 @@ export default class extends Vue {
   }
 
   get shorterAddress(): string {
-    if (!this.account) return "<no wallet>";
+    this.messageNoWallet = this.$i18n.t("qr.noWallet").toString();
+    if (!this.account) return this.messageNoWallet;
 
     if (this.account.data.name && this.account.data.name != "")
       return this.account.data.name;
@@ -78,7 +85,8 @@ export default class extends Vue {
   }
 
   get shortAddress(): string {
-    if (!this.account) return "<no wallet>";
+    this.messageNoWallet = this.$i18n.t("qr.noWallet").toString();
+    if (!this.account) return this.messageNoWallet;
 
     let addr = this.account.address;
     return (
@@ -89,7 +97,7 @@ export default class extends Vue {
   }
 
   async mounted() {
-    await this.state.check();
+    await this.state.check(this.$parent.$i18n);
 
     if (this.account) {
       const qr = new QRCode();

@@ -1,7 +1,17 @@
 /// <reference types="chrome"/>
-
+import Vue from "vue";
 import { PhantasmaAPI } from "@/phan-js";
 import { state } from "@/popup/PopupState";
+import VueI18n from 'vue-i18n';
+import { messages, defaultLocale } from "@/i18n";
+
+Vue.use(VueI18n);
+
+const i18n = new VueI18n({
+  messages,
+  locale: defaultLocale,
+  fallbackLocale: defaultLocale
+});
 
 let phantasmaAPI = new PhantasmaAPI(
   "https://seed.ghostdevs.com:7077/rpc",
@@ -123,6 +133,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
+
+  i18n.locale = state.locale;
+
   if (msg.uid == "plsres") {
     console.log(JSON.stringify(msg));
     chrome.tabs.sendMessage(msg.tabid, msg);
@@ -133,7 +146,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
     const id = parseInt(args[0]);
     if (args.length != 2) {
-      throw Error("Malformed request");
+      throw Error(i18n.t('error.malformed').toString());
     }
 
     let cmd = args[1];
@@ -351,4 +364,5 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
         break;
     }
   }
+  return Promise.resolve("Dummy response to keep the console quiet");
 });

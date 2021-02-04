@@ -6,7 +6,9 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>PHANTASMA LINK</v-list-item-title>
-          <v-list-item-subtitle>Authorization request</v-list-item-subtitle>
+          <v-list-item-subtitle>{{
+            $t("authorize.request")
+          }}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-spacer />
@@ -34,35 +36,42 @@
           >
         </v-row>
 
-        <div style="text-align:center" class="mb-7 mt-5">
-          <strong>{{ $route.params.dapp }}</strong> wants to connect to
-          Phantasma Link. Each transaction will request your permission. Do you
-          want to allow it?
+        <div style="text-align:center" class="mb-4 mt-4">
+          <strong>{{ $route.params.dapp }}</strong>
+          {{ $t("authorize.description") }}
           <br />
           <br />
           {{ domain }}
         </div>
 
+        <v-row style="margin: 5px;display:none;">
+          <v-select
+            :items="authorizeAccounts"
+            v-model="authorizeAccount"
+            :label="$t('authorize.labelAccount')"
+          ></v-select>
+        </v-row>
+
         <v-row style="margin: 5px">
           <v-select
             :items="authorizeForItems"
             v-model="authorizeFor"
-            label="Authorize for"
+            :label="$t('authorize.label')"
           ></v-select>
         </v-row>
 
         <v-row class="mt-6">
           <v-col>
-            <v-btn secondary style="width: 100%" @click="refuse()"
-              >Refuse</v-btn
-            >
+            <v-btn secondary style="width: 100%" @click="refuse()">{{
+              $t("authorize.refuse")
+            }}</v-btn>
           </v-col>
           <v-col>
             <v-btn
               dark
               style="width: 100%; background-color:#17b1e7"
               @click="connect()"
-              >Connect</v-btn
+              >{{ $t("authorize.connect") }}</v-btn
             >
           </v-col>
         </v-row>
@@ -74,9 +83,10 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import { Watch } from "vue-property-decorator";
 import { Account, Transaction, getPrivateKeyFromWif, Balance } from "@/phan-js";
 
-import { state } from "@/popup/PopupState";
+import { state, WalletAccount } from "@/popup/PopupState";
 
 @Component({})
 export default class extends Vue {
@@ -86,24 +96,34 @@ export default class extends Vue {
   hostname = "";
   domain = "";
   faviconUrl = "";
-  authorizeFor = "Current session";
-  authorizeForItems = [
-    "Current session",
-    "One hour",
-    "One day",
-    "One month",
-    "Always",
-  ];
+  authorizeFor = "";
+  authorizeForItems: string[] = [];
+  authorizeAccount: string = "";
+  authorizeAccounts: string[] = [];
 
   async mounted() {
     console.log("authorize");
+
+    await state.check(this.$parent.$i18n);
+
+    this.authorizeForItems = [
+      this.$i18n.t("authorize.periodCurrent").toString(),
+      this.$i18n.t("authorize.period1h").toString(),
+      this.$i18n.t("authorize.period1d").toString(),
+      this.$i18n.t("authorize.period1m").toString(),
+      this.$i18n.t("authorize.periodAlways").toString(),
+    ];
+    this.authorizeFor = this.$i18n.t("authorize.periodCurrent").toString();
+
+    state.accounts.forEach((account) => {
+      this.authorizeAccounts.push(account.address)
+    })
+    this.authorizeAccount = state.currentAccount!.address;
 
     this.url = atob(this.$route.params.url);
     this.faviconUrl = atob(this.$route.params.favicon);
     this.hostname = new URL(this.url).hostname;
     this.domain = new URL(this.url).protocol + "//" + this.hostname;
-
-    await state.check();
 
     if (!state.hasAccount) {
       this.$router.push("/addwallet");
@@ -163,6 +183,20 @@ export default class extends Vue {
       data: { id, success: false },
     });
     window.close();
+  }
+
+  @Watch("authorizeAccount")
+  onWatchauthorizeAccount(oldValue: string, newValue: string) {
+
+    // const matchAccount = this.state.accounts.filter((a) => a.address == newValue);
+    // this.selectAccount(matchAccount[0]);
+
+  }
+
+  async selectAccount(newValue: WalletAccount) {
+
+    await state.selectAccount(newValue);
+
   }
 
   async connect() {

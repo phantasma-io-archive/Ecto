@@ -3,12 +3,12 @@
     <router-view></router-view>
 
     <v-dialog v-model="settingsDialog" style="z-index:100">
-      <v-card style="height:400px">
+      <v-card style="height:408px">
         <v-card-title>
           <v-img
             src="ecto.png"
             class="mx-auto mt-3 mb-3"
-            style="max-width:120px"
+            style="max-width:80px"
           ></v-img>
           <div class="overline mx-auto">Ecto wallet v{{ version }}</div>
         </v-card-title>
@@ -17,17 +17,27 @@
             <v-select
               v-model="currency"
               :items="currencies"
-              label="Currency to show"
+              :label="$t('app.currencyDescription')"
               class="pl-4 pr-4"
               @input="changeCurrency()"
             ></v-select>
           </v-row>
+          <v-row class="mt-3">
+            <v-select
+              v-model="language"
+              :items="languages"
+              :label="$t('app.languageDescription')"
+              class="pl-4 pr-4"
+              @input="changeLanguage()"
+            >
+            </v-select>
+          </v-row>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text color="blue darken-1" @click="settingsDialog = false"
-            >Close</v-btn
-          >
+          <v-btn text color="blue darken-1" @click="settingsDialog = false">{{
+            $t("app.closeButton")
+          }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -63,7 +73,7 @@
       tile
       elevation="0"
       dark
-      style="position:fixed; width:100%; bottom:0; padding:2px 5px; background:linear-gradient(45deg, #28cec6, #17b1e8); background-color:#17b1e8; z-index:1000"
+      style="position:fixed; width:100%; bottom:0; padding:2px 5px; background:linear-gradient(45deg, #28cec6, #17b1e8); background-color:#17b1e8; z-index:1000;"
       ><v-menu top offset-y :close-on-content-click="false">
         <template v-slot:activator="{ on, attrs }">
           <span color="primary" dark v-bind="attrs" v-on="on">
@@ -145,7 +155,8 @@
           </v-list-item-group>
         </v-list> </v-menu
       ><v-icon x-small class="ml-2" @click="refreshAccount">mdi-refresh</v-icon
-      ><v-spacer /><span @click="settingsDialog = true"
+      ><v-icon x-small class="ml-2" @click="toggleBalance">mdi-eye</v-icon
+      ><v-spacer /><span style="cursor:pointer;" @click="settingsDialog = true"
         >v{{ version }}<v-icon x-small class="ml-2">mdi-settings</v-icon>
       </span>
     </v-footer>
@@ -163,6 +174,8 @@ import {
   Balance,
 } from "@/phan-js";
 
+import { LOCALES } from "@/i18n/locales";
+import { defaultLocale } from "@/i18n";
 import { state } from "@/popup/PopupState";
 import { Watch } from "vue-property-decorator";
 
@@ -172,6 +185,25 @@ export default class extends Vue {
   version = "";
   currencies = ["EUR", "USD", "GBP", "JPY", "CAD", "AUD", "CNY"];
   currency = "EUR";
+  languages = [
+    "English",
+    "Français",
+    "Italiano",
+    "Spanish",
+    "Русский",
+    "中文",
+    "Nederlands",
+    "Deutsch",
+    "Türkçe",
+    "Tiếng Việt",
+    "Norwegian",
+    "Português",
+  ];
+  language = "en";
+  balanceShown = true;
+
+  LOCALES = LOCALES;
+  defaultLocale = defaultLocale;
 
   rpcList: any[] = [];
 
@@ -200,8 +232,10 @@ export default class extends Vue {
   }
 
   async mounted() {
-    await state.check();
+    await state.check(this.$parent.$i18n);
     this.currency = state.currency;
+    this.language = state.language;
+    this.balanceShown = state.balanceShown;
 
     this.version = chrome.runtime.getManifest().version;
 
@@ -237,7 +271,7 @@ export default class extends Vue {
             let shortError =
               error.length > 120 ? error.substring(0, 120) + "..." : error;
             this.$root.$emit("errorMessage", {
-              msg: "There has been an error in the transaction:",
+              msg: this.$t("app.errorMessage"),
               details: shortError,
             });
           }
@@ -251,12 +285,28 @@ export default class extends Vue {
     await this.state.setCurrency(this.currency);
   }
 
+  async changeLanguage() {
+    console.log("setting language", this.language);
+    const locale = state.getLocaleFromLanguage(this.language);
+    if (this.$i18n.locale !== locale) {
+      this.$i18n.locale = locale;
+      await this.state.setLanguage(this.language);
+      this.$root.$emit("changeLanguage");
+    }
+  }
+
   async refreshAccount() {
     if (state.hasAccount) {
       this.$root.$emit("loading", true);
       await state.refreshCurrentAccount();
       this.$root.$emit("loading", false);
     }
+  }
+
+  async toggleBalance() {
+    this.balanceShown = !this.balanceShown;
+    console.log("setting balance toggle", this.balanceShown);
+    await this.state.toggleBalance(this.balanceShown);
   }
 
   async selectNet(item: string) {
@@ -311,5 +361,11 @@ header {
 
 .v-menu__content {
   max-width: 92%;
+}
+
+footer button:hover,
+footer span:hover,
+footer span:hover > i {
+  color: black;
 }
 </style>
