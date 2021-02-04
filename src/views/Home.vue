@@ -1097,10 +1097,10 @@
 
           <v-slider
             v-model="sendAmount"
-            :min="0.01"
+            :min="sendSymbol === 'ETH' ? 0.0001 : 0.01"
             :max="sendMaxAmount"
             :value="1"
-            step="0.01"
+            :step="sendSymbol === 'ETH' ? 0.0001 : 0.01"
             thumb-label="always"
             style="margin-top:40px"
           >
@@ -2054,8 +2054,6 @@ export default class extends Vue {
     this.swapFromChain = "neo";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(bal.amount.toString());
-    // if (this.sendSymbol == "GAS") {
-    // }
     this.swapAmountDialog = true;
   }
 
@@ -2731,8 +2729,12 @@ export default class extends Vue {
     );
     if (this.sendSymbol == "GAS") {
       this.sendMaxAmount -= 0.1;
-      // TODO: check if there is enough
     }
+    if (this.sendSymbol == "ETH") {
+      const ethFee = (Math.round(100000 * this.ethGasPrices[1] * 1.2) / 1e9).toFixed(4)
+      this.sendMaxAmount -= parseFloat((parseFloat(ethFee)).toFixed(4));
+    }
+    if (this.sendMaxAmount < 0) this.sendMaxAmount = 0
     this.swapAmountDialog = true;
   }
 
