@@ -416,7 +416,7 @@ export default class extends Vue {
               tooltip:
                 this.txFor +
                 " " +
-                formatSymbol("" + data.amount, data.quoteSymbol),
+                formatSymbol("" + (data.endAmount != 0 ? data.endAmount : data.amount).toString(), data.quoteSymbol),
               nftId,
               symbol: data.baseSymbol,
             });
@@ -437,8 +437,6 @@ export default class extends Vue {
               text:
                 this.txBid +
                 " " +
-                data.type +
-                " " +
                 this.txAuction +
                 " (" +
                 data.baseSymbol +
@@ -446,7 +444,7 @@ export default class extends Vue {
               tooltip:
                 this.txFor +
                 " " +
-                formatSymbol("" + data.amount, data.quoteSymbol),
+                formatSymbol("" + (data.endAmount != 0 ? data.endAmount : data.amount).toString(), data.quoteSymbol),
               nftId,
               symbol: data.baseSymbol,
             });
