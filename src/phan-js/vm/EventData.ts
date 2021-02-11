@@ -57,10 +57,10 @@ export enum EventKind {
 }
 
 export enum TypeAuction {
-  Fixed,
-  Reserve,
-  Schedule,
-  Dutch,
+  Fixed = 0,
+  Classic = 1,
+  Reserve = 2,
+  Dutch = 3,
 }
 
 export class Decoder {
