@@ -333,6 +333,24 @@
                   $t("home.claim")
                 }}</a>
               </div>
+              <div
+                v-for="(cs, idx) in state.claimablePendingSwaps"
+                :key="cs.hash + idx"
+                class="pa-1"
+              >
+                <span v-if="!state.balanceShown">***</span>
+                <span v-else>{{
+                  formatSymbol(cs.swap.value, swap.symbol)
+                }}</span>
+                {{ $t("home.from") }} {{ formatChain(cs.swap.sourcePlatform) }}
+                {{ $t("home.to") }}
+                {{ formatChain(cs.swap.destinationPlatform) }} ({{
+                  swap.addressTo
+                }})
+                <a href="#" @click.prevent="claimSwap(cs.swap)">{{
+                  $t("home.claim")
+                }}</a>
+              </div>
             </div>
             <div style="text-align:center">
               <v-expansion-panels focusable hover multiple>
@@ -532,13 +550,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><!--<br /><br />
+                    ><br /><br />
                     {{ $t("home.swapToAnotherNEO") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >-->
+                    >
                     <br />
                     <br />
                     {{ $t("home.needGasToSwap", [0.1]) }}
@@ -571,13 +589,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><!--<br /><br />
+                    ><br /><br />
                     {{ $t("home.swapToAnotherETH") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >-->
+                    >
                     <br />
                     <br />
                     {{
@@ -2106,6 +2124,8 @@ export default class extends Vue {
       );
       console.log("hash from sendNeo", hash);
 
+      state.addPendingSwap("neo", this.sendDestination, hash);
+
       const neoApi = isMainnet
         ? "https://neoscan.io/transaction/"
         : "http://mankinighost.phantasma.io:4000/transaction/";
@@ -2223,6 +2243,8 @@ export default class extends Vue {
       (isMainnet
         ? "https://etherscan.io/tx/"
         : "https://ropsten.etherscan.io/tx/") + txRes;
+
+    state.addPendingSwap("eth", this.sendDestination, txRes);
 
     console.log("%c" + txRes, "color:green;font-size:20px");
   }
@@ -2746,10 +2768,12 @@ export default class extends Vue {
       this.sendMaxAmount -= 0.1;
     }
     if (this.sendSymbol == "ETH") {
-      const ethFee = (Math.round(100000 * this.ethGasPrices[1] * 1.2) / 1e9).toFixed(4)
-      this.sendMaxAmount -= parseFloat((parseFloat(ethFee)).toFixed(4));
+      const ethFee = (
+        Math.round(100000 * this.ethGasPrices[1] * 1.2) / 1e9
+      ).toFixed(4);
+      this.sendMaxAmount -= parseFloat(parseFloat(ethFee).toFixed(4));
     }
-    if (this.sendMaxAmount < 0) this.sendMaxAmount = 0
+    if (this.sendMaxAmount < 0) this.sendMaxAmount = 0;
     this.swapAmountDialog = true;
   }
 

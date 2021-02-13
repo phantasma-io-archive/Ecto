@@ -16,7 +16,6 @@ import {
   signData,
   Swap,
 } from "@/phan-js";
-import { rejects } from "assert";
 
 import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
 import {
@@ -30,6 +29,13 @@ import { byteArrayToHex } from "@/phan-js/utils";
 export interface ISymbolAmount {
   symbol: string;
   amount: string | number;
+}
+
+export interface IPendingSwap {
+  chainTo: string;
+  addressTo: string;
+  hash: string;
+  swap: Swap | null;
 }
 
 interface IAuthorization {
@@ -66,6 +72,7 @@ export class PopupState {
   private _currentAccountIndex = 0;
   private _accounts: WalletAccount[] = [];
   private _authorizations: IAuthorization[] = [];
+  private _pendingSwaps: IPendingSwap[] = [];
   private _currency: string = "USD";
   private _language: string = "English";
   private _balanceShown: boolean = true;
@@ -239,6 +246,14 @@ export class PopupState {
     return this.api.availableHosts;
   }
 
+  get pendingSwaps() {
+    return this._pendingSwaps;
+  }
+
+  get claimablePendingSwaps() {
+    return this._pendingSwaps.filter((ps) => ps.swap != null);
+  }
+
   get currencySymbol() {
     switch (this._currency) {
       case "USD":
@@ -288,7 +303,7 @@ export class PopupState {
   }
 
   async check($i18n: any): Promise<void> {
-    this.$i18n = $i18n; // save translate method from Vue i18n
+    if ($i18n) this.$i18n = $i18n; // save translate method from Vue i18n
     return new Promise((resolve, reject) => {
       chrome.storage.local.get((items) => {
         console.log("[PopupState] Get local storage");
@@ -299,13 +314,14 @@ export class PopupState {
           ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
           : [];
         this._authorizations = items.authorizations ? items.authorizations : [];
+        this._pendingSwaps = items.pendingSwaps ? items.pendingSwaps : [];
         this._currency = items.currency ? items.currency : "USD";
         this._language = items.language ? items.language : "English";
         this._balanceShown =
           items.balanceShown === undefined || items.balanceShown;
         this.nfts = items.nfts ? items.nfts : {};
 
-        $i18n.locale = this.locale;
+        if ($i18n) $i18n.locale = this.locale;
 
         this._accounts = items.accounts
           ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
@@ -657,6 +673,24 @@ export class PopupState {
         ) < 0
     );
     console.log("allSwaps", this.allSwaps);
+
+    // check external pending swaps, if there are
+    const toRemove: IPendingSwap[] = [];
+    this._pendingSwaps.forEach(async (ps) => {
+      let swaps = await this.api.getSwapsForAddress(ps.addressTo);
+      var swap = swaps.find((s) => s.sourceHash == ps.hash);
+      if (swap && swap.destinationHash === "pending") {
+        ps.swap = swap;
+      } else {
+        toRemove.push(ps);
+      }
+    });
+
+    // remove the ones already processed
+    if (toRemove.length > 0) {
+      this._pendingSwaps.filter((p) => !toRemove.includes(p));
+      chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => {});
+    }
   }
 
   async authorizeDapp(
@@ -689,6 +723,11 @@ export class PopupState {
 
   getDapp(token: string): string {
     return this._authorizations.find((a) => a.token == token)!.dapp;
+  }
+
+  addPendingSwap(chainTo: string, addressTo: string, hash: string) {
+    this._pendingSwaps.push({ chainTo, addressTo, hash, swap: null });
+    chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => {});
   }
 
   addSwapAddressWithPassword(password: string) {
