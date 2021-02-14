@@ -27,7 +27,7 @@
         v-if="isLoading"
         color="#17b1e8"
         indeterminate
-        style="z-index:7777"
+        style="z-index:7777;position:absolute;"
       ></v-progress-linear>
       <v-tabs
         v-model="activeTab"
@@ -2820,4 +2820,8 @@ export default class extends Vue {
 }
 </script>
 
-<style></style>
+<style>
+.v-tabs .v-slide-group__next {
+  display: none !important;
+}
+</style>
