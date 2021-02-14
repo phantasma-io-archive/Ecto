@@ -432,8 +432,6 @@ export default class extends Vue {
             res.push({
               icon: "mdi-database-plus",
               iconColor: "blue",
-              postIcon: "mdi-eye-outline",
-              postIconColor: "gray",
               text:
                 this.txBid +
                 " " +
