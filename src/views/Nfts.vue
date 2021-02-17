@@ -24,7 +24,7 @@
         v-if="isLoading"
         color="#17b1e8"
         indeterminate
-        style="z-index:7777"
+        style="z-index:7777;position:absolute;"
       ></v-progress-linear>
       <div class="pl-3 pr-3" style="overflow: auto; height: 500px">
         <div class="pa-0 ma-0 mt-1 mb-2">

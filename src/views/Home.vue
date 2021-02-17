@@ -27,7 +27,7 @@
         v-if="isLoading"
         color="#17b1e8"
         indeterminate
-        style="z-index:7777"
+        style="z-index:7777;position:absolute;"
       ></v-progress-linear>
       <v-tabs
         v-model="activeTab"
@@ -330,6 +330,24 @@
                 {{ $t("home.to") }}
                 {{ formatChain(swap.destinationPlatform) }}
                 <a href="#" @click.prevent="claimSwap(swap)">{{
+                  $t("home.claim")
+                }}</a>
+              </div>
+              <div
+                v-for="(cs, idx) in state.claimablePendingSwaps"
+                :key="cs.hash + idx"
+                class="pa-1"
+              >
+                <span v-if="!state.balanceShown">***</span>
+                <span v-else>{{
+                  formatSymbol(cs.swap.value, swap.symbol)
+                }}</span>
+                {{ $t("home.from") }} {{ formatChain(cs.swap.sourcePlatform) }}
+                {{ $t("home.to") }}
+                {{ formatChain(cs.swap.destinationPlatform) }} ({{
+                  swap.addressTo
+                }})
+                <a href="#" @click.prevent="claimSwap(cs.swap)">{{
                   $t("home.claim")
                 }}</a>
               </div>
@@ -1180,7 +1198,7 @@
                     ? $t("home.feeStandard")
                     : $t("home.feeFast")
                 }}
-                {{ ethGasPrices[swapGasIndex] }} Gwei
+                {{ ethGasPrices[swapGasIndex] }} Gwei (~{{ state.currencySymbol }}{{ getFeeEth(ethGasPrices[swapGasIndex],sendSymbol) }})
               </div>
             </template>
             <template
@@ -1223,14 +1241,14 @@
                     ? $t("home.feeStandard")
                     : $t("home.feeFast")
                 }}
-                {{ neoGasPrices[swapGasIndex] }} GAS {{ $t("home.fee") }}
+                {{ neoGasPrices[swapGasIndex] }} GAS {{ $t("home.fee") }} (~{{ state.currencySymbol }}{{ getFeeNeo(neoGasPrices[swapGasIndex]) }})
               </div>
             </template>
             <div
               v-if="swapToChain === 'neo' && swapFromChain !== 'neo'"
               class="mx-auto"
             >
-              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS
+              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS (~{{ state.currencySymbol }}{{ getFeeNeo(gasFeeAmount) }})
             </div>
             <div
               v-if="(swapToChain === 'eth') & (swapFromChain !== 'neo')"
@@ -1246,7 +1264,7 @@
                   ) / 1e9
                 ).toFixed(4)
               }}
-              ETH
+              ETH (~{{ state.currencySymbol }}{{ getFeeEth(ethGasPrices[1],sendSymbol) }})
             </div>
           </v-row>
         </v-card-text>
@@ -1624,6 +1642,22 @@ export default class extends Vue {
   getDate(timestamp: number) {
     const date = new Date(timestamp * 1000);
     return date.toLocaleDateString();
+  }
+
+  getFeeNeo(gas: number) {
+    const currencyPrice = state.getRate("GAS");
+    const feesValue = gas * currencyPrice
+    return feesValue.toFixed(2)
+  }
+
+  getFeeEth(gwei: number, symbol: string) {
+    const gasLimit = symbol == "ETH" ? 21000 : 10000
+    const currencyPrice = state.getRate("ETH");
+    const decimals = 18
+    const decimalsGas = 9
+    const fees = (gwei * ((10 ** decimalsGas))) * gasLimit / (10 ** decimals)
+    const feesValue = fees * currencyPrice
+    return feesValue.toFixed(2)
   }
 
   formatHash(hash: string) {
@@ -2106,6 +2140,8 @@ export default class extends Vue {
       );
       console.log("hash from sendNeo", hash);
 
+      state.addPendingSwap("neo", this.sendDestination, hash);
+
       const neoApi = isMainnet
         ? "https://neoscan.io/transaction/"
         : "http://mankinighost.phantasma.io:4000/transaction/";
@@ -2223,6 +2259,8 @@ export default class extends Vue {
       (isMainnet
         ? "https://etherscan.io/tx/"
         : "https://ropsten.etherscan.io/tx/") + txRes;
+
+    state.addPendingSwap("eth", this.sendDestination, txRes);
 
     console.log("%c" + txRes, "color:green;font-size:20px");
   }
@@ -2746,10 +2784,12 @@ export default class extends Vue {
       this.sendMaxAmount -= 0.1;
     }
     if (this.sendSymbol == "ETH") {
-      const ethFee = (Math.round(100000 * this.ethGasPrices[1] * 1.2) / 1e9).toFixed(4)
-      this.sendMaxAmount -= parseFloat((parseFloat(ethFee)).toFixed(4));
+      const ethFee = (
+        Math.round(100000 * this.ethGasPrices[1] * 1.2) / 1e9
+      ).toFixed(4);
+      this.sendMaxAmount -= parseFloat(parseFloat(ethFee).toFixed(4));
     }
-    if (this.sendMaxAmount < 0) this.sendMaxAmount = 0
+    if (this.sendMaxAmount < 0) this.sendMaxAmount = 0;
     this.swapAmountDialog = true;
   }
 
@@ -2796,4 +2836,8 @@ export default class extends Vue {
 }
 </script>
 
-<style></style>
+<style>
+.v-tabs .v-slide-group__next {
+  display: none !important;
+}
+</style>

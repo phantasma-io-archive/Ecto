@@ -2,7 +2,7 @@
 import Vue from "vue";
 import { PhantasmaAPI } from "@/phan-js";
 import { state } from "@/popup/PopupState";
-import VueI18n from 'vue-i18n';
+import VueI18n from "vue-i18n";
 import { messages, defaultLocale } from "@/i18n";
 
 Vue.use(VueI18n);
@@ -10,13 +10,8 @@ Vue.use(VueI18n);
 const i18n = new VueI18n({
   messages,
   locale: defaultLocale,
-  fallbackLocale: defaultLocale
+  fallbackLocale: defaultLocale,
 });
-
-let phantasmaAPI = new PhantasmaAPI(
-  "https://seed.ghostdevs.com:7077/rpc",
-  "https://ghostdevs.com/getpeers.json"
-);
 
 interface IAuthorization {
   dapp: string;
@@ -24,6 +19,7 @@ interface IAuthorization {
   token: string;
   address: string;
   expireDate: number;
+  version: string | undefined;
 }
 
 interface IWalletLinkResponse {
@@ -48,6 +44,8 @@ interface IGetAccountResponse extends IWalletLinkResponse {
   name: string;
   avatar: string;
   balances: IBalance[];
+  platform: string | undefined;
+  external: string | undefined;
 }
 
 interface ISignTxResponse extends IWalletLinkResponse {
@@ -84,7 +82,8 @@ function genHexString(len: number) {
 
 function getAuthorizationToken(
   dapp: string,
-  hostname: string
+  hostname: string,
+  version: string
 ): string | undefined {
   // remove first all authorizations that are expired
   const now = new Date();
@@ -94,7 +93,11 @@ function getAuthorizationToken(
     chrome.storage.local.set({ authorizations: validAuths }, () => {});
   }
 
-  const auth = validAuths.find((a) => a.dapp == dapp && a.hostname == hostname);
+  const auth = validAuths.find((a) => {
+    if (version == "2")
+      return a.dapp == dapp && a.hostname == hostname && a.version == "2";
+    else return a.dapp == dapp && a.hostname == hostname;
+  });
   if (!auth) return undefined;
 
   return auth.token;
@@ -111,12 +114,16 @@ function isValidRequest(args: string[]): boolean {
   return false;
 }
 
-function getRequestAddress(args: string[]): string | undefined {
+function getRequestAddress(
+  args: string[]
+): { address: string; version: string } | undefined {
   if (args.length >= 3) {
     const dapp = args[args.length - 2];
     const token = args[args.length - 1];
     const auth = authorizations.find((a) => a.token == token);
-    return auth?.address;
+    return auth
+      ? { address: auth.address, version: auth.version ? auth.version : "1" }
+      : undefined;
   }
 }
 
@@ -133,7 +140,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
-
   i18n.locale = state.locale;
 
   if (msg.uid == "plsres") {
@@ -146,7 +152,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
     const id = parseInt(args[0]);
     if (args.length != 2) {
-      throw Error(i18n.t('error.malformed').toString());
+      throw Error(i18n.t("error.malformed").toString());
     }
 
     let cmd = args[1];
@@ -163,13 +169,16 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           const token = genHexString(64);
           const dapp = args[1];
 
+          const version = args.length > 2 ? args[2] : "1";
+
           chrome.tabs.get(msg.tabid, (tab) => {
             const url = tab.url || "http://unknown";
             const favicon = tab.favIconUrl || "unknown";
 
             const authToken = getAuthorizationToken(
               dapp,
-              new URL(url).hostname
+              new URL(url).hostname,
+              version
             );
 
             if (authToken) {
@@ -183,6 +192,9 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
                   wallet: "Ecto",
                   dapp,
                   token: authToken,
+                  // new in v2
+                  nexus: state.nexus,
+                  version: "1",
                   id,
                   success: true,
                 },
@@ -221,11 +233,21 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
       case "getAccount":
         if (isValidRequest(args)) {
-          const address = getRequestAddress(args);
-          if (address == null) return;
+          const req = getRequestAddress(args);
+          if (req == null) return;
+          const address = req.address;
+          const version = req.version;
 
+          let platform = "phantasma";
+          if (args.length > 3) {
+            platform = args[1];
+            /// check that this is ok
+          }
+
+          await state.check(undefined);
+          console.log("nexus", state.nexus);
           console.log("getting account " + address);
-          let account = await phantasmaAPI.getAccount(address);
+          let account = await state.api.getAccount(address);
 
           if (!account.balances) {
             account.balances = [];
@@ -239,11 +261,15 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
               decimals: 8,
             });
 
+          let external = ""; // external address (neo or eth) if platform is not phantasma
+
           console.log("got account: " + JSON.stringify(account));
           let response: IGetAccountResponse = {
             name: account.name,
             address: account.address,
             avatar: "",
+            platform,
+            external,
             balances: account.balances.map((x) => {
               return {
                 value: x.amount,
@@ -265,10 +291,11 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
       case "signTx":
         if (isValidRequest(args)) {
-          const address = getRequestAddress(args);
+          const req = getRequestAddress(args);
+          if (req == null) return;
+          const address = req.address;
+          const version = req.version;
           const token = args[args.length - 1];
-
-          if (address == null) return;
 
           const nexus = args[1];
           const chain = args[2];
@@ -314,10 +341,11 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
       case "signData":
         if (isValidRequest(args)) {
-          const address = getRequestAddress(args);
+          const req = getRequestAddress(args);
+          if (req == null) return;
+          const address = req.address;
+          const version = req.version;
           const token = args[args.length - 1];
-
-          if (address == null) return;
 
           const hexdata = args[1];
           const signKind = args[2];

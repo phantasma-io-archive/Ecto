@@ -98,7 +98,7 @@ async function sendNep5(
     "address"
   );
   const param_receiving_address = sc.ContractParam.byteArray(dest, "address");
-  const param_amount = Neon.create.contractParam("Integer", 1 * 1e8);
+  const param_amount = Neon.create.contractParam("Integer", amount * 1e8);
 
   // Build contract script
   const props = {
