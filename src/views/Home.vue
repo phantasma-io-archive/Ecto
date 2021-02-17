@@ -550,13 +550,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherNEO") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >
+                    >-->
                     <br />
                     <br />
                     {{ $t("home.needGasToSwap", [0.1]) }}
@@ -589,13 +589,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherETH") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >
+                    >-->
                     <br />
                     <br />
                     {{
