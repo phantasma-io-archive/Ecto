@@ -70,6 +70,10 @@ export class Decoder {
     this.str = str;
   }
 
+  isEnd() {
+    return this.str.length == 0;
+  }
+
   readCharPair() {
     var res = this.str.substr(0, 2);
     this.str = this.str.slice(2);
@@ -199,7 +203,7 @@ export function getMarketEventData(str: string) {
     quoteSymbol: dec.readString(),
     id: dec.readBigIntAccurate(),
     amount: dec.readBigInt(),
-    endAmount: dec.readBigInt(),
+    endAmount: dec.isEnd() ? 0 : dec.readBigInt()
   };
 }
 
