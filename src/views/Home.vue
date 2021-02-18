@@ -2003,7 +2003,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1200;
+    const minGasLimit = 1800;
 
     let transcodeAddress = "";
 
@@ -2304,7 +2304,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2399,7 +2399,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2453,7 +2453,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2514,7 +2514,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2564,7 +2564,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2664,7 +2664,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2716,7 +2716,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
