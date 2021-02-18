@@ -550,13 +550,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherNEO") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >
+                    >-->
                     <br />
                     <br />
                     {{ $t("home.needGasToSwap", [0.1]) }}
@@ -589,13 +589,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherETH") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >
+                    >-->
                     <br />
                     <br />
                     {{
@@ -1198,7 +1198,7 @@
                     ? $t("home.feeStandard")
                     : $t("home.feeFast")
                 }}
-                {{ ethGasPrices[swapGasIndex] }} Gwei
+                {{ ethGasPrices[swapGasIndex] }} Gwei (~{{ state.currencySymbol }}{{ getFeeEth(ethGasPrices[swapGasIndex],sendSymbol) }})
               </div>
             </template>
             <template
@@ -1241,14 +1241,14 @@
                     ? $t("home.feeStandard")
                     : $t("home.feeFast")
                 }}
-                {{ neoGasPrices[swapGasIndex] }} GAS {{ $t("home.fee") }}
+                {{ neoGasPrices[swapGasIndex] }} GAS {{ $t("home.fee") }} (~{{ state.currencySymbol }}{{ getFeeNeo(neoGasPrices[swapGasIndex]) }})
               </div>
             </template>
             <div
               v-if="swapToChain === 'neo' && swapFromChain !== 'neo'"
               class="mx-auto"
             >
-              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS
+              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS (~{{ state.currencySymbol }}{{ getFeeNeo(gasFeeAmount) }})
             </div>
             <div
               v-if="(swapToChain === 'eth') & (swapFromChain !== 'neo')"
@@ -1264,7 +1264,7 @@
                   ) / 1e9
                 ).toFixed(4)
               }}
-              ETH
+              ETH (~{{ state.currencySymbol }}{{ getFeeEth(ethGasPrices[1],sendSymbol) }})
             </div>
           </v-row>
         </v-card-text>
@@ -1642,6 +1642,22 @@ export default class extends Vue {
   getDate(timestamp: number) {
     const date = new Date(timestamp * 1000);
     return date.toLocaleDateString();
+  }
+
+  getFeeNeo(gas: number) {
+    const currencyPrice = state.getRate("GAS");
+    const feesValue = gas * currencyPrice
+    return feesValue.toFixed(2)
+  }
+
+  getFeeEth(gwei: number, symbol: string) {
+    const gasLimit = symbol == "ETH" ? 21000 : 10000
+    const currencyPrice = state.getRate("ETH");
+    const decimals = 18
+    const decimalsGas = 9
+    const fees = (gwei * ((10 ** decimalsGas))) * gasLimit / (10 ** decimals)
+    const feesValue = fees * currencyPrice
+    return feesValue.toFixed(2)
   }
 
   formatHash(hash: string) {
