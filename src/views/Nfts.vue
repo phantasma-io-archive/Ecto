@@ -763,7 +763,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800 * this.nftsToSend.length;
+    const minGasLimit = 2100 * this.nftsToSend.length;
 
     let sb = new ScriptBuilder();
 
@@ -833,7 +833,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800 * this.nftsToBurn.length;
+    const minGasLimit = 2100 * this.nftsToBurn.length;
 
     let sb = new ScriptBuilder();
 
