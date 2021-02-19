@@ -2008,7 +2008,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800;
+    const minGasLimit = 2100;
 
     let transcodeAddress = "";
 
@@ -2147,7 +2147,7 @@ export default class extends Vue {
       );
       console.log("hash from sendNeo", hash);
 
-      state.addPendingSwap("neo", this.sendDestination, hash);
+      // state.addPendingSwap("neo", this.sendDestination, hash);
 
       const neoApi = isMainnet
         ? "https://neoscan.io/transaction/"
@@ -2269,7 +2269,7 @@ export default class extends Vue {
         ? "https://etherscan.io/tx/"
         : "https://ropsten.etherscan.io/tx/") + txRes;
 
-    state.addPendingSwap("eth", this.sendDestination, txRes);
+    // state.addPendingSwap("eth", this.sendDestination, txRes);
 
     console.log("%c" + txRes, "color:green;font-size:20px");
   }
@@ -2313,7 +2313,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800;
+    const minGasLimit = 2100;
 
     let sb = new ScriptBuilder();
 
@@ -2408,7 +2408,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800;
+    const minGasLimit = 2100;
 
     let sb = new ScriptBuilder();
 
@@ -2462,7 +2462,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800;
+    const minGasLimit = 2100;
 
     let sb = new ScriptBuilder();
 
@@ -2523,7 +2523,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800;
+    const minGasLimit = 2100;
 
     let sb = new ScriptBuilder();
 
@@ -2573,7 +2573,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800;
+    const minGasLimit = 2100;
 
     let sb = new ScriptBuilder();
 
@@ -2673,7 +2673,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800;
+    const minGasLimit = 2100;
 
     let sb = new ScriptBuilder();
 
@@ -2725,7 +2725,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1800;
+    const minGasLimit = 2100;
 
     let sb = new ScriptBuilder();
 

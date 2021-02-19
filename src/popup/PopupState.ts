@@ -316,7 +316,7 @@ export class PopupState {
           ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
           : [];
         this._authorizations = items.authorizations ? items.authorizations : [];
-        this._pendingSwaps = items.pendingSwaps ? items.pendingSwaps : [];
+        // this._pendingSwaps = items.pendingSwaps ? items.pendingSwaps : [];
         this._currency = items.currency ? items.currency : "USD";
         this._language = items.language ? items.language : "English";
         this._balanceShown =
@@ -677,7 +677,7 @@ export class PopupState {
     console.log("allSwaps", this.allSwaps);
 
     // check external pending swaps, if there are
-    const toRemove: IPendingSwap[] = [];
+    /* const toRemove: IPendingSwap[] = [];
     this._pendingSwaps.forEach(async (ps) => {
       let swaps = await this.api.getSwapsForAddress(ps.addressTo);
       var swap = swaps.find((s) => s.sourceHash == ps.hash);
@@ -692,7 +692,7 @@ export class PopupState {
     if (toRemove.length > 0) {
       this._pendingSwaps.filter((p) => !toRemove.includes(p));
       chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => {});
-    }
+    } */
   }
 
   async authorizeDapp(
