@@ -65,7 +65,7 @@ export async function getNeoBalances(
   console.log("soulfixed", soulFixed);
   const soulAmount = soulFixed.toString();
   console.log("soulamount", soulAmount);
-  if (soulAmount !== "0") balances.push({ symbol: "SOUL", amount: soulAmount });
+  if (soulAmount !== "0") balances.push({ symbol: "SOUL", amount: (parseFloat(soulAmount) * 10 ** 8).toFixed(0)});
 
   if (account.result && account.result.balances) {
     const bals = account.result.balances;
@@ -73,7 +73,7 @@ export async function getNeoBalances(
       if (el.asset == tokens.NEO && el.value !== 0)
         balances.push({ symbol: "NEO", amount: el.value });
       if (el.asset == tokens.GAS && el.value !== 0)
-        balances.push({ symbol: "GAS", amount: el.value });
+        balances.push({ symbol: "GAS", amount: (parseFloat(el.value) * 10 ** 8).toFixed(0) });
     });
   }
 
