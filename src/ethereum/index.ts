@@ -6,11 +6,13 @@ import { isMainThread } from "worker_threads";
 const contractsRopsten: any = {
   SOUL: "19861B13425d8aCFB70eB91Ac50EC3cF721d0C8a",
   KCAL: "8218c82446bb74fB525fECC8844B03C34f987efe",
+  DYT: "e7018acad667012d50edb363effa4f2f56c6a0b0",
 };
 
 const contractsMainnet: any = {
   SOUL: "79C75E2e8720B39e258F41c37cC4f309E0b0fF80",
   KCAL: "14EB60F5f270B059B0c788De0Ddc51Da86f8a06d",
+  DYT: "e7018acad667012d50edb363effa4f2f56c6a0b0", // to update
 };
 
 export function getEthContract(symbol: string, isMainnet: boolean) {
@@ -104,9 +106,22 @@ export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
   const kcalVal = parseInt("0" + kcalBalance.slice(2), 16);
   console.log("kcal balance", kcalVal);
 
+  const dytBalance = await JSONRPC(rpcUrl, "eth_call", [
+    {
+      to: "0x" + (isMainnet ? contractsMainnet.DYT : contractsRopsten.DYT),
+      data: ethDataAddr,
+    },
+    "latest",
+  ]);
+
+  const dytVal = parseInt("0" + dytBalance.slice(2), 16)
+  console.log("dyt balance", dytVal);
+
+
   if (ethVal !== 0) balances.push({ symbol: "ETH", amount: ethVal });
   if (soulVal !== 0) balances.push({ symbol: "SOUL", amount: soulVal });
   if (kcalVal !== 0) balances.push({ symbol: "KCAL", amount: kcalVal });
+  if (dytVal !== 0) balances.push({ symbol: "DYT", amount: dytVal });
 
   return balances;
 }
