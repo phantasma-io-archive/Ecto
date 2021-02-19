@@ -97,6 +97,8 @@ function decimals(symbol: string) {
       return 18;
     case "MKNI":
       return 0;
+    case "DYT":
+      return 18;
     default:
       return 0;
   }
