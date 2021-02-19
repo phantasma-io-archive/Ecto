@@ -35,7 +35,7 @@
         color="#17b1e8"
         right
       >
-        <v-tab>{{ $t("home.assets") }}</v-tab>
+        <v-tab @change="onAssetsTab">{{ $t("home.assets") }}</v-tab>
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
         <v-tab
           ><v-badge
@@ -2812,6 +2812,14 @@ export default class extends Vue {
     this.txs = res.result.txs;
     this.loadingTxs = [];
     this.isLoading = false;
+  }
+
+  async onAssetsTab() {
+    if (state.hasAccount) {
+      this.$root.$emit("loading", true);
+      await state.refreshCurrentAccount();
+      this.$root.$emit("loading", false);
+    }
   }
 
   async loadMoreTxs() {
