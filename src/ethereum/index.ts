@@ -83,7 +83,10 @@ export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
     "0x70a08231000000000000000000000000" + ethAddress.substring(2);
 
   const soulErcBalance = await JSONRPC(rpcUrl, "eth_call", [
-    { to: "0x" + contractsRopsten.SOUL, data: ethDataAddr },
+    {
+      to: "0x" + (isMainnet ? contractsMainnet.SOUL : contractsRopsten.SOUL),
+      data: ethDataAddr,
+    },
     "latest",
   ]);
 
@@ -91,7 +94,10 @@ export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
   console.log("soul balance", soulVal);
 
   const kcalBalance = await JSONRPC(rpcUrl, "eth_call", [
-    { to: "0x" + contractsRopsten.KCAL, data: ethDataAddr },
+    {
+      to: "0x" + (isMainnet ? contractsMainnet.KCAL : contractsRopsten.KCAL),
+      data: ethDataAddr,
+    },
     "latest",
   ]);
 

@@ -35,7 +35,7 @@
         color="#17b1e8"
         right
       >
-        <v-tab>{{ $t("home.assets") }}</v-tab>
+        <v-tab @change="onAssetsTab">{{ $t("home.assets") }}</v-tab>
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
         <v-tab
           ><v-badge
@@ -421,11 +421,10 @@
                               ><span
                                 v-if="!state.balanceShown"
                                 style="display:contents;"
-                                >***</span
+                                >*** {{ bal.symbol }}</span
                               ><span v-else style="display:contents;">{{
-                                bal.amount
+                                formatSymbol(bal.amount, bal.symbol)
                               }}</span>
-                              {{ bal.symbol }}
                             </v-list-item-content>
                             <v-list-item-action>
                               <a
@@ -1198,7 +1197,8 @@
                     ? $t("home.feeStandard")
                     : $t("home.feeFast")
                 }}
-                {{ ethGasPrices[swapGasIndex] }} Gwei (~{{ state.currencySymbol }}{{ getFeeEth(ethGasPrices[swapGasIndex],sendSymbol) }})
+                {{ ethGasPrices[swapGasIndex] }} Gwei (~{{ state.currencySymbol
+                }}{{ getFeeEth(ethGasPrices[swapGasIndex], sendSymbol) }})
               </div>
             </template>
             <template
@@ -1241,14 +1241,18 @@
                     ? $t("home.feeStandard")
                     : $t("home.feeFast")
                 }}
-                {{ neoGasPrices[swapGasIndex] }} GAS {{ $t("home.fee") }} (~{{ state.currencySymbol }}{{ getFeeNeo(neoGasPrices[swapGasIndex]) }})
+                {{ neoGasPrices[swapGasIndex] }} GAS {{ $t("home.fee") }} (~{{
+                  state.currencySymbol
+                }}{{ getFeeNeo(neoGasPrices[swapGasIndex]) }})
               </div>
             </template>
             <div
               v-if="swapToChain === 'neo' && swapFromChain !== 'neo'"
               class="mx-auto"
             >
-              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS (~{{ state.currencySymbol }}{{ getFeeNeo(gasFeeAmount) }})
+              {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS (~{{
+                state.currencySymbol
+              }}{{ getFeeNeo(gasFeeAmount) }})
             </div>
             <div
               v-if="(swapToChain === 'eth') & (swapFromChain !== 'neo')"
@@ -1264,7 +1268,8 @@
                   ) / 1e9
                 ).toFixed(4)
               }}
-              ETH (~{{ state.currencySymbol }}{{ getFeeEth(ethGasPrices[1],sendSymbol) }})
+              ETH (~{{ state.currencySymbol
+              }}{{ getFeeEth(ethGasPrices[1], sendSymbol) }})
             </div>
           </v-row>
         </v-card-text>
@@ -1474,7 +1479,7 @@ import ErrorDialogVue from "@/components/ErrorDialog.vue";
 import TransactionComponent from "@/components/TransactionComponent.vue";
 import { Watch } from "vue-property-decorator";
 import { getScriptHashFromAddress, sendNeo } from "@/neo";
-import { JSONRPC } from "@/ethereum";
+import { getEthBalances, JSONRPC } from "@/ethereum";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
 
 @Component({
@@ -1646,18 +1651,18 @@ export default class extends Vue {
 
   getFeeNeo(gas: number) {
     const currencyPrice = state.getRate("GAS");
-    const feesValue = gas * currencyPrice
-    return feesValue.toFixed(2)
+    const feesValue = gas * currencyPrice;
+    return feesValue.toFixed(2);
   }
 
   getFeeEth(gwei: number, symbol: string) {
-    const gasLimit = symbol == "ETH" ? 21000 : 10000
+    const gasLimit = symbol == "ETH" ? 21000 : 10000;
     const currencyPrice = state.getRate("ETH");
-    const decimals = 18
-    const decimalsGas = 9
-    const fees = (gwei * ((10 ** decimalsGas))) * gasLimit / (10 ** decimals)
-    const feesValue = fees * currencyPrice
-    return feesValue.toFixed(2)
+    const decimals = 18;
+    const decimalsGas = 9;
+    const fees = (gwei * 10 ** decimalsGas * gasLimit) / 10 ** decimals;
+    const feesValue = fees * currencyPrice;
+    return feesValue.toFixed(2);
   }
 
   formatHash(hash: string) {
@@ -1727,7 +1732,7 @@ export default class extends Vue {
     if (!balance) return "";
 
     const val = parseFloat(
-      this.formatBalance(balance.amount, balance.decimals, 5).replace(" ", "")
+      this.formatBalance(balance.amount, balance.decimals, 5).replace(/ /gi, "")
     );
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
@@ -1762,7 +1767,7 @@ export default class extends Vue {
 
   getStackedSoul() {
     if (!this.account) return "0";
-    return this.formatBalance(this.account.data.stake, 8).replace(" ", "");
+    return this.formatBalance(this.account.data.stake, 8).replace(/ /gi, "");
   }
 
   getUnstackedSoul() {
@@ -1773,7 +1778,7 @@ export default class extends Vue {
       (b) => b.symbol == "SOUL"
     );
     if (!soulBalance) return "0";
-    return this.formatBalance(soulBalance!.amount, 8).replace(" ", "");
+    return this.formatBalance(soulBalance!.amount, 8).replace(/ /gi, "");
   }
 
   getSecondLine(item: Balance) {
@@ -1809,7 +1814,7 @@ export default class extends Vue {
         ? this.account.data.stake
         : this.account.data.unclaimed;
     const val = parseFloat(
-      this.formatBalance(amount, balance.decimals).replace(" ", "")
+      this.formatBalance(amount, balance.decimals).replace(/ /gi, "")
     );
     const rate = state.getRate(balance.symbol);
     if (rate >= 0) {
@@ -2003,7 +2008,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 1200;
+    const minGasLimit = 1800;
 
     let transcodeAddress = "";
 
@@ -2080,7 +2085,7 @@ export default class extends Vue {
     this.swapFromChain = "eth";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), state.decimals(bal.symbol))
+      this.formatBalance(bal.amount.toString(), state.decimals(bal.symbol)).replace(/ /gi, "")
     ) as number;
     this.swapAmountDialog = true;
 
@@ -2099,7 +2104,9 @@ export default class extends Vue {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "neo";
     this.swapToChain = "phantasma";
-    this.sendMaxAmount = parseFloat(bal.amount.toString());
+    this.sendMaxAmount = parseFloat(
+      this.formatBalance(bal.amount.toString(), state.decimals(bal.symbol)).replace(/ /gi, "")
+    ) as number;
     this.swapAmountDialog = true;
   }
 
@@ -2163,8 +2170,12 @@ export default class extends Vue {
     console.log("Sending from ETH", this.sendAmount, this.sendSymbol);
     console.log("Ethereum Address", this.account.ethAddress);
 
+    const isMainnet = state.isMainnet;
+
     const nonceRes = await JSONRPC(
-      "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
+      "https://" +
+        (isMainnet ? "mainnet" : "ropsten") +
+        ".infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
       "eth_getTransactionCount",
       [this.account.ethAddress, "pending"]
     );
@@ -2192,8 +2203,6 @@ export default class extends Vue {
     const amount = this.sendAmount * 10 ** decimals; // amount erc-20
     const gasPrice = this.ethGasPrices[this.swapGasIndex] * 10 ** 9; //100000000000;
     const gasLimit = this.sendSymbol == "ETH" ? 21000 : 100000;
-
-    const isMainnet = state.isMainnet;
 
     const platforms = await state.api.getPlatforms();
     const interopAddr = platforms.find((p) => p.platform == "ethereum")
@@ -2304,7 +2313,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2399,7 +2408,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2453,7 +2462,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2514,7 +2523,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2564,7 +2573,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2625,7 +2634,7 @@ export default class extends Vue {
     this.sendSymbol = item.symbol;
     this.sendDecimals = item.decimals;
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(item.amount, item.decimals).replace(" ", "")
+      this.formatBalance(item.amount, item.decimals).replace(/ /gi, "")
     );
     if (this.sendSymbol == "KCAL")
       this.sendMaxAmount = this.sendMaxAmount - 0.01;
@@ -2664,7 +2673,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2716,7 +2725,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800;
+    const minGasLimit = 1800;
 
     let sb = new ScriptBuilder();
 
@@ -2778,7 +2787,7 @@ export default class extends Vue {
         bal.amount,
         bal.decimals,
         bal.symbol == "ETH" ? 3 : 2
-      ).replace(" ", "")
+      ).replace(/ /gi, "")
     );
     if (this.sendSymbol == "GAS") {
       this.sendMaxAmount -= 0.1;
@@ -2803,6 +2812,14 @@ export default class extends Vue {
     this.txs = res.result.txs;
     this.loadingTxs = [];
     this.isLoading = false;
+  }
+
+  async onAssetsTab() {
+    if (state.hasAccount) {
+      this.$root.$emit("loading", true);
+      await state.refreshCurrentAccount();
+      this.$root.$emit("loading", false);
+    }
   }
 
   async loadMoreTxs() {
