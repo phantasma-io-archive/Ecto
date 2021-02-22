@@ -1657,9 +1657,13 @@ export default class extends Vue {
     (b) => b.symbol == "KCAL"
   );
 
-  if (!kcalBalance?.amount) return true
+  const soulBalance = this.account.data.balances.find(
+    (b) => b.symbol == "SOUL"
+  );
 
-  if (parseFloat(kcalBalance.amount) / (10 ** kcalBalance.decimals) > 0.1) return false
+  if (!kcalBalance?.amount || !soulBalance?.amount) return true
+
+  if ((parseFloat(kcalBalance.amount) / (10 ** kcalBalance.decimals) > 0.1) && (parseFloat(soulBalance.amount) / (10 ** soulBalance.decimals) > 0.2)) return false
 
   return true
 
