@@ -980,7 +980,24 @@
           </v-form>
         </v-card-text>
 
-        <v-card-actions>
+
+        <v-card-text v-if="isMissingKCAL">
+          You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?
+        </v-card-text>
+
+        <v-card-actions v-if="isMissingKCAL">
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="closeSignTx">
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="doCosmicSwap">
+            {{ $t("home.agree") }}
+          </v-btn>
+        </v-card-actions>
+
+        <v-card-actions v-else>
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="closeSignTx">
@@ -1632,6 +1649,22 @@ export default class extends Vue {
     );
   }
 
+  get isMissingKCAL(): boolean {
+
+  if (!this.account) return true;
+
+  const kcalBalance = this.account.data.balances.find(
+    (b) => b.symbol == "KCAL"
+  );
+
+  if (!kcalBalance?.amount) return true
+
+  if (parseFloat(kcalBalance.amount) / (10 ** kcalBalance.decimals) > 0.1) return false
+
+  return true
+
+  }
+
   @Watch("state.nexus")
   onWatchNexus(oldValue: string, newValue: string) {
     if (this.activeTab == 1) {
@@ -1948,6 +1981,10 @@ export default class extends Vue {
   doSignTx() {
     if (this.signTxCallback) this.signTxCallback();
     this.signTxCallback = null;
+  }
+
+  doCosmicSwap() {
+    this.cosmicSwap()
   }
 
   doGenerateSwapAddress() {
@@ -2584,6 +2621,55 @@ export default class extends Vue {
     ]);
 
     sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      if (this.needsWif) {
+        tx = await state.signTx(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxWithPassword(txdata, address, this.password);
+      }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2500);
+  }
+
+  async cosmicSwap() {
+    if (!this.account) return;
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 2100;
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+
+    sb.callContract("swap", "SwapFee", [address, "SOUL", 2000000000]);
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    sb.spendGas(address);
+
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
