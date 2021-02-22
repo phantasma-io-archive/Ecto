@@ -1663,7 +1663,7 @@ export default class extends Vue {
 
   if (!kcalBalance?.amount || !soulBalance?.amount) return true
 
-  if ((parseFloat(kcalBalance.amount) / (10 ** kcalBalance.decimals) > 0.1) && (parseFloat(soulBalance.amount) / (10 ** soulBalance.decimals) > 0.2)) return false
+  if ((parseFloat(kcalBalance.amount) / (10 ** kcalBalance.decimals) > 0.1) || (parseFloat(soulBalance.amount) / (10 ** soulBalance.decimals) < 0.02)) return false
 
   return true
 
