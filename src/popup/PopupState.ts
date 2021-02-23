@@ -297,6 +297,8 @@ export class PopupState {
           return this._currenciesRate["ethereum"][curSym];
         case "dyt":
           return this._currenciesRate["dynamite"][curSym];
+        case "goati":
+          return 0.1;
       }
     } catch {
       console.log("Error getting rates for " + symbol + " in " + curSym);
