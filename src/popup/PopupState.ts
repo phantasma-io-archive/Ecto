@@ -985,6 +985,10 @@ export class PopupState {
         return 0;
       case "DYT":
         return 18;
+      case "MUU":
+        return 18;
+      case "DANK":
+        return 18;
       default:
         return 0;
     }
