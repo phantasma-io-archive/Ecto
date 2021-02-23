@@ -2241,7 +2241,7 @@ export default class extends Vue {
 
     const decimals = state.decimals(this.sendSymbol);
 
-    const amount = this.sendAmount * 10 ** decimals; // amount erc-20
+    const amount = Math.floor(this.sendAmount * 10 ** decimals); // amount erc-20
     const gasPrice = this.ethGasPrices[this.swapGasIndex] * 10 ** 9; //100000000000;
     const gasLimit = this.sendSymbol == "ETH" ? 21000 : 100000;
 
