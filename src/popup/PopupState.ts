@@ -28,7 +28,7 @@ import { byteArrayToHex } from "@/phan-js/utils";
 
 export interface ISymbolAmount {
   symbol: string;
-  amount: string | number;
+  amount: string | number | BigInt;
 }
 
 export interface IPendingSwap {
