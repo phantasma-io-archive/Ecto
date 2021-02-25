@@ -36,6 +36,7 @@ export interface IPendingSwap {
   addressTo: string;
   hash: string;
   swap: Swap | null;
+  date: number;
 }
 
 interface IAuthorization {
@@ -318,7 +319,7 @@ export class PopupState {
           ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
           : [];
         this._authorizations = items.authorizations ? items.authorizations : [];
-        // this._pendingSwaps = items.pendingSwaps ? items.pendingSwaps : [];
+        this._pendingSwaps = items.pendingSwaps ? items.pendingSwaps : [];
         this._currency = items.currency ? items.currency : "USD";
         this._language = items.language ? items.language : "English";
         this._balanceShown =
@@ -679,13 +680,15 @@ export class PopupState {
     console.log("allSwaps", this.allSwaps);
 
     // check external pending swaps, if there are
-    /* const toRemove: IPendingSwap[] = [];
+    const curTime = new Date().getTime();
+    const toRemove: IPendingSwap[] = [];
     this._pendingSwaps.forEach(async (ps) => {
       let swaps = await this.api.getSwapsForAddress(ps.addressTo);
       var swap = swaps.find((s) => s.sourceHash == ps.hash);
       if (swap && swap.destinationHash === "pending") {
         ps.swap = swap;
-      } else {
+      } else if (curTime - ps.date > 10000) {
+        // only remove if 10 seconds elapsed
         toRemove.push(ps);
       }
     });
@@ -694,7 +697,7 @@ export class PopupState {
     if (toRemove.length > 0) {
       this._pendingSwaps.filter((p) => !toRemove.includes(p));
       chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => {});
-    } */
+    }
   }
 
   async authorizeDapp(
@@ -729,8 +732,16 @@ export class PopupState {
     return this._authorizations.find((a) => a.token == token)!.dapp;
   }
 
-  addPendingSwap(chainTo: string, addressTo: string, hash: string) {
-    this._pendingSwaps.push({ chainTo, addressTo, hash, swap: null });
+  async addPendingSwap(chainTo: string, addressTo: string, hash: string) {
+    await this.check(this.$i18n); // make sure we don't overwrite any other pending swap
+    this._pendingSwaps.push({
+      chainTo,
+      addressTo,
+      hash,
+      swap: null,
+      date: new Date().getTime(),
+    });
+    console.log("pending swaps", JSON.stringify(this._pendingSwaps, null, 2));
     chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => {});
   }
 

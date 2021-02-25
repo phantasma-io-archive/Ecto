@@ -321,7 +321,7 @@
               </div>
               <div
                 v-for="(swap, idx) in state.allSwaps"
-                :key="swap.sourceHash + idx"
+                :key="swap.sourceHash + 'a' + idx"
                 class="pa-1"
               >
                 <span v-if="!state.balanceShown">***</span>
@@ -335,18 +335,18 @@
               </div>
               <div
                 v-for="(cs, idx) in state.claimablePendingSwaps"
-                :key="cs.hash + idx"
+                :key="cs.hash + 'c' + idx"
                 class="pa-1"
               >
                 <span v-if="!state.balanceShown">***</span>
-                <span v-else>{{
-                  formatSymbol(cs.swap.value, swap.symbol)
-                }}</span>
+                <span v-else
+                  >{{ formatSymbol(cs.swap.value, cs.swap.symbol) }}
+                </span>
                 {{ $t("home.from") }} {{ formatChain(cs.swap.sourcePlatform) }}
                 {{ $t("home.to") }}
-                {{ formatChain(cs.swap.destinationPlatform) }} ({{
-                  swap.addressTo
-                }})
+                {{ formatChain(cs.swap.destinationPlatform) }}
+                <strong style="font-size: 10px">{{ cs.addressTo }} </strong
+                >&nbsp;
                 <a href="#" @click.prevent="claimSwap(cs.swap)">{{
                   $t("home.claim")
                 }}</a>
@@ -549,13 +549,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><!--<br /><br />
+                    ><br /><br />
                     {{ $t("home.swapToAnotherNEO") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >-->
+                    >
                     <br />
                     <br />
                     {{ $t("home.needGasToSwap", [0.1]) }}
@@ -588,13 +588,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><!--<br /><br />
+                    ><br /><br />
                     {{ $t("home.swapToAnotherETH") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >-->
+                    >
                     <br />
                     <br />
                     {{
@@ -980,9 +980,9 @@
           </v-form>
         </v-card-text>
 
-
         <v-card-text v-if="isMissingKCAL">
-          You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?
+          You do not have enough KCAL to perform this transaction. Use some SOUL
+          to perform a cosmic swap?
         </v-card-text>
 
         <v-card-actions v-if="isMissingKCAL">
@@ -1650,23 +1650,25 @@ export default class extends Vue {
   }
 
   get isMissingKCAL(): boolean {
+    if (!this.account) return true;
 
-  if (!this.account) return true;
+    const kcalBalance = this.account.data.balances.find(
+      (b) => b.symbol == "KCAL"
+    );
 
-  const kcalBalance = this.account.data.balances.find(
-    (b) => b.symbol == "KCAL"
-  );
+    const soulBalance = this.account.data.balances.find(
+      (b) => b.symbol == "SOUL"
+    );
 
-  const soulBalance = this.account.data.balances.find(
-    (b) => b.symbol == "SOUL"
-  );
+    if (!kcalBalance?.amount || !soulBalance?.amount) return true;
 
-  if (!kcalBalance?.amount || !soulBalance?.amount) return true
+    if (
+      parseFloat(kcalBalance.amount) / 10 ** kcalBalance.decimals > 0.1 ||
+      parseFloat(soulBalance.amount) / 10 ** soulBalance.decimals < 0.02
+    )
+      return false;
 
-  if ((parseFloat(kcalBalance.amount) / (10 ** kcalBalance.decimals) > 0.1) || (parseFloat(soulBalance.amount) / (10 ** soulBalance.decimals) < 0.02)) return false
-
-  return true
-
+    return true;
   }
 
   @Watch("state.nexus")
@@ -1736,7 +1738,7 @@ export default class extends Vue {
     );
   }
 
-  formatSymbol(amount: number | string, symbol: string) {
+  formatSymbol(amount: number | string | BigInt, symbol: string) {
     const value = amount.toString();
 
     if (!this.state.balanceShown) return "***" + " " + symbol;
@@ -1988,7 +1990,7 @@ export default class extends Vue {
   }
 
   doCosmicSwap() {
-    this.cosmicSwap()
+    this.cosmicSwap();
   }
 
   doGenerateSwapAddress() {
@@ -2126,7 +2128,10 @@ export default class extends Vue {
     this.swapFromChain = "eth";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), state.decimals(bal.symbol)).replace(/ /gi, "")
+      this.formatBalance(
+        bal.amount.toString(),
+        state.decimals(bal.symbol)
+      ).replace(/ /gi, "")
     ) as number;
     this.swapAmountDialog = true;
 
@@ -2146,7 +2151,10 @@ export default class extends Vue {
     this.swapFromChain = "neo";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), state.decimals(bal.symbol)).replace(/ /gi, "")
+      this.formatBalance(
+        bal.amount.toString(),
+        state.decimals(bal.symbol)
+      ).replace(/ /gi, "")
     ) as number;
     this.swapAmountDialog = true;
   }
@@ -2187,8 +2195,6 @@ export default class extends Vue {
         isMainnet
       );
       console.log("hash from sendNeo", hash);
-
-      // state.addPendingSwap("neo", this.sendDestination, hash);
 
       const neoApi = isMainnet
         ? "https://neoscan.io/transaction/"
@@ -2310,8 +2316,6 @@ export default class extends Vue {
         ? "https://etherscan.io/tx/"
         : "https://ropsten.etherscan.io/tx/") + txRes;
 
-    // state.addPendingSwap("eth", this.sendDestination, txRes);
-
     console.log("%c" + txRes, "color:green;font-size:20px");
   }
 
@@ -2389,6 +2393,8 @@ export default class extends Vue {
       }
       console.log("tx successful: " + tx);
       this.$root.$emit("checkTx", tx);
+
+      await state.addPendingSwap("ethereum", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
@@ -2483,6 +2489,8 @@ export default class extends Vue {
       }
       console.log("tx successful: " + tx);
       this.$root.$emit("checkTx", tx);
+
+      await state.addPendingSwap("neo", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
