@@ -1660,6 +1660,8 @@ export default class extends Vue {
       (b) => b.symbol == "SOUL"
     );
 
+    if (soulBalance && parseFloat(soulBalance.amount) < 0.02) return false
+
     if (!kcalBalance?.amount || !soulBalance?.amount) return true;
 
     if (
