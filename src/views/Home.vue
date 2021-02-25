@@ -333,7 +333,7 @@
                   $t("home.claim")
                 }}</a>
               </div>
-              <div
+              <!--<div
                 v-for="(cs, idx) in state.claimablePendingSwaps"
                 :key="cs.hash + 'c' + idx"
                 class="pa-1"
@@ -350,7 +350,7 @@
                 <a href="#" @click.prevent="claimSwap(cs.swap)">{{
                   $t("home.claim")
                 }}</a>
-              </div>
+              </div>-->
             </div>
             <div style="text-align:center">
               <v-expansion-panels focusable hover multiple>
@@ -549,13 +549,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherNEO") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('neo', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >
+                    >-->
                     <br />
                     <br />
                     {{ $t("home.needGasToSwap", [0.1]) }}
@@ -588,13 +588,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherETH") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('eth', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >
+                    >-->
                     <br />
                     <br />
                     {{
@@ -2396,7 +2396,7 @@ export default class extends Vue {
       console.log("tx successful: " + tx);
       this.$root.$emit("checkTx", tx);
 
-      await state.addPendingSwap("ethereum", this.sendDestination, tx);
+      // await state.addPendingSwap("ethereum", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
@@ -2492,7 +2492,7 @@ export default class extends Vue {
       console.log("tx successful: " + tx);
       this.$root.$emit("checkTx", tx);
 
-      await state.addPendingSwap("neo", this.sendDestination, tx);
+      // await state.addPendingSwap("neo", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
