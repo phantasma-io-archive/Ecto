@@ -165,9 +165,9 @@
         "needGasToSwap": "Je hebt {0} GAS in Phantasma nodig om voor de swapkosten te betalen.",
         "needEthToSwap": "Je hebt ongeveer {0} ETH in Phantasma nodig om voor de swapkosten te betalen.",
         "swapInProgressTitle": "Swap wordt verwerkt",
-        "swapBeingProcessed": "Jouw swap is verwerkt.",
+        "swapBeingProcessed": "Swap wordt verwerkt.",
         "needsConfirmations": "Er zijn 12 bevestigingen nodig om te verschijnen.",
-        "checkTransaction": "Controleer jouw transactie",
+        "checkTransaction": "Controleer de transactie",
         "here": "hier"
     },
     "nfts": {
