@@ -147,7 +147,7 @@
         "swapExplanation": "Om swaps mogelijk te maken moet je eenmalig gebruik maken van jouw WIF of privésleutel. Dit genereert de NEO and Ethereum addressen die gekoppeld zijn aan jouw wallet.",
         "continue": "verder",
         "labelDestinationAddress": " bestemmingsadres",
-        "availableToSwap": "Je hebt de volgende beschikbare bezittingen on te swappen naar",
+        "availableToSwap": "Je hebt de volgende beschikbare bezittingen om te swappen naar",
         "fee": "Kosten",
         "swapNeed": "Om te swappen heb je nodig:",
         "swapDestination": "Swap bestemming",
