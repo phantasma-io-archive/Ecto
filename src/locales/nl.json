@@ -22,7 +22,8 @@
         "with": "Met",
         "for": "voor",
         "bid": "Bod",
-        "auction": "Veiling"
+        "auction": "Veiling",
+        "sale": "Participated in sale with"
     },
     "app": {
         "currencyDescription": "Valuta",

@@ -22,7 +22,8 @@
         "with": "与",
         "for": "对于",
         "bid": "出价",
-        "auction": "拍卖"
+        "auction": "拍卖",
+        "sale": "Participated in sale with"
     },
     "app": {
         "currencyDescription": "币种",

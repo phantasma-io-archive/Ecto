@@ -22,7 +22,8 @@
         "with": "Con",
         "for": "para",
         "bid": "Bid",
-        "auction": "Auction"
+        "auction": "Auction",
+        "sale": "Participated in sale with"
     },
     "app": {
         "currencyDescription": "Moneda",

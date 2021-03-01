@@ -22,7 +22,8 @@
         "with": "Con",
         "for": "per",
         "bid": "Offri",
-        "auction": "Asta"
+        "auction": "Asta",
+        "sale": "Participated in sale with"
     },
     "app": {
         "currencyDescription": "Valuta",

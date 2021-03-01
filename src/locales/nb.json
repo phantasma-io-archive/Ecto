@@ -22,7 +22,8 @@
         "with": "Med",
         "for": "for",
         "bid": "Gi bud",
-        "auction": "Auksjon"
+        "auction": "Auksjon",
+        "sale": "Participated in sale with"
     },
     "app": {
         "currencyDescription": "Valuta",
