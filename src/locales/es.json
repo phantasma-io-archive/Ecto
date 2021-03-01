@@ -23,7 +23,7 @@
         "for": "para",
         "bid": "Bid",
         "auction": "Auction",
-        "sale": "Participated in sale with"
+        "sale": "Ha comprado por valor de"
     },
     "app": {
         "currencyDescription": "Moneda",
