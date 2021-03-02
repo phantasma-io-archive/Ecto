@@ -22,7 +22,8 @@
         "with": "Med",
         "for": "for",
         "bid": "Gi bud",
-        "auction": "Auksjon"
+        "auction": "Auksjon",
+        "sale": "Deltok i salget med"
     },
     "app": {
         "currencyDescription": "Valuta",

@@ -321,7 +321,7 @@
               </div>
               <div
                 v-for="(swap, idx) in state.allSwaps"
-                :key="swap.sourceHash + idx"
+                :key="swap.sourceHash + 'a' + idx"
                 class="pa-1"
               >
                 <span v-if="!state.balanceShown">***</span>
@@ -333,24 +333,24 @@
                   $t("home.claim")
                 }}</a>
               </div>
-              <div
+              <!--<div
                 v-for="(cs, idx) in state.claimablePendingSwaps"
-                :key="cs.hash + idx"
+                :key="cs.hash + 'c' + idx"
                 class="pa-1"
               >
                 <span v-if="!state.balanceShown">***</span>
-                <span v-else>{{
-                  formatSymbol(cs.swap.value, swap.symbol)
-                }}</span>
+                <span v-else
+                  >{{ formatSymbol(cs.swap.value, cs.swap.symbol) }}
+                </span>
                 {{ $t("home.from") }} {{ formatChain(cs.swap.sourcePlatform) }}
                 {{ $t("home.to") }}
-                {{ formatChain(cs.swap.destinationPlatform) }} ({{
-                  swap.addressTo
-                }})
+                {{ formatChain(cs.swap.destinationPlatform) }}
+                <strong style="font-size: 10px">{{ cs.addressTo }} </strong
+                >&nbsp;
                 <a href="#" @click.prevent="claimSwap(cs.swap)">{{
                   $t("home.claim")
                 }}</a>
-              </div>
+              </div>-->
             </div>
             <div style="text-align:center">
               <v-expansion-panels focusable hover multiple>
@@ -980,7 +980,24 @@
           </v-form>
         </v-card-text>
 
-        <v-card-actions>
+        <v-card-text v-if="isMissingKCAL">
+          You do not have enough KCAL to perform this transaction. Use some SOUL
+          to perform a cosmic swap?
+        </v-card-text>
+
+        <v-card-actions v-if="isMissingKCAL">
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="closeSignTx">
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="doCosmicSwap">
+            {{ $t("home.agree") }}
+          </v-btn>
+        </v-card-actions>
+
+        <v-card-actions v-else>
           <v-spacer></v-spacer>
 
           <v-btn color="gray darken-1" text @click="closeSignTx">
@@ -1632,6 +1649,30 @@ export default class extends Vue {
     );
   }
 
+  get isMissingKCAL(): boolean {
+    if (!this.account) return true;
+
+    const kcalBalance = this.account.data.balances.find(
+      (b) => b.symbol == "KCAL"
+    );
+
+    const soulBalance = this.account.data.balances.find(
+      (b) => b.symbol == "SOUL"
+    );
+
+    if (soulBalance && parseFloat(soulBalance.amount) < 0.02) return false
+
+    if (!kcalBalance?.amount || !soulBalance?.amount) return true;
+
+    if (
+      parseFloat(kcalBalance.amount) / 10 ** kcalBalance.decimals > 0.1 ||
+      parseFloat(soulBalance.amount) / 10 ** soulBalance.decimals < 0.02
+    )
+      return false;
+
+    return true;
+  }
+
   @Watch("state.nexus")
   onWatchNexus(oldValue: string, newValue: string) {
     if (this.activeTab == 1) {
@@ -1699,7 +1740,7 @@ export default class extends Vue {
     );
   }
 
-  formatSymbol(amount: number | string, symbol: string) {
+  formatSymbol(amount: number | string | BigInt, symbol: string) {
     const value = amount.toString();
 
     if (!this.state.balanceShown) return "***" + " " + symbol;
@@ -1950,6 +1991,10 @@ export default class extends Vue {
     this.signTxCallback = null;
   }
 
+  doCosmicSwap() {
+    this.cosmicSwap();
+  }
+
   doGenerateSwapAddress() {
     try {
       if (this.needsWif) state.addSwapAddress(this.wif);
@@ -2085,7 +2130,10 @@ export default class extends Vue {
     this.swapFromChain = "eth";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), state.decimals(bal.symbol)).replace(/ /gi, "")
+      this.formatBalance(
+        bal.amount.toString(),
+        state.decimals(bal.symbol)
+      ).replace(/ /gi, "")
     ) as number;
     this.swapAmountDialog = true;
 
@@ -2105,7 +2153,10 @@ export default class extends Vue {
     this.swapFromChain = "neo";
     this.swapToChain = "phantasma";
     this.sendMaxAmount = parseFloat(
-      this.formatBalance(bal.amount.toString(), state.decimals(bal.symbol)).replace(/ /gi, "")
+      this.formatBalance(
+        bal.amount.toString(),
+        state.decimals(bal.symbol)
+      ).replace(/ /gi, "")
     ) as number;
     this.swapAmountDialog = true;
   }
@@ -2146,8 +2197,6 @@ export default class extends Vue {
         isMainnet
       );
       console.log("hash from sendNeo", hash);
-
-      // state.addPendingSwap("neo", this.sendDestination, hash);
 
       const neoApi = isMainnet
         ? "https://neoscan.io/transaction/"
@@ -2200,7 +2249,7 @@ export default class extends Vue {
 
     const decimals = state.decimals(this.sendSymbol);
 
-    const amount = this.sendAmount * 10 ** decimals; // amount erc-20
+    const amount = Math.floor(this.sendAmount * 10 ** decimals); // amount erc-20
     const gasPrice = this.ethGasPrices[this.swapGasIndex] * 10 ** 9; //100000000000;
     const gasLimit = this.sendSymbol == "ETH" ? 21000 : 100000;
 
@@ -2268,8 +2317,6 @@ export default class extends Vue {
       (isMainnet
         ? "https://etherscan.io/tx/"
         : "https://ropsten.etherscan.io/tx/") + txRes;
-
-    // state.addPendingSwap("eth", this.sendDestination, txRes);
 
     console.log("%c" + txRes, "color:green;font-size:20px");
   }
@@ -2348,6 +2395,8 @@ export default class extends Vue {
       }
       console.log("tx successful: " + tx);
       this.$root.$emit("checkTx", tx);
+
+      // await state.addPendingSwap("ethereum", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
@@ -2442,6 +2491,8 @@ export default class extends Vue {
       }
       console.log("tx successful: " + tx);
       this.$root.$emit("checkTx", tx);
+
+      // await state.addPendingSwap("neo", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
@@ -2584,6 +2635,55 @@ export default class extends Vue {
     ]);
 
     sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      if (this.needsWif) {
+        tx = await state.signTx(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxWithPassword(txdata, address, this.password);
+      }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2500);
+  }
+
+  async cosmicSwap() {
+    if (!this.account) return;
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 2100;
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+
+    sb.callContract("swap", "SwapFee", [address, "SOUL", 2000000000]);
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    sb.spendGas(address);
+
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
