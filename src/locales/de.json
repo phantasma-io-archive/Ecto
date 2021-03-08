@@ -22,7 +22,8 @@
         "with": "Mit",
         "for": "für",
         "bid": "Bieten",
-        "auction": "Auktion"
+        "auction": "Auktion",
+        "sale": "Teilgenommen am Verkauf mit"
     },
     "app": {
         "currencyDescription": "Währung",

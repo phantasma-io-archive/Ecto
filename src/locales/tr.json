@@ -22,7 +22,8 @@
       "with": "İle",
       "for": "İçin",
       "bid": "Fiyat ver",
-      "auction": "Müzayede"
+      "auction": "Müzayede",
+      "sale": "Satışa katıldığınız miktar"
   },
   "app": {
       "currencyDescription": "Para Birimi",
