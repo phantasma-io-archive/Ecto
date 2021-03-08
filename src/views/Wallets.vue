@@ -44,7 +44,7 @@
       </v-list>
 
       <div style="padding: 20px">
-        <v-btn block @click="$router.push('/addwallet')">{{
+        <v-btn class="mb-4" block @click="$router.push('/addwallet')">{{
           $t("wallets.add")
         }}</v-btn>
       </div>

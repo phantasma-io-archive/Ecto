@@ -1660,7 +1660,7 @@ export default class extends Vue {
       (b) => b.symbol == "SOUL"
     );
 
-    if (soulBalance && parseFloat(soulBalance.amount) < 0.02) return false
+    if (soulBalance && parseFloat(soulBalance.amount) < 0.02) return false;
 
     if (!kcalBalance?.amount || !soulBalance?.amount) return true;
 
@@ -2396,7 +2396,8 @@ export default class extends Vue {
       console.log("tx successful: " + tx);
       this.$root.$emit("checkTx", tx);
 
-      // await state.addPendingSwap("ethereum", this.sendDestination, tx);
+      if (this.swapToCustomDest)
+        await state.addPendingSwap("ethereum", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
@@ -2492,7 +2493,8 @@ export default class extends Vue {
       console.log("tx successful: " + tx);
       this.$root.$emit("checkTx", tx);
 
-      // await state.addPendingSwap("neo", this.sendDestination, tx);
+      if (this.swapToCustomDest)
+        await state.addPendingSwap("neo", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
