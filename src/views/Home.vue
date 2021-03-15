@@ -1892,7 +1892,7 @@ export default class extends Vue {
 
   isSwappable(symbol: string, swapToChain: string) {
     if (swapToChain == "eth")
-      return symbol == "KCAL" || symbol == "SOUL" || symbol == "ETH";
+      return symbol == "KCAL" || symbol == "SOUL" || symbol == "ETH" || symbol == "DANK";
     else if (swapToChain == "neo")
       return symbol == "SOUL" || symbol == "NEO" || symbol == "GAS";
     return false;
@@ -2310,6 +2310,13 @@ export default class extends Vue {
     );
 
     this.closeSignTx();
+
+    if (txRes.error) {
+      this.errorDialog = true;
+      this.errorMessage = txRes.error;
+      return;
+    } 
+
     this.swapInProgressDialog = true;
 
     this.lastSwapTx = txRes;
