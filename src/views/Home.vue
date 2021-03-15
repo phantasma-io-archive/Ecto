@@ -812,10 +812,10 @@
 
           <v-slider
             v-model="sendAmount"
-            :min="0.001"
+            :min="sendSymbol === 'ETH' ? 0.0001 : 0.01"
             :max="sendMaxAmount"
             :value="1"
-            step="0.01"
+            :step="sendSymbol === 'ETH' ? 0.0001 : 0.01"
             thumb-label="always"
             style="margin-top:40px"
           >
