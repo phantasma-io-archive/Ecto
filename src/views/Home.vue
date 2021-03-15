@@ -1139,7 +1139,8 @@
             style="margin-top:40px"
           >
             <template v-slot:thumb-label="{ value }">
-              {{ Math.round((100 * value) / sendMaxAmount) }}%
+              <span v-if="sendMaxAmount > 0">{{ Math.round((100 * value) / sendMaxAmount) }}%</span>
+              <span v-else>0</span>
             </template></v-slider
           >
           <v-row style="margin-top:-25px">
