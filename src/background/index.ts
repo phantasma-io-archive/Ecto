@@ -1,9 +1,11 @@
 /// <reference types="chrome"/>
 import Vue from "vue";
 import { PhantasmaAPI } from "@/phan-js";
-import { state } from "@/popup/PopupState";
+import { state, WalletAccount } from "@/popup/PopupState";
 import VueI18n from "vue-i18n";
 import { messages, defaultLocale } from "@/i18n";
+import { getEthBalances } from "@/ethereum";
+import { getNeoBalances } from "@/neo";
 
 Vue.use(VueI18n);
 
@@ -53,6 +55,14 @@ interface ISignTxResponse extends IWalletLinkResponse {
 }
 
 let authorizations: IAuthorization[] = [];
+let accounts: WalletAccount[] = [];
+let currentAccountIndex = 0;
+
+function currentAccount() {
+  return currentAccountIndex < accounts.length
+    ? accounts[currentAccountIndex]
+    : null;
+}
 
 chrome.tabs.onUpdated.addListener(function(activeInfo) {
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
@@ -114,6 +124,11 @@ function isValidRequest(args: string[]): boolean {
   return false;
 }
 
+function getAddressFromToken(token: string): string | undefined {
+  const auth = authorizations.find((a) => a.token == token);
+  return auth?.address;
+}
+
 function getRequestAddress(
   args: string[]
 ): { address: string; version: string } | undefined {
@@ -129,12 +144,24 @@ function getRequestAddress(
 
 chrome.storage.local.get((items) => {
   authorizations = items.authorizations ? items.authorizations : [];
+  currentAccountIndex = items.currentAccountIndex
+    ? items.currentAccountIndex
+    : 0;
+  accounts = items.accounts
+    ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
+    : [];
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area == "local") {
     if (changes.authorizations) {
       authorizations = changes.authorizations.newValue;
+    }
+    if (changes.accounts) {
+      accounts = changes.accounts.newValue;
+    }
+    if (changes.currentAccountIndex) {
+      currentAccountIndex = changes.currentAccountIndex.newValue;
     }
   }
 });
@@ -175,11 +202,19 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
             const url = tab.url || "http://unknown";
             const favicon = tab.favIconUrl || "unknown";
 
-            const authToken = getAuthorizationToken(
+            let authToken = getAuthorizationToken(
               dapp,
               new URL(url).hostname,
               version
             );
+
+            // if authorization doesn't match current address, request new one
+            if (
+              authToken &&
+              getAddressFromToken(authToken) !== currentAccount()?.address
+            ) {
+              authToken = undefined;
+            }
 
             if (authToken) {
               console.log("Valid authorization token: " + authToken);
@@ -194,7 +229,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
                   token: authToken,
                   // new in v2
                   nexus: state.nexus,
-                  version: "1",
+                  version: "2",
                   id,
                   success: true,
                 },
@@ -248,9 +283,38 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           console.log("nexus", state.nexus);
           console.log("getting account " + address);
           let account = await state.api.getAccount(address);
-
           if (!account.balances) {
             account.balances = [];
+          }
+          let balances = account.balances.map((x) => {
+            return {
+              value: x.amount,
+              decimals: x.decimals,
+              symbol: x.symbol,
+            };
+          });
+
+          let external = ""; // external address (neo or eth) if platform is not phantasma
+
+          const curAccount = currentAccount();
+          if (platform == "ethereum") {
+            let ethAddress = curAccount?.ethAddress;
+            if (ethAddress) {
+              external = ethAddress;
+              await getEthBalances(ethAddress, state.nexus == "mainnet");
+            } else {
+              platform = "phantasma";
+            }
+          }
+
+          if (platform == "neo") {
+            let neoAddress = curAccount?.neoAddress;
+            if (neoAddress) {
+              external = neoAddress;
+              await getNeoBalances(neoAddress, state.nexus == "mainnet");
+            } else {
+              platform = "phantasma";
+            }
           }
 
           if (!account.balances.find((b) => b.symbol == "SOUL"))
@@ -261,8 +325,6 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
               decimals: 8,
             });
 
-          let external = ""; // external address (neo or eth) if platform is not phantasma
-
           console.log("got account: " + JSON.stringify(account));
           let response: IGetAccountResponse = {
             name: account.name,
@@ -270,13 +332,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
             avatar: "",
             platform,
             external,
-            balances: account.balances.map((x) => {
-              return {
-                value: x.amount,
-                decimals: x.decimals,
-                symbol: x.symbol,
-              };
-            }),
+            balances,
             id,
             success: true,
           };
