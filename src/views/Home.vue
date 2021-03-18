@@ -1698,7 +1698,7 @@ export default class extends Vue {
   }
 
   getFeeEth(gwei: number, symbol: string) {
-    const gasLimit = symbol == "ETH" ? 21000 : 10000;
+    const gasLimit = symbol == "ETH" ? 21000 : 100000;
     const currencyPrice = state.getRate("ETH");
     const decimals = 18;
     const decimalsGas = 9;
