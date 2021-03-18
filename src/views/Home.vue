@@ -2888,7 +2888,7 @@ export default class extends Vue {
     this.selectAssetToSwapDialog = true;
   }
 
-  askAmountToSwap(bal: Balance) {
+  async askAmountToSwap(bal: Balance) {
     this.selectAssetToSwapDialog = false;
     this.sendSymbol = bal.symbol;
     this.sendAmount = 0;
@@ -2899,6 +2899,17 @@ export default class extends Vue {
         bal.symbol == "ETH" ? 3 : 2
       ).replace(/ /gi, "")
     );
+
+    const res = await fetch("https://gasprice.poa.network/");
+
+    const resJson = await res.json();
+
+    this.ethGasPrices[0] = resJson.slow;
+    this.ethGasPrices[1] = resJson.standard;
+    this.ethGasPrices[2] = parseFloat(
+      ((resJson.fast + resJson.instant) / 2).toFixed(2)
+    );
+
     if (this.sendSymbol == "GAS") {
       this.sendMaxAmount -= 0.1;
     }
