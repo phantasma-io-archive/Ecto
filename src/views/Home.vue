@@ -1246,7 +1246,7 @@
               </div>
             </template>
             <div
-              v-if="swapToChain === 'neo' && swapFromChain !== 'neo'"
+              v-if="swapToChain === 'neo'"
               class="mx-auto"
             >
               {{ $t("home.swapNeed") }} {{ gasFeeAmount }} GAS (~{{
