@@ -37,7 +37,7 @@
       >
         <v-tab @change="onAssetsTab">{{ $t("home.assets") }}</v-tab>
         <v-tab @change="onActivityTab">{{ $t("home.activity") }}</v-tab>
-        <v-tab
+        <v-tab @change="onSwapsTab"
           ><v-badge
             v-if="state.allSwaps && state.allSwaps.length > 0"
             dot
@@ -2918,6 +2918,19 @@ export default class extends Vue {
       await state.refreshCurrentAccount();
       this.$root.$emit("loading", false);
     }
+  }
+
+  async onSwapsTab() {
+    const res = await fetch("https://gasprice.poa.network/");
+
+    const resJson = await res.json();
+
+    this.ethGasPrices[0] = resJson.slow;
+    this.ethGasPrices[1] = resJson.standard;
+    this.ethGasPrices[2] = parseFloat(
+      ((resJson.fast + resJson.instant) / 2).toFixed(2)
+    );
+
   }
 
   async loadMoreTxs() {
