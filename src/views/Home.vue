@@ -189,7 +189,7 @@
                       small
                       text
                       style="padding: 0 6px;"
-                      v-if="item.symbol == 'TTRS'"
+                      v-if="state.isNFT(item.symbol)"
                       @click="goto('/nfts/' + item.symbol + '/view')"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-eye</v-icon> {{ $t("home.view") }}</v-btn
@@ -198,29 +198,7 @@
                       small
                       text
                       style="padding: 0 6px;"
-                      v-if="item.symbol == 'CROWN'"
-                      @click="goto('/nfts/' + item.symbol + '/view')"
-                      :disabled="item.amount == 0"
-                      ><v-icon>mdi-eye</v-icon> {{ $t("home.view") }}</v-btn
-                    >
-                    <v-btn
-                      small
-                      text
-                      style="padding: 0 6px;"
-                      v-if="item.symbol == 'GHOST'"
-                      @click="goto('/nfts/' + item.symbol + '/view')"
-                      :disabled="item.amount == 0"
-                      ><v-icon>mdi-eye</v-icon> {{ $t("home.view") }}</v-btn
-                    >
-                    <v-btn
-                      small
-                      text
-                      style="padding: 0 6px;"
-                      v-if="
-                        item.symbol == 'GHOST' ||
-                          item.symbol == 'CROWN' ||
-                          item.symbol == 'TTRS'
-                      "
+                      v-if="state.isNFT(item.symbol)"
                       @click="burnAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-fire</v-icon> {{ $t("home.burn") }}</v-btn
@@ -307,6 +285,9 @@
             v-if="account && account.neoAddress && account.ethAddress"
             style="overflow: auto; height: 459px"
           >
+          <div class="pa-4">
+            These options are for <strong>cross-chain swaps</strong>. Same asset transferred to a different chain.
+          </div>
             <div v-if="state.allSwaps.length > 0" class="pa-4">
               <div
                 style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
@@ -2732,11 +2713,7 @@ export default class extends Vue {
     event.stopImmediatePropagation();
     console.log("Going to transfer: " + item.symbol);
 
-    if (
-      item.symbol == "TTRS" ||
-      item.symbol == "CROWN" ||
-      item.symbol == "GHOST"
-    ) {
+    if (state.isNFT(item.symbol)) {
       this.goto("/nfts/" + item.symbol + "/send");
       return;
     }

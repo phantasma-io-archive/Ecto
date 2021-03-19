@@ -523,9 +523,9 @@ export class PhantasmaAPI {
   }
 
   //Returns an array of tokens deployed in Phantasma.
-  async getTokens(): Promise<Token> {
+  async getTokens(): Promise<Token[]> {
     let params: Array<any> = [];
-    return (await this.JSONRPC("getTokens", params)) as Token;
+    return (await this.JSONRPC("getTokens", params)) as Token[];
   }
 
   //Returns info about a specific token deployed in Phantasma.
