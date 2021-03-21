@@ -6,11 +6,17 @@ import { isMainThread } from "worker_threads";
 const contractsRopsten: any = {
   SOUL: "19861B13425d8aCFB70eB91Ac50EC3cF721d0C8a",
   KCAL: "8218c82446bb74fB525fECC8844B03C34f987efe",
+  DYT: "e7018acad667012d50edb363effa4f2f56c6a0b0",
+  MUU: "25836ce76065A3DfCeF069fD4964C240C4F2523F", // to update
+  DANK: "9ea1ae46c15a4164b74463bc26f8aa3b0eea2e6e", // to update
 };
 
 const contractsMainnet: any = {
   SOUL: "79C75E2e8720B39e258F41c37cC4f309E0b0fF80",
   KCAL: "14EB60F5f270B059B0c788De0Ddc51Da86f8a06d",
+  DYT: "740623d2c797b7D8D1EcB98e9b4Afcf99Ec31E14",
+  MUU: "25836ce76065A3DfCeF069fD4964C240C4F2523F",
+  DANK: "9ea1ae46c15a4164b74463bc26f8aa3b0eea2e6e",
 };
 
 export function getEthContract(symbol: string, isMainnet: boolean) {
@@ -76,31 +82,73 @@ export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
     "latest",
   ]);
 
-  const ethVal = parseInt(ethBalance.slice(2), 16);
+  const ethVal = BigInt(ethBalance === "0x" ? 0 : ethBalance);
   console.log("ethBalance", ethVal);
 
   const ethDataAddr =
     "0x70a08231000000000000000000000000" + ethAddress.substring(2);
 
   const soulErcBalance = await JSONRPC(rpcUrl, "eth_call", [
-    { to: "0x" + contractsRopsten.SOUL, data: ethDataAddr },
+    {
+      to: "0x" + (isMainnet ? contractsMainnet.SOUL : contractsRopsten.SOUL),
+      data: ethDataAddr,
+    },
     "latest",
   ]);
 
-  const soulVal = parseInt("0" + soulErcBalance.slice(2), 16);
+  const soulVal = BigInt(soulErcBalance == "0x" ? 0 : soulErcBalance);
   console.log("soul balance", soulVal);
 
   const kcalBalance = await JSONRPC(rpcUrl, "eth_call", [
-    { to: "0x" + contractsRopsten.KCAL, data: ethDataAddr },
+    {
+      to: "0x" + (isMainnet ? contractsMainnet.KCAL : contractsRopsten.KCAL),
+      data: ethDataAddr,
+    },
     "latest",
   ]);
 
-  const kcalVal = parseInt("0" + kcalBalance.slice(2), 16);
+  const kcalVal = BigInt(kcalBalance == "0x" ? 0 : kcalBalance);
   console.log("kcal balance", kcalVal);
 
-  if (ethVal !== 0) balances.push({ symbol: "ETH", amount: ethVal });
-  if (soulVal !== 0) balances.push({ symbol: "SOUL", amount: soulVal });
-  if (kcalVal !== 0) balances.push({ symbol: "KCAL", amount: kcalVal });
+  const dytBalance = await JSONRPC(rpcUrl, "eth_call", [
+    {
+      to: "0x" + (isMainnet ? contractsMainnet.DYT : contractsRopsten.DYT),
+      data: ethDataAddr,
+    },
+    "latest",
+  ]);
+
+  const dytVal = BigInt(dytBalance === "0x" ? 0 : dytBalance);
+  console.log("dyt balance", dytVal);
+
+  const muuBalance = await JSONRPC(rpcUrl, "eth_call", [
+    {
+      to: "0x" + (isMainnet ? contractsMainnet.MUU : contractsRopsten.MUU),
+      data: ethDataAddr,
+    },
+    "latest",
+  ]);
+
+  const muuVal = BigInt(muuBalance === "0x" ? 0 : muuBalance);
+  console.log("muu balance", muuVal);
+
+  const dankBalance = await JSONRPC(rpcUrl, "eth_call", [
+    {
+      to: "0x" + (isMainnet ? contractsMainnet.DANK : contractsRopsten.DANK),
+      data: ethDataAddr,
+    },
+    "latest",
+  ]);
+
+  const dankVal = BigInt(dankBalance === "0x" ? 0 : dankBalance);
+  console.log("dank balance", dankVal);
+
+  if (ethVal !== 0n) balances.push({ symbol: "ETH", amount: ethVal });
+  if (soulVal !== 0n) balances.push({ symbol: "SOUL", amount: soulVal });
+  if (kcalVal !== 0n) balances.push({ symbol: "KCAL", amount: kcalVal });
+  if (dytVal !== 0n) balances.push({ symbol: "DYT", amount: dytVal });
+  if (muuVal !== 0n) balances.push({ symbol: "MUU", amount: muuVal });
+  if (dankVal !== 0n) balances.push({ symbol: "DANK", amount: dankVal });
 
   return balances;
 }

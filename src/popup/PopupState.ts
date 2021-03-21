@@ -15,6 +15,7 @@ import {
   Balance,
   signData,
   Swap,
+  Token,
 } from "@/phan-js";
 
 import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
@@ -28,7 +29,7 @@ import { byteArrayToHex } from "@/phan-js/utils";
 
 export interface ISymbolAmount {
   symbol: string;
-  amount: string | number;
+  amount: string | number | BigInt;
 }
 
 export interface IPendingSwap {
@@ -36,6 +37,7 @@ export interface IPendingSwap {
   addressTo: string;
   hash: string;
   swap: Swap | null;
+  date: number;
 }
 
 interface IAuthorization {
@@ -63,6 +65,15 @@ export interface TxArgsData {
   payload: string;
 }
 
+export interface NexusData<T> {
+  mainnet: T | undefined;
+  testnet: T | undefined;
+  simnet: T | undefined;
+  mainnetLastUpdate: number;
+  testnetLastUpdate: number;
+  simnetLastUpdate: number;
+}
+
 export class PopupState {
   api = new PhantasmaAPI(
     "https://seed.ghostdevs.com:7077/rpc",
@@ -81,6 +92,14 @@ export class PopupState {
   private _simnetRpc = "http://localhost:7077/rpc";
   private _testnetRpc = "http://testnet.phantasma.io:7077/rpc";
   private _mainnetRpc = "Auto";
+  private _tokens: NexusData<Token[]> = {
+    mainnet: [],
+    testnet: [],
+    simnet: [],
+    mainnetLastUpdate: 0,
+    testnetLastUpdate: 0,
+    simnetLastUpdate: 0,
+  };
 
   accountNfts: any[] = [];
   nfts: any = {};
@@ -90,7 +109,7 @@ export class PopupState {
 
   allSwaps: Swap[] = [];
 
-  payload = "4543542D312E302E31";
+  payload = "4543542D312E302E33";
 
   $i18n: any = {
     t: (s: string) => s,
@@ -295,6 +314,12 @@ export class PopupState {
           return this._currenciesRate["dai"][curSym];
         case "eth":
           return this._currenciesRate["ethereum"][curSym];
+        case "dyt":
+          return this._currenciesRate["dynamite"][curSym];
+        case "dank":
+          return this._currenciesRate["mu-dank"][curSym];
+        case "goati":
+          return 0.1;
       }
     } catch {
       console.log("Error getting rates for " + symbol + " in " + curSym);
@@ -305,7 +330,7 @@ export class PopupState {
   async check($i18n: any): Promise<void> {
     if ($i18n) this.$i18n = $i18n; // save translate method from Vue i18n
     return new Promise((resolve, reject) => {
-      chrome.storage.local.get((items) => {
+      chrome.storage.local.get(async (items) => {
         console.log("[PopupState] Get local storage");
         this._currentAccountIndex = items.currentAccountIndex
           ? items.currentAccountIndex
@@ -314,7 +339,7 @@ export class PopupState {
           ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
           : [];
         this._authorizations = items.authorizations ? items.authorizations : [];
-        this._pendingSwaps = items.pendingSwaps ? items.pendingSwaps : [];
+        // this._pendingSwaps = items.pendingSwaps ? items.pendingSwaps : [];
         this._currency = items.currency ? items.currency : "USD";
         this._language = items.language ? items.language : "English";
         this._balanceShown =
@@ -327,6 +352,10 @@ export class PopupState {
           ? items.accounts.filter((a: WalletAccount) => a.type !== "wif")
           : [];
 
+        if (items.tokens) this._tokens = items.tokens;
+
+        console.log("Current tokens", JSON.stringify(this._tokens, null, 2));
+
         const numAccounts = items.accounts ? items.accounts.length : 0;
 
         if (items.simnetRpc) this._simnetRpc = items.simnetRpc;
@@ -338,6 +367,28 @@ export class PopupState {
         this.api.setNexus(this._nexus);
         if (this._nexus == "SimNet") this.api.setRpcHost(this._simnetRpc);
         if (this._nexus == "TestNet") this.api.setRpcHost(this._testnetRpc);
+
+        try {
+          // query tokens info if needed for current nexus
+          const now = new Date().valueOf();
+          const nexus = this.nexus;
+          var lastUpdate = (this._tokens as any)[nexus + "LastUpdate"];
+          const secsSinceLastUpdate = (now - lastUpdate) / 1000;
+          console.log("Last update was ", secsSinceLastUpdate, "secs ago");
+          if (secsSinceLastUpdate > 60 * 60 * 8) {
+            let tokens = await this.api.getTokens();
+            // remove script, we don't need it
+            tokens.forEach((t: any) => {
+              if (t.script != undefined) delete t.script;
+            });
+            console.log("tokens for", nexus, tokens);
+            (this._tokens as any)[nexus] = tokens;
+            (this._tokens as any)[nexus + "LastUpdate"] = now;
+            chrome.storage.local.set({ tokens: this._tokens });
+          }
+        } catch (err) {
+          console.error("Could not get tokens", err);
+        }
 
         if (this._accounts.length !== numAccounts)
           chrome.storage.local.set({ accounts: this._accounts });
@@ -401,7 +452,7 @@ export class PopupState {
 
   async fetchRates() {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
+      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
     );
     const resJson = await res.json();
     this._currenciesRate = resJson;
@@ -430,7 +481,10 @@ export class PopupState {
   async addAccount(addressOrName: string): Promise<void> {
     let address = addressOrName;
 
-    if (!address.startsWith("P") || address.length != 47) {
+    if (
+      !(address.startsWith("P") || address.startsWith("S")) ||
+      address.length != 47
+    ) {
       address = await this.api.lookUpName(address);
       if ((address as any).error) throw new Error("Wallet name not found");
     }
@@ -463,6 +517,7 @@ export class PopupState {
   ): boolean {
     try {
       return (
+        (account && account.address && account.address.startsWith("S")) ||
         (account !== undefined
           ? account.address
           : this.currentAccount?.address) === getAddressFromWif(wif)
@@ -596,23 +651,23 @@ export class PopupState {
       account.address
     );
 
-    await this.fetchNftData(
-      this._accounts[this._currentAccountIndex].data.balances.find(
-        (b) => b.symbol == "TTRS"
-      )!
+    const allNfts = this.getAllTokens().filter(
+      (t) => t.flags && !t.flags.includes("Fungible")
     );
 
-    await this.fetchNftData(
-      this._accounts[this._currentAccountIndex].data.balances.find(
-        (b) => b.symbol == "GHOST"
-      )!
-    );
-
-    await this.fetchNftData(
-      this._accounts[this._currentAccountIndex].data.balances.find(
-        (b) => b.symbol == "CROWN"
-      )!
-    );
+    // fetch all nfts data available
+    for (var i = 0; i < allNfts.length; ++i) {
+      try {
+        const symbol = allNfts[i].symbol;
+        await this.fetchNftData(
+          this._accounts[this._currentAccountIndex].data.balances.find(
+            (b) => b.symbol == symbol
+          )!
+        );
+      } catch (err) {
+        console.error("Error fetching NFTs", err);
+      }
+    }
 
     await this.refreshSwapInfo();
 
@@ -661,27 +716,33 @@ export class PopupState {
       }
     }
 
-    let phaSwaps = await this.api.getSwapsForAddress(
-      this.currentAccount!.address
-    );
-    console.log("phaSwaps", phaSwaps);
-    phaSwaps = phaSwaps.filter(
-      (s) =>
-        s.destinationHash === "pending" &&
-        this.allSwaps.findIndex(
-          (p) => p.sourceHash == s.sourceHash && p.symbol == s.symbol
-        ) < 0
-    );
-    console.log("allSwaps", this.allSwaps);
+    try {
+      let phaSwaps = await this.api.getSwapsForAddress(
+        this.currentAccount!.address
+      );
+      console.log("phaSwaps", phaSwaps);
+      phaSwaps = phaSwaps.filter(
+        (s) =>
+          s.destinationHash === "pending" &&
+          this.allSwaps.findIndex(
+            (p) => p.sourceHash == s.sourceHash && p.symbol == s.symbol
+          ) < 0
+      );
+      console.log("allSwaps", this.allSwaps);
+    } catch (err) {
+      console.log("error in getting pending pha swaps", err);
+    }
 
     // check external pending swaps, if there are
+    /* const curTime = new Date().getTime();
     const toRemove: IPendingSwap[] = [];
     this._pendingSwaps.forEach(async (ps) => {
       let swaps = await this.api.getSwapsForAddress(ps.addressTo);
       var swap = swaps.find((s) => s.sourceHash == ps.hash);
       if (swap && swap.destinationHash === "pending") {
         ps.swap = swap;
-      } else {
+      } else if (curTime - ps.date > 10000) {
+        // only remove if 10 seconds elapsed
         toRemove.push(ps);
       }
     });
@@ -690,7 +751,7 @@ export class PopupState {
     if (toRemove.length > 0) {
       this._pendingSwaps.filter((p) => !toRemove.includes(p));
       chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => {});
-    }
+    } */
   }
 
   async authorizeDapp(
@@ -725,8 +786,16 @@ export class PopupState {
     return this._authorizations.find((a) => a.token == token)!.dapp;
   }
 
-  addPendingSwap(chainTo: string, addressTo: string, hash: string) {
-    this._pendingSwaps.push({ chainTo, addressTo, hash, swap: null });
+  async addPendingSwap(chainTo: string, addressTo: string, hash: string) {
+    await this.check(this.$i18n); // make sure we don't overwrite any other pending swap
+    this._pendingSwaps.push({
+      chainTo,
+      addressTo,
+      hash,
+      swap: null,
+      date: new Date().getTime(),
+    });
+    console.log("pending swaps", JSON.stringify(this._pendingSwaps, null, 2));
     chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => {});
   }
 
@@ -963,7 +1032,18 @@ export class PopupState {
     return wif;
   }
 
-  decimals(symbol: string) {
+  getAllTokens(): Token[] {
+    return (this._tokens as any)[this.nexus] as Token[];
+  }
+
+  getToken(symbol: string) {
+    return this.getAllTokens().find((t) => t.symbol == symbol);
+  }
+
+  decimals(symbol: string): number {
+    const token = this.getToken(symbol);
+    if (token) return token.decimals;
+
     switch (symbol) {
       case "KCAL":
         return 10;
@@ -979,24 +1059,25 @@ export class PopupState {
         return 18;
       case "MKNI":
         return 0;
+      case "DYT":
+        return 18;
+      case "MUU":
+        return 18;
+      case "DANK":
+        return 18;
       default:
         return 0;
     }
   }
 
+  isNFT(symbol: string) {
+    const token = this.getToken(symbol);
+    return token && token.flags && !token.flags.includes("Fungible");
+  }
+
   formatBalance(symbol: string, amount: string): string {
     const decimals = this.decimals(symbol);
-
-    switch (symbol) {
-      case "TTRS":
-        return symbol + " NFT";
-      case "GHOST":
-        return symbol + " NFT";
-      case "CROWN":
-        return symbol + " NFT";
-      default:
-        break;
-    }
+    if (this.isNFT(symbol)) return symbol + " NFT";
 
     if (decimals == 0) return amount + " " + symbol;
     while (amount.length < decimals + 1) amount = "0" + amount;

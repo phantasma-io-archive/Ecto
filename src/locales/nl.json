@@ -22,7 +22,8 @@
         "with": "Met",
         "for": "voor",
         "bid": "Bod",
-        "auction": "Veiling"
+        "auction": "Veiling",
+        "sale": "Deelgenomen in de verkoop met"
     },
     "app": {
         "currencyDescription": "Valuta",
@@ -147,7 +148,7 @@
         "swapExplanation": "Om swaps mogelijk te maken moet je eenmalig gebruik maken van jouw WIF of privésleutel. Dit genereert de NEO and Ethereum addressen die gekoppeld zijn aan jouw wallet.",
         "continue": "verder",
         "labelDestinationAddress": " bestemmingsadres",
-        "availableToSwap": "Je hebt de volgende beschikbare bezittingen on te swappen naar",
+        "availableToSwap": "Je hebt de volgende beschikbare bezittingen om te swappen naar",
         "fee": "Kosten",
         "swapNeed": "Om te swappen heb je nodig:",
         "swapDestination": "Swap bestemming",
@@ -165,9 +166,9 @@
         "needGasToSwap": "Je hebt {0} GAS in Phantasma nodig om voor de swapkosten te betalen.",
         "needEthToSwap": "Je hebt ongeveer {0} ETH in Phantasma nodig om voor de swapkosten te betalen.",
         "swapInProgressTitle": "Swap wordt verwerkt",
-        "swapBeingProcessed": "Jouw swap is verwerkt.",
+        "swapBeingProcessed": "Swap wordt verwerkt.",
         "needsConfirmations": "Er zijn 12 bevestigingen nodig om te verschijnen.",
-        "checkTransaction": "Controleer jouw transactie",
+        "checkTransaction": "Controleer de transactie",
         "here": "hier"
     },
     "nfts": {

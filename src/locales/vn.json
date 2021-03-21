@@ -22,7 +22,8 @@
         "with": "Với",
         "for": "Cho",
         "bid": "Bid",
-        "auction": "Auction"
+        "auction": "Auction",
+        "sale": "Đã tham gia bán với"
     },
     "app": {
         "currencyDescription": "Tiền tệ",

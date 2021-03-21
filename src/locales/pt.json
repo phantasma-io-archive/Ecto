@@ -22,7 +22,8 @@
         "with": "Com",
         "for": "para",
         "bid": "Licitar",
-        "auction": "Leilão"
+        "auction": "Leilão",
+        "sale": "Participou na venda com"
     },
     "app": {
         "currencyDescription": "Moeda",
