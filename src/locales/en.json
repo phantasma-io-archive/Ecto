@@ -174,7 +174,8 @@
     "sendInProgress": "Send in progress",
     "sendBeingProcessed": "Your send is being processed.",
     "exportPrivateKey": "export your hex private key",
-    "andImportInMetamask": "and import in Metamask"
+    "andImportInMetamask": "and import in Metamask",
+    "multiChain": "multi<br/>chain"
   },
   "nfts": {
     "selected": "selected",

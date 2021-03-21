@@ -42,10 +42,9 @@
             v-if="state.allSwaps && state.allSwaps.length > 0"
             dot
             color="#17b1e8"
-          >
-            {{ $t("home.swaps") }}</v-badge
-          ><span v-else>multi<br />chain</span></v-tab
-        >
+            ><span v-html="$t('home.multiChain')"></span></v-badge
+          ><span v-else v-html="$t('home.multiChain')"></span
+        ></v-tab>
 
         <v-tab-item key="1">
           <v-container
