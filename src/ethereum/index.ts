@@ -2,6 +2,7 @@ import WIF from "wif";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
 import EthWallet from "ethereumjs-wallet";
 import { isMainThread } from "worker_threads";
+import { state } from "@/popup/PopupState";
 
 const contractsRopsten: any = {
   SOUL: "19861B13425d8aCFB70eB91Ac50EC3cF721d0C8a",
@@ -20,6 +21,12 @@ const contractsMainnet: any = {
 };
 
 export function getEthContract(symbol: string, isMainnet: boolean) {
+  let hash = state.getTokenHash(symbol, "ethereum");
+  if (hash) {
+    return hash;
+  }
+
+  // to remove soon
   if (isMainnet) return contractsMainnet[symbol];
   else return contractsRopsten[symbol];
 }
@@ -70,7 +77,14 @@ export function getEthAddressFromWif(wif: string): string {
 }
 
 export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
-  const balances = [];
+  const balances: { symbol: string; amount: bigint }[] = [];
+
+  console.log("%cGET ETH BALANCES", "font-size: 20px");
+  const erc20Tokens = state
+    .getAllSwapableTokens("ethereum")
+    .filter((t) => t.symbol != "ETH");
+
+  console.log("erc20 tokens", erc20Tokens);
 
   const rpcUrl =
     "https://" +
@@ -88,67 +102,19 @@ export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
   const ethDataAddr =
     "0x70a08231000000000000000000000000" + ethAddress.substring(2);
 
-  const soulErcBalance = await JSONRPC(rpcUrl, "eth_call", [
-    {
-      to: "0x" + (isMainnet ? contractsMainnet.SOUL : contractsRopsten.SOUL),
-      data: ethDataAddr,
-    },
-    "latest",
-  ]);
+  erc20Tokens.map(async (t) => {
+    const ercBalance = await JSONRPC(rpcUrl, "eth_call", [
+      {
+        to: "0x" + (isMainnet ? contractsMainnet.SOUL : contractsRopsten.SOUL),
+        data: ethDataAddr,
+      },
+      "latest",
+    ]);
 
-  const soulVal = BigInt(soulErcBalance == "0x" ? 0 : soulErcBalance);
-  console.log("soul balance", soulVal);
-
-  const kcalBalance = await JSONRPC(rpcUrl, "eth_call", [
-    {
-      to: "0x" + (isMainnet ? contractsMainnet.KCAL : contractsRopsten.KCAL),
-      data: ethDataAddr,
-    },
-    "latest",
-  ]);
-
-  const kcalVal = BigInt(kcalBalance == "0x" ? 0 : kcalBalance);
-  console.log("kcal balance", kcalVal);
-
-  const dytBalance = await JSONRPC(rpcUrl, "eth_call", [
-    {
-      to: "0x" + (isMainnet ? contractsMainnet.DYT : contractsRopsten.DYT),
-      data: ethDataAddr,
-    },
-    "latest",
-  ]);
-
-  const dytVal = BigInt(dytBalance === "0x" ? 0 : dytBalance);
-  console.log("dyt balance", dytVal);
-
-  const muuBalance = await JSONRPC(rpcUrl, "eth_call", [
-    {
-      to: "0x" + (isMainnet ? contractsMainnet.MUU : contractsRopsten.MUU),
-      data: ethDataAddr,
-    },
-    "latest",
-  ]);
-
-  const muuVal = BigInt(muuBalance === "0x" ? 0 : muuBalance);
-  console.log("muu balance", muuVal);
-
-  const dankBalance = await JSONRPC(rpcUrl, "eth_call", [
-    {
-      to: "0x" + (isMainnet ? contractsMainnet.DANK : contractsRopsten.DANK),
-      data: ethDataAddr,
-    },
-    "latest",
-  ]);
-
-  const dankVal = BigInt(dankBalance === "0x" ? 0 : dankBalance);
-  console.log("dank balance", dankVal);
-
-  if (ethVal !== 0n) balances.push({ symbol: "ETH", amount: ethVal });
-  if (soulVal !== 0n) balances.push({ symbol: "SOUL", amount: soulVal });
-  if (kcalVal !== 0n) balances.push({ symbol: "KCAL", amount: kcalVal });
-  if (dytVal !== 0n) balances.push({ symbol: "DYT", amount: dytVal });
-  if (muuVal !== 0n) balances.push({ symbol: "MUU", amount: muuVal });
-  if (dankVal !== 0n) balances.push({ symbol: "DANK", amount: dankVal });
+    const val = BigInt(ercBalance == "0x" ? 0 : ercBalance);
+    if (val != 0n) balances.push({ symbol: t.symbol, amount: val });
+    console.log(t.symbol, "balance", val);
+  });
 
   return balances;
 }
