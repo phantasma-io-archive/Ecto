@@ -3170,9 +3170,9 @@ export default class extends Vue {
     }
     if (this.sendSymbol == "ETH") {
       const ethFee = (
-        Math.round(100000 * this.ethGasPrices[1] * 1.2) / 1e9
+        Math.round(21000 * this.ethGasPrices[1] * 1.2) / 1e9
       ).toFixed(4);
-      this.sendMaxAmount -= parseFloat(parseFloat(ethFee).toFixed(4));
+      this.sendMaxAmount -= parseFloat(parseFloat(ethFee).toFixed(3));
     }
     if (this.sendMaxAmount < 0) this.sendMaxAmount = 0;
     this.swapAmountDialog = true;
