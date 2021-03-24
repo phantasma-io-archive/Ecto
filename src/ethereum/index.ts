@@ -2,18 +2,31 @@ import WIF from "wif";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
 import EthWallet from "ethereumjs-wallet";
 import { isMainThread } from "worker_threads";
+import { state } from "@/popup/PopupState";
 
 const contractsRopsten: any = {
   SOUL: "19861B13425d8aCFB70eB91Ac50EC3cF721d0C8a",
   KCAL: "8218c82446bb74fB525fECC8844B03C34f987efe",
+  DYT: "e7018acad667012d50edb363effa4f2f56c6a0b0",
+  MUU: "25836ce76065A3DfCeF069fD4964C240C4F2523F", // to update
+  DANK: "9ea1ae46c15a4164b74463bc26f8aa3b0eea2e6e", // to update
 };
 
 const contractsMainnet: any = {
   SOUL: "79C75E2e8720B39e258F41c37cC4f309E0b0fF80",
   KCAL: "14EB60F5f270B059B0c788De0Ddc51Da86f8a06d",
+  DYT: "740623d2c797b7D8D1EcB98e9b4Afcf99Ec31E14",
+  MUU: "25836ce76065A3DfCeF069fD4964C240C4F2523F",
+  DANK: "9ea1ae46c15a4164b74463bc26f8aa3b0eea2e6e",
 };
 
 export function getEthContract(symbol: string, isMainnet: boolean) {
+  let hash = state.getTokenHash(symbol, "ethereum");
+  if (hash) {
+    return hash;
+  }
+
+  // to remove soon
   if (isMainnet) return contractsMainnet[symbol];
   else return contractsRopsten[symbol];
 }
@@ -63,42 +76,45 @@ export function getEthAddressFromWif(wif: string): string {
   return ethWallet.getAddressString();
 }
 
-export async function getEthBalances(ethAddress: string) {
-  const balances = [];
+export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
+  const balances: { symbol: string; amount: bigint }[] = [];
 
-  const ethBalance = await JSONRPC(
-    "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
-    "eth_getBalance",
-    [ethAddress, "latest"]
-  );
+  const erc20Tokens = state
+    .getAllSwapableTokens("ethereum")
+    .filter((t) => t.symbol != "ETH");
 
-  const ethVal = parseInt(ethBalance.slice(2), 16);
+  console.log("erc20 tokens", erc20Tokens);
+
+  const rpcUrl =
+    "https://" +
+    (isMainnet ? "mainnet" : "ropsten") +
+    ".infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8";
+
+  const ethBalance = await JSONRPC(rpcUrl, "eth_getBalance", [
+    ethAddress,
+    "latest",
+  ]);
+
+  const ethVal = BigInt(ethBalance === "0x" ? 0 : ethBalance);
   console.log("ethBalance", ethVal);
+  if (ethVal != 0n) balances.push({ symbol: "ETH", amount: ethVal });
 
   const ethDataAddr =
     "0x70a08231000000000000000000000000" + ethAddress.substring(2);
 
-  const soulErcBalance = await JSONRPC(
-    "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
-    "eth_call",
-    [{ to: "0x" + contractsRopsten.SOUL, data: ethDataAddr }, "latest"]
-  );
+  erc20Tokens.map(async (t) => {
+    const ercBalance = await JSONRPC(rpcUrl, "eth_call", [
+      {
+        to: "0x" + (isMainnet ? contractsMainnet.SOUL : contractsRopsten.SOUL),
+        data: ethDataAddr,
+      },
+      "latest",
+    ]);
 
-  const soulVal = parseInt(soulErcBalance.slice(2), 16);
-  console.log("soul balance", soulVal);
-
-  const kcalBalance = await JSONRPC(
-    "https://ropsten.infura.io/v3/aad54c5b39ad4aefa496246bcbf817f8",
-    "eth_call",
-    [{ to: "0x" + contractsRopsten.KCAL, data: ethDataAddr }, "latest"]
-  );
-
-  const kcalVal = parseInt(kcalBalance.slice(2), 16);
-  console.log("kcal balance", kcalVal);
-
-  if (ethVal !== 0) balances.push({ symbol: "ETH", amount: ethVal });
-  if (soulVal !== 0) balances.push({ symbol: "SOUL", amount: soulVal });
-  if (kcalVal !== 0) balances.push({ symbol: "KCAL", amount: kcalVal });
+    const val = BigInt(ercBalance == "0x" ? 0 : ercBalance);
+    if (val != 0n) balances.push({ symbol: t.symbol, amount: val });
+    console.log(t.symbol, "balance", val);
+  });
 
   return balances;
 }

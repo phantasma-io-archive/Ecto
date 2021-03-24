@@ -36,13 +36,21 @@
           >
         </v-row>
 
-        <div style="text-align:center" class="mb-7 mt-5">
+        <div style="text-align:center" class="mb-4 mt-4">
           <strong>{{ $route.params.dapp }}</strong>
           {{ $t("authorize.description") }}
           <br />
           <br />
           {{ domain }}
         </div>
+
+        <v-row style="margin: 5px;display:none;">
+          <v-select
+            :items="authorizeAccounts"
+            v-model="authorizeAccount"
+            :label="$t('authorize.labelAccount')"
+          ></v-select>
+        </v-row>
 
         <v-row style="margin: 5px">
           <v-select
@@ -75,9 +83,10 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import { Watch } from "vue-property-decorator";
 import { Account, Transaction, getPrivateKeyFromWif, Balance } from "@/phan-js";
 
-import { state } from "@/popup/PopupState";
+import { state, WalletAccount } from "@/popup/PopupState";
 
 @Component({})
 export default class extends Vue {
@@ -89,6 +98,8 @@ export default class extends Vue {
   faviconUrl = "";
   authorizeFor = "";
   authorizeForItems: string[] = [];
+  authorizeAccount: string = "";
+  authorizeAccounts: string[] = [];
 
   async mounted() {
     console.log("authorize");
@@ -103,6 +114,11 @@ export default class extends Vue {
       this.$i18n.t("authorize.periodAlways").toString(),
     ];
     this.authorizeFor = this.$i18n.t("authorize.periodCurrent").toString();
+
+    state.accounts.forEach((account) => {
+      this.authorizeAccounts.push(account.address)
+    })
+    this.authorizeAccount = state.currentAccount!.address;
 
     this.url = atob(this.$route.params.url);
     this.faviconUrl = atob(this.$route.params.favicon);
@@ -167,6 +183,20 @@ export default class extends Vue {
       data: { id, success: false },
     });
     window.close();
+  }
+
+  @Watch("authorizeAccount")
+  onWatchauthorizeAccount(oldValue: string, newValue: string) {
+
+    // const matchAccount = this.state.accounts.filter((a) => a.address == newValue);
+    // this.selectAccount(matchAccount[0]);
+
+  }
+
+  async selectAccount(newValue: WalletAccount) {
+
+    await state.selectAccount(newValue);
+
   }
 
   async connect() {

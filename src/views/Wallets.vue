@@ -36,7 +36,7 @@
           <v-list-item-action>
             <PopupMenu
               icon="mdi-dots-vertical"
-              :actions="popupActions"
+              :actions="acc.type == 'encKey' ? popupActionsWif : popupActions"
               :item="acc"
             ></PopupMenu>
           </v-list-item-action>
@@ -44,18 +44,118 @@
       </v-list>
 
       <div style="padding: 20px">
-        <v-btn block @click="$router.push('/addwallet')">{{
+        <v-btn class="mb-4" block @click="$router.push('/addwallet')">{{
           $t("wallets.add")
         }}</v-btn>
       </div>
     </v-main>
+
+    <v-dialog v-model="requestPasswordDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">{{
+          $t("wallets.enterPassword")
+        }}</v-card-title>
+
+        <v-card-text>
+          <span>
+            {{ $t("wallets.enterPasswordDecrypt") }}
+          </span>
+          <v-spacer class="ma-4" />
+
+          <v-form @keyup.native.enter="exportPrivateKey" @submit.prevent>
+            <v-text-field
+              autofocus
+              tabindex="1"
+              type="password"
+              :label="$t('home.labelPassword')"
+              v-model="password"
+              required
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              prepend-inner-icon="mdi-lock"
+            />
+          </v-form>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="gray darken-1"
+            text
+            @click="
+              requestPasswordDialog = false;
+              password = '';
+            "
+          >
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="exportPrivateKey">
+            {{ $t("home.continue") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="showPrivateKeyDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">{{
+          $t("wallets.titlePrivateKey")
+        }}</v-card-title>
+
+        <v-card-text>
+          <span>
+            {{ $t("wallets.keyExplanation") }}
+          </span>
+          <v-spacer class="ma-4" />
+
+          <v-textarea
+            v-model="wif"
+            readonly
+            :label="$t('wallets.labelWIF')"
+            rows="3"
+          ></v-textarea>
+          <v-textarea
+            v-model="hexPk"
+            readonly
+            :label="$t('wallets.labelHEX')"
+            rows="3"
+          ></v-textarea>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="
+              wif = '';
+              hexPk = '';
+              showPrivateKeyDialog = false;
+            "
+          >
+            {{ $t("home.continue") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <ErrorDialog
+      :show="errorDialog"
+      :message="errorMessage"
+      @close="errorDialog = false"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Account } from "@/phan-js";
+import { Account, getPrivateKeyFromWif } from "@/phan-js";
+import ErrorDialog from "@/components/ErrorDialog.vue";
 
 import { state, WalletAccount } from "@/popup/PopupState";
 import PopupMenuComponent from "@/components/PopupMenu.vue";
@@ -63,13 +163,28 @@ import PopupMenuComponent from "@/components/PopupMenu.vue";
 @Component({
   components: {
     PopupMenu: PopupMenuComponent,
+    ErrorDialog,
   },
 })
 export default class extends Vue {
   state = state;
 
   popupActions: any[] = [];
+  popupActionsWif: any[] = [];
   desc: any = {};
+
+  password = "";
+
+  wif = "";
+  hexPk = "";
+
+  reqAccount: WalletAccount | null = null;
+
+  requestPasswordDialog = false;
+  showPrivateKeyDialog = false;
+
+  errorDialog = false;
+  errorMessage = "";
 
   async mounted() {
     await this.state.check(this.$parent.$i18n);
@@ -86,6 +201,21 @@ export default class extends Vue {
     this.popupActions = [
       // { icon: 'mdi-pen', title: "Add password", subtitle: "Store WIF with password", action: this.addPassword },
       // { divider: true },
+      {
+        icon: "mdi-delete",
+        title: this.$i18n.t("wallets.title").toString(),
+        subtitle: this.$i18n.t("wallets.subtitle").toString(),
+        action: this.deleteAccount,
+      },
+    ];
+    this.popupActionsWif = [
+      {
+        icon: "mdi-home-export-outline",
+        title: this.$i18n.t("wallets.titleKey").toString(),
+        subtitle: this.$i18n.t("wallets.subtitleKey").toString(),
+        action: this.askPasswordToExport,
+      },
+      { divider: true },
       {
         icon: "mdi-delete",
         title: this.$i18n.t("wallets.title").toString(),
@@ -127,6 +257,26 @@ export default class extends Vue {
     else if (type == "verified")
       return this.$i18n.t("wallets.verified").toString();
     return "";
+  }
+
+  askPasswordToExport(account: WalletAccount) {
+    this.reqAccount = account;
+    this.requestPasswordDialog = true;
+  }
+
+  exportPrivateKey() {
+    if (!this.reqAccount) return;
+
+    try {
+      this.requestPasswordDialog = false;
+      this.wif = state.getWifFromPassword(this.password, this.reqAccount);
+      this.hexPk = getPrivateKeyFromWif(this.wif);
+      this.showPrivateKeyDialog = true;
+    } catch (err) {
+      this.errorMessage = err;
+      this.errorDialog = true;
+    }
+    this.password = "";
   }
 
   async gotoAccount(account: WalletAccount) {

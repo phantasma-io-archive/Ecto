@@ -111,13 +111,14 @@
             </v-btn>
           </v-container>
           <v-container v-if="createStep === 1">
-            <div class="mb-5" style="padding: 20px 8px">
+            <div style="padding: 20px 8px">
               {{ $t('addWallet.created') }}
             </div>
             <v-textarea
               v-model="newAddress"
               readonly
               class="mx-2"
+              style="font-size:12px;"
               :label="$t('addWallet.labelAddressShort')"
               rows="2"
             ></v-textarea>
@@ -125,10 +126,19 @@
               v-model="newWif"
               readonly
               class="mx-2"
+              style="font-size:12px;"
               label="WIF"
               rows="2"
             ></v-textarea>
-            <v-btn block primary class="mt-3" @click="copyWifDialog = true">
+            <v-textarea
+              v-model="newHex"
+              readonly
+              class="mx-2"
+              style="font-size:12px;"
+              label="HEX"
+              rows="2"
+            ></v-textarea>
+            <v-btn block primary @click="copyWifDialog = true">
               {{ $t('addWallet.importLong') }}
             </v-btn>
             <div class="ma-3 mt-6">
@@ -296,6 +306,7 @@ export default class extends Vue {
 
   createStep = 0;
   newWif = "";
+  newHex = "";
   newAddress = "";
   copyWifDialog = false;
 
@@ -349,6 +360,7 @@ export default class extends Vue {
     this.wif = "";
     this.password = "";
     this.newWif = "";
+    this.newHex = "";
     this.newAddress = "";
     this.isLoading = false;
   }
@@ -362,6 +374,7 @@ export default class extends Vue {
     }
     const wif = WIF.encode(128, pk, true);
     this.newWif = wif;
+    this.newHex = getPrivateKeyFromWif(wif);
     this.newAddress = getAddressFromWif(wif);
     this.createStep = 1;
   }

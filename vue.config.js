@@ -35,5 +35,17 @@ module.exports = {
     config.plugins.push(new CopyWebpackPlugin(plugins));
     config.output.filename = 'js/[name].js';
     config.output.chunkFilename = 'js/[name].js';
+  },
+  chainWebpack: config => {
+    config.plugin('copy')
+          .tap(args => {
+            args[0].push({
+              from: path.resolve(__dirname, 'src/_locales'),
+              to: path.resolve(__dirname, 'dist/_locales'),
+              toType: 'dir',
+              ignore: ['.DS_Store']
+            })
+            return args
+          })
   }
 };

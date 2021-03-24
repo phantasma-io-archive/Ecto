@@ -78,28 +78,11 @@ import {
 import { state } from "@/popup/PopupState";
 
 function isFungible(symbol: string) {
-  return symbol !== "TTRS" && symbol !== "GHOST" && symbol !== "CROWN";
+  return !state.isNFT(symbol);
 }
 
-function decimals(symbol: string) {
-  switch (symbol) {
-    case "KCAL":
-      return 10;
-    case "SOUL":
-      return 8;
-    case "NEO":
-      return 0;
-    case "GAS":
-      return 8;
-    case "GOATI":
-      return 3;
-    case "ETH":
-      return 18;
-    case "MKNI":
-      return 0;
-    default:
-      return 0;
-  }
+function formatNumber(num: any) {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
 }
 
 function formatBalance(amount: string, decimals: number): string {
@@ -116,12 +99,8 @@ function formatBalance(amount: string, decimals: number): string {
   );
 }
 
-function formatNumber(num: any) {
-  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
-}
-
 function formatSymbol(amount: string, symbol: string): string {
-  return formatBalance(amount, decimals(symbol)) + " " + symbol;
+  return formatBalance(amount, state.decimals(symbol)) + " " + symbol;
 }
 
 function formatAddress(addr: string) {
@@ -160,6 +139,7 @@ export default class extends Vue {
   txUnshown = "";
   txBid = "";
   txAuction = "";
+  txSale = "";
 
   mounted() {
     this.descriptions = this.getDescriptions();
@@ -196,6 +176,7 @@ export default class extends Vue {
     this.txUnshown = this.$i18n.t("transactionComponent.unshown").toString();
     this.txBid = this.$i18n.t("transactionComponent.bid").toString();
     this.txAuction = this.$i18n.t("transactionComponent.auction").toString();
+    this.txSale = this.$i18n.t("transactionComponent.sale").toString();
 
     if (this.tx == null || this.tx.events == null) {
       console.log("TX undefined or no events");
@@ -261,7 +242,7 @@ export default class extends Vue {
         case "TokenClaim": {
           const data = getTokenEventData(ev.data);
           if (ev.address != this.address) break;
-          if (data.symbol == "SOUL") {
+          if (isFungible(data.symbol) && data.symbol != "KCAL") {
             const amount = data.value;
             res.push({
               icon: "mdi-star-outline",
@@ -295,6 +276,13 @@ export default class extends Vue {
             res.push({
               icon: "mdi-swap-horizontal",
               text: this.txSwapped + " " + formatSymbol(amount, data.symbol),
+            });
+          }
+          if (ev.contract == "sale") {
+            const amount = data.value;
+            res.push({
+              icon: "mdi-swap-horizontal",
+              text: this.txSale + " " + formatSymbol(amount, data.symbol),
             });
           }
           break;
@@ -416,7 +404,7 @@ export default class extends Vue {
               tooltip:
                 this.txFor +
                 " " +
-                formatSymbol("" + data.amount, data.quoteSymbol),
+                formatSymbol("" + (data.endAmount != 0 ? data.endAmount : data.amount).toString(), data.quoteSymbol),
               nftId,
               symbol: data.baseSymbol,
             });
@@ -434,11 +422,17 @@ export default class extends Vue {
               iconColor: "blue",
               postIcon: "mdi-eye-outline",
               postIconColor: "gray",
-              text: this.txBid + ' ' + data.type + ' ' + this.txAuction + ' (' + data.baseSymbol + ')',
+              text:
+                this.txBid +
+                " " +
+                this.txAuction +
+                " (" +
+                data.baseSymbol +
+                ")",
               tooltip:
                 this.txFor +
                 " " +
-                formatSymbol("" + data.amount, data.quoteSymbol),
+                formatSymbol("" + (data.endAmount != 0 ? data.endAmount : data.amount).toString(), data.quoteSymbol),
               nftId,
               symbol: data.baseSymbol,
             });
@@ -451,11 +445,7 @@ export default class extends Vue {
           // if (ev.address == this.address) {
           {
             const nftId = data.TokenID;
-            if (
-              data.InfusedSymbol === "TTRS" ||
-              data.InfusedSymbol === "GHOST" ||
-              data.InfusedSymbol === "CROWN"
-            ) {
+            if (state.isNFT(data.InfusedSymbol)) {
               res.push({
                 icon: "mdi-basket-fill",
                 postIcon: "mdi-eye-outline",

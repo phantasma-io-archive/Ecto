@@ -22,7 +22,8 @@
         "with": "Mit",
         "for": "für",
         "bid": "Bieten",
-        "auction": "Auktion"
+        "auction": "Auktion",
+        "sale": "Teilgenommen am Verkauf mit"
     },
     "app": {
         "currencyDescription": "Währung",
@@ -65,6 +66,7 @@
         "description": "möchte sich mit Phantasma Link verbinden. Jede Transaktion wird Ihre Erlaubnis anfordern. Möchten Sie dies zulassen?",
         "request": "Autorisierungsanfrage",
         "label": "Autorisieren für",
+        "labelAccount": "Account",
         "refuse": "Verweigern",
         "connect": "Verbinden",
         "periodCurrent": "Aktuelle Sitzung",
@@ -77,6 +79,7 @@
         "assets": "Vermögenswerte",
         "activity": "Aktivität",
         "swaps": "Tausche",
+        "multiChain": "multi<br/>chain",
         "unstake": "Entstaken",
         "unstakeTitle": "Entstaken",
         "stake": "Staken",
@@ -162,12 +165,20 @@
         "or": "oder",
         "swapAmount": "Tauschmenge",
         "needGasToSwap": "Sie brauchen {0} GAS in Phantasma, um die Tauschgebühren bezahlen zu können.",
-        "needEthToSwap": "Sie brauchen schätzungsweise {0} ETH in Phantasma, um die Tauschgebühren bezahlen zu können.",
+        "needEthToSwap": "An ETH swap costs approx. {0} ETH in fees.<br>An ERC20 swap costs approx. {1} ETH in fees.",
         "swapInProgressTitle": "Tausch in Bearbeitung",
         "swapBeingProcessed": "Ihr Tausch wird bearbeitet.",
         "needsConfirmations": "Es braucht 12 Bestätigungen um zu erscheinen.",
         "checkTransaction": "Sie können Ihre Transaktion nachprüfen:",
-        "here": "hier"
+        "here": "hier",
+        "assetsIn": "Known assets in",
+        "sendInProgress": "Send in progress",
+        "sendBeingProcessed": "Your send is being processed.",
+        "exportPrivateKey": "export your hex private key",
+        "andImportInMetamask": "and import in Metamask",
+        "crossChain": "CROSS CHAIN TRANSFERS",
+        "sameChain": "SAME CHAIN TRANSFERS",
+        "sendOn": "Send on"
     },
     "nfts": {
         "selected": "ausgewählt",
@@ -232,9 +243,17 @@
         "select": "BRIEFTASCHE AUSWÄHLEN",
         "title": "Konto entfernen",
         "subtitle": "Entfernt das Konto",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Benötigt Passwort",
         "unverified": "Schreibgeschütztes, nicht verifiziertes Konto",
-        "verified": "Benötigt WIF"
+        "verified": "Benötigt WIF",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
     },
     "error": {
         "malformed": "Fehlerhafte Anfrage",

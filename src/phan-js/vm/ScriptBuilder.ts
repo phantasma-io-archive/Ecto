@@ -100,7 +100,7 @@ export class ScriptBuilder {
         // obj is BigInteger
         // var bytes = val.ToSignedByteArray();
         // this.emitLoadBytes(reg, bytes, VMType.Number);
-        let bytes = this.rawString(obj.toString());
+        let bytes = this.rawString(BigInt(obj).toString());
         this.emitLoadBytes(reg, bytes, VMType.String);
         break;
       }

@@ -11,7 +11,7 @@ import tr from "../locales/tr.json";
 import ru from "../locales/ru.json";
 import vn from "../locales/vn.json";
 import nb from "../locales/nb.json";
-import nb from "../locales/pt.json";
+import pt from "../locales/pt.json";
 
 export const messages = {
   [Locales.EN]: en,

@@ -146,6 +146,7 @@ export interface Token {
   currentSupply: string; //Amount of minted tokens
   maxSupply: string; //Max amount of tokens that can be minted
   platform: string; //Platform of token
+  external?: { hash: string; platform: string }[];
   hash: string; //Hash of token
   flags: string;
 }
@@ -313,13 +314,18 @@ export class PhantasmaAPI {
     fetch(peersUrlJson + "?_=" + new Date().getTime()).then(async (res) => {
       const data = await res.json();
       for (var i = 0; i < data.length; i++) {
-        const msecs = await this.pingAsync(data[i].url);
-        data[i].info = data[i].location + " • " + msecs + " ms";
-        data[i].msecs = msecs;
-        console.log(
-          data[i].location + " • " + msecs + " ms • " + data[i].url + "/rpc"
-        );
-        this.availableHosts.push(data[i]);
+        console.log("Checking RPC: ", data[i]);
+        try {
+          const msecs = await this.pingAsync(data[i].url);
+          data[i].info = data[i].location + " • " + msecs + " ms";
+          data[i].msecs = msecs;
+          console.log(
+            data[i].location + " • " + msecs + " ms • " + data[i].url + "/rpc"
+          );
+          this.availableHosts.push(data[i]);
+        } catch (err) {
+          console.log("Error with RPC: " + data[i]);
+        }
       }
       this.availableHosts.sort((a, b) => a.msecs - b.msecs);
       this.updateRpc();
@@ -518,9 +524,9 @@ export class PhantasmaAPI {
   }
 
   //Returns an array of tokens deployed in Phantasma.
-  async getTokens(): Promise<Token> {
+  async getTokens(): Promise<Token[]> {
     let params: Array<any> = [];
-    return (await this.JSONRPC("getTokens", params)) as Token;
+    return (await this.JSONRPC("getTokens", params)) as Token[];
   }
 
   //Returns info about a specific token deployed in Phantasma.

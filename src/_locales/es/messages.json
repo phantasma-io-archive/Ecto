@@ -1,0 +1,8 @@
+{
+    "appName": {
+      "message": "Ecto Wallet"
+    },
+    "appDesc": {
+      "message": "Extensión de chrome para gestionar billeteras en Phantasma Blockchain."
+    }
+  }

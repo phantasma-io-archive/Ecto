@@ -24,10 +24,10 @@
         v-if="isLoading"
         color="#17b1e8"
         indeterminate
-        style="z-index:7777"
+        style="z-index:7777;position:absolute;"
       ></v-progress-linear>
       <div class="pl-3 pr-3" style="overflow: auto; height: 500px">
-        <div class="pa-0 ma-0 mt-1 mb-2">
+        <div class="pa-0 ma-0 mt-3 mb-3">
           <v-row>
             <v-col class="pl-3 pt-1 flex-grow-1">
               <v-text-field
@@ -245,9 +245,7 @@
 
     <v-dialog v-model="burnWhereDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{
-          $t("nfts.burnTitle")
-        }}</v-card-title>
+        <v-card-title class="headline">{{ $t("nfts.burnTitle") }}</v-card-title>
 
         <v-card-text>
           <span>
@@ -754,8 +752,7 @@ export default class extends Vue {
 
     console.log(
       "sending",
-      this.sendAmount * 10 ** this.sendDecimals,
-      "of",
+      this.nftsToSend.length,
       this.sendSymbol,
       "to",
       this.sendDestination
@@ -763,7 +760,7 @@ export default class extends Vue {
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800 * this.nftsToSend.length;
+    const minGasLimit = 2100 * this.nftsToSend.length;
 
     let sb = new ScriptBuilder();
 
@@ -824,34 +821,20 @@ export default class extends Vue {
   async burnNFTs() {
     if (!this.account) return;
 
-    console.log(
-      "burning",
-      this.burnAmount * 10 ** this.burnDecimals,
-      "of",
-      this.burnSymbol
-    );
+    console.log("burning", this.nftsToBurn.length, this.burnSymbol);
 
     const address = this.account.address;
     const gasPrice = 100000;
-    const minGasLimit = 800 * this.nftsToBurn.length;
+    const minGasLimit = 2100 * this.nftsToBurn.length;
 
     let sb = new ScriptBuilder();
 
     sb.beginScript();
     sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
     this.nftsToBurn.forEach((nft) => {
-      sb.callInterop("Runtime.BurnToken", [
-        address,
-        this.sendSymbol,
-        nft.id,
-      ]);
+      sb.callInterop("Runtime.BurnToken", [address, this.sendSymbol, nft.id]);
 
-      console.log(
-        "nft to burn",
-        nft.id,
-        "of",
-        this.sendSymbol
-      );
+      console.log("nft to burn", nft.id, "of", this.sendSymbol);
     });
     sb.spendGas(address);
     const script = sb.endScript();

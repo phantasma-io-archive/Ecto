@@ -22,7 +22,8 @@
         "with": "Com",
         "for": "para",
         "bid": "Licitar",
-        "auction": "Leilão"
+        "auction": "Leilão",
+        "sale": "Participou na venda com"
     },
     "app": {
         "currencyDescription": "Moeda",
@@ -65,6 +66,7 @@
         "description": "quer conectar via Phantasma Link. Cada transação irá requisitar a tua permissão. Dás accesso?",
         "request": "Pedido de autorização",
         "label": "Autoriza para",
+        "labelAccount": "Account",
         "refuse": "Recusa",
         "connect": "Conecta",
         "periodCurrent": "Sessão atual",
@@ -77,6 +79,7 @@
         "assets": "Espólio",
         "activity": "Atividade",
         "swaps": "Trocas",
+        "multiChain": "multi<br/>chain",
         "unstake": "Recuperar",
         "unstakeTitle": "Recuperar",
         "stake": "Depositar",
@@ -162,12 +165,20 @@
         "or": "ou",
         "swapAmount": "Quantidade de troca",
         "needGasToSwap": "Necesitas {0} GAS em Phantasma para puderes pagar as taxas de troca.",
-        "needEthToSwap": "Necesitas approx. {0} ETH em Phantasma para puderes pagar as taxas de troca.",
+        "needEthToSwap": "An ETH swap costs approx. {0} ETH in fees.<br>An ERC20 swap costs approx. {1} ETH in fees.",
         "swapInProgressTitle": "Troca pendente",
         "swapBeingProcessed": "A tua troca está a ser processada.",
         "needsConfirmations": "Necesita 12 confirmações para aparecer.",
         "checkTransaction": "Podes verificar a tua transação",
-        "here": "here"
+        "here": "here",
+        "assetsIn": "Known assets in",
+        "sendInProgress": "Send in progress",
+        "sendBeingProcessed": "Your send is being processed.",
+        "exportPrivateKey": "export your hex private key",
+        "andImportInMetamask": "and import in Metamask",
+        "crossChain": "CROSS CHAIN TRANSFERS",
+        "sameChain": "SAME CHAIN TRANSFERS",
+        "sendOn": "Send on"
     },
     "nfts": {
         "selected": "selecionado",
@@ -232,9 +243,17 @@
         "select": "SELECIONAR CARTEIRA",
         "title": "Remover conta",
         "subtitle": "Remove a conta",
+        "titleKey": "Export private key",
+        "subtitleKey": "WIF and HEX format",
         "encKey": "Requer password",
         "unverified": "Conta em modo de leitura",
-        "verified": "Requer WIF"
+        "verified": "Requer WIF",
+        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
+        "titlePrivateKey": "Private Key",
+        "labelWIF": "Private key (WIF format)",
+        "labelHEX": "Private key (HEX format)",
+        "enterPassword": "Enter password",
+        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
     },
     "error": {
         "malformed": "Pedido malformado",
