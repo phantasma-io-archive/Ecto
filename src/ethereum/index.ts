@@ -79,7 +79,6 @@ export function getEthAddressFromWif(wif: string): string {
 export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
   const balances: { symbol: string; amount: bigint }[] = [];
 
-  console.log("%cGET ETH BALANCES", "font-size: 20px");
   const erc20Tokens = state
     .getAllSwapableTokens("ethereum")
     .filter((t) => t.symbol != "ETH");
