@@ -3144,6 +3144,7 @@ export default class extends Vue {
   }
 
   selectAssetToSwap(chain: string, customDest: boolean) {
+    this.swapFromChain = "phantasma";
     this.swapToCustomDest = customDest;
     this.swapToChain = chain;
     this.selectAssetToSwapDialog = true;
