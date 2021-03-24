@@ -1103,6 +1103,11 @@ export class PopupState {
     return token && token.flags && !token.flags.includes("Fungible");
   }
 
+  isBurnable(symbol: string) {
+    const token = this.getToken(symbol);
+    return token && token.flags && token.flags.includes("Burnable");
+  }
+
   formatBalance(symbol: string, amount: string): string {
     const decimals = this.decimals(symbol);
     if (this.isNFT(symbol)) return symbol + " NFT";

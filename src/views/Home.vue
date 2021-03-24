@@ -197,7 +197,7 @@
                       small
                       text
                       style="padding: 0 6px;"
-                      v-if="state.isNFT(item.symbol)"
+                      v-if="state.isNFT(item.symbol) && state.isBurnable(item.symbol)"
                       @click="burnAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-fire</v-icon> {{ $t("home.burn") }}</v-btn
@@ -2996,11 +2996,7 @@ export default class extends Vue {
     event.stopImmediatePropagation();
     console.log("Going to burn: " + item.symbol);
 
-    if (
-      item.symbol == "TTRS" ||
-      item.symbol == "CROWN" ||
-      item.symbol == "GHOST"
-    ) {
+    if (state.isNFT(item.symbol) && state.isBurnable(item.symbol)) {
       this.goto("/nfts/" + item.symbol + "/burn");
       return;
     }
