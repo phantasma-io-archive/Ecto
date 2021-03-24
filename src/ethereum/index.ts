@@ -97,6 +97,7 @@ export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
 
   const ethVal = BigInt(ethBalance === "0x" ? 0 : ethBalance);
   console.log("ethBalance", ethVal);
+  if (ethVal != 0n) balances.push({ symbol: "ETH", amount: ethVal });
 
   const ethDataAddr =
     "0x70a08231000000000000000000000000" + ethAddress.substring(2);
