@@ -959,7 +959,13 @@
             :min="sendSymbol === 'ETH' ? 0.0001 : 0.01"
             :max="sendMaxAmount"
             :value="1"
-            :step="sendSymbol === 'ETH' ? 0.0001 : 0.01"
+            :step="
+              sendSymbol === 'ETH'
+                ? 0.0001
+                : state.decimals(sendSymbol) === 0
+                ? 1
+                : 0.01
+            "
             thumb-label="always"
             style="margin-top:40px"
           >
@@ -1274,7 +1280,13 @@
             :min="sendSymbol === 'ETH' ? 0.0001 : 0.01"
             :max="sendMaxAmount"
             :value="1"
-            :step="sendSymbol === 'ETH' ? 0.0001 : 0.01"
+            :step="
+              sendSymbol === 'ETH'
+                ? 0.0001
+                : state.decimals(sendSymbol) === 0
+                ? 1
+                : 0.01
+            "
             thumb-label="always"
             style="margin-top:40px"
           >
