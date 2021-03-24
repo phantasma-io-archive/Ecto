@@ -197,7 +197,10 @@
                       small
                       text
                       style="padding: 0 6px;"
-                      v-if="state.isNFT(item.symbol) && state.isBurnable(item.symbol)"
+                      v-if="
+                        state.isNFT(item.symbol) &&
+                          state.isBurnable(item.symbol)
+                      "
                       @click="burnAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-fire</v-icon> {{ $t("home.burn") }}</v-btn
@@ -284,33 +287,42 @@
             v-if="account && account.neoAddress && account.ethAddress"
             style="overflow: auto; height: 459px"
           >
-            <div v-if="state.allSwaps.length > 0" class="pa-4">
-              <div
-                style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
-              >
-                <v-badge
-                  v-if="state.allSwaps.length > 0"
-                  :content="state.allSwaps.length"
-                  color="#17b1e8"
-                  style="margin-left:0.5rem;"
-                  >{{ $t("home.pendingSwaps") }}</v-badge
+            <div style="text-align:center">
+              <v-expansion-panels focusable hover multiple>
+                <div
+                  style="width: 100%; height: 16px; margin-top: 8px; background: linear-gradient(45deg, #28ceaf, #17b1e8); color: white"
                 >
-              </div>
-              <div
-                v-for="(swap, idx) in state.allSwaps"
-                :key="swap.sourceHash + 'a' + idx"
-                class="pa-1"
-              >
-                <span v-if="!state.balanceShown">***</span>
-                <span v-else>{{ formatSymbol(swap.value, swap.symbol) }}</span>
-                {{ $t("home.from") }} {{ formatChain(swap.sourcePlatform) }}
-                {{ $t("home.to") }}
-                {{ formatChain(swap.destinationPlatform) }}
-                <a href="#" @click.prevent="claimSwap(swap)">{{
-                  $t("home.claim")
-                }}</a>
-              </div>
-              <!--<div
+                  {{ $t("home.crossChain") }}
+                </div>
+                <div v-if="state.allSwaps.length > 0" class="pa-4">
+                  <div
+                    style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
+                  >
+                    <v-badge
+                      v-if="state.allSwaps.length > 0"
+                      :content="state.allSwaps.length"
+                      color="#17b1e8"
+                      style="margin-left:0.5rem;"
+                      >{{ $t("home.pendingSwaps") }}</v-badge
+                    >
+                  </div>
+                  <div
+                    v-for="(swap, idx) in state.allSwaps"
+                    :key="swap.sourceHash + 'a' + idx"
+                    class="pa-1"
+                  >
+                    <span v-if="!state.balanceShown">***</span>
+                    <span v-else>{{
+                      formatSymbol(swap.value, swap.symbol)
+                    }}</span>
+                    {{ $t("home.from") }} {{ formatChain(swap.sourcePlatform) }}
+                    {{ $t("home.to") }}
+                    {{ formatChain(swap.destinationPlatform) }}
+                    <a href="#" @click.prevent="claimSwap(swap)">{{
+                      $t("home.claim")
+                    }}</a>
+                  </div>
+                  <!--<div
                 v-for="(cs, idx) in state.claimablePendingSwaps"
                 :key="cs.hash + 'c' + idx"
                 class="pa-1"
@@ -328,13 +340,6 @@
                   $t("home.claim")
                 }}</a>
               </div>-->
-            </div>
-            <div style="text-align:center">
-              <v-expansion-panels focusable hover multiple>
-                <div
-                  style="width: 100%; height: 16px; margin-top: 8px; background: linear-gradient(45deg, #28ceaf, #17b1e8); color: white"
-                >
-                  {{ $t("home.crossChain") }}
                 </div>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
@@ -579,14 +584,18 @@
                     >-->
                     <br />
                     <br />
-                    <span v-html="$t('home.needEthToSwap', [
-                        (
-                          Math.round(21000 * ethGasPrices[1] * 1.2) / 1e9
-                        ).toFixed(4),
-                        (
-                          Math.round(100000 * ethGasPrices[1] * 1.2) / 1e9
-                        ).toFixed(4),
-                      ])"></span>
+                    <span
+                      v-html="
+                        $t('home.needEthToSwap', [
+                          (
+                            Math.round(21000 * ethGasPrices[1] * 1.2) / 1e9
+                          ).toFixed(4),
+                          (
+                            Math.round(100000 * ethGasPrices[1] * 1.2) / 1e9
+                          ).toFixed(4),
+                        ])
+                      "
+                    ></span>
                     <!-- Each swap costs 0.001 ETH -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -669,7 +678,9 @@
                 >
                   <v-expansion-panel-header>
                     <v-row>
-                      <v-col class="mt-2"> {{ $t("home.sendOn") }} Ethereum </v-col>
+                      <v-col class="mt-2">
+                        {{ $t("home.sendOn") }} Ethereum
+                      </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
                           class="ma-1"
@@ -2405,7 +2416,7 @@ export default class extends Vue {
   }
 
   async sendFromNeo() {
-    if (this.swapToChain === "pha") {
+    if (this.swapToChain === "phantasma") {
       const platforms = await state.api.getPlatforms();
       const interopAddr = platforms.find((p) => p.platform == "neo")
         ?.interop[0];
@@ -2498,7 +2509,7 @@ export default class extends Vue {
     const gasPrice = this.ethGasPrices[this.swapGasIndex] * 10 ** 9; //100000000000;
     const gasLimit = this.sendSymbol == "ETH" ? 21000 : 100000;
 
-    if (this.swapToChain === "pha") {
+    if (this.swapToChain === "phantasma") {
       const platforms = await state.api.getPlatforms();
       const interopAddr = platforms.find((p) => p.platform == "ethereum")
         ?.interop[0];
@@ -2508,6 +2519,12 @@ export default class extends Vue {
       }
       console.log("Interop address is ", interopAddr.external);
       this.sendDestination = interopAddr.external;
+    }
+
+    if (this.sendDestination == "") {
+      this.errorDialog = true;
+      this.errorMessage = "Error in destination address";
+      return;
     }
 
     const destAddr = this.sendDestination // interopAddr.external //"0x259D17A3E6658B79CE7F6F87CAC614A696056E79"
