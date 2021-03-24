@@ -171,14 +171,14 @@
         "needsConfirmations": "Nó cần 12 xác nhận để xuất hiện.",
         "checkTransaction": "Bạn có thể kiểm tra giao dịch của mình",
         "here": "đây",
-        "assetsIn": "Known assets in",
-        "sendInProgress": "Send in progress",
-        "sendBeingProcessed": "Your send is being processed.",
-        "exportPrivateKey": "export your hex private key",
-        "andImportInMetamask": "and import in Metamask",
-        "crossChain": "CROSS CHAIN TRANSFERS",
-        "sameChain": "SAME CHAIN TRANSFERS",
-        "sendOn": "Send on"
+        "assetIn": "Nội dung đã biết trong",
+        "sendInProgress": "Đang gửi",
+        "sendBeingProcessed": "Quá trình chuyển tài sản của bạn đang được xử lý.",
+        "exportPrivateKey": "xuất khóa cá nhân hex của bạn",
+        "andImportInMetamask": "và nhập trong Metamask",
+        "crossChain": "CHUYỂN ĐỔI CHUỖI CHÉO",
+        "sameChain": "CÙNG CHUYỂN ĐỔI CHUỖI",
+        "sendOn": "Gửi tiếp"
     },
     "nfts": {
         "selected": "đã chọn",
