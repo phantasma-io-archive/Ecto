@@ -109,7 +109,7 @@ export class PopupState {
 
   allSwaps: Swap[] = [];
 
-  payload = "4543542D312E302E33";
+  payload = "4543542D312E31302E30";
 
   $i18n: any = {
     t: (s: string) => s,
@@ -990,6 +990,12 @@ export class PopupState {
     return getEthContract(symbol, this.isMainnet);
   }
 
+  getNeoContract(symbol: string) {
+    const hash = this.getTokenHash(symbol, "neo");
+    if (hash) return hash;
+    return "ed07cffad18f1308db51920d99a2af60ac66a7b3"; // harcoded SOUL NEP5 contract
+  }
+
   getTranscodeAddress(wif: string) {
     const pkHex = getPrivateKeyFromWif(wif);
     const privateKey = Secp256k1.uint256(pkHex, 16);
@@ -1036,8 +1042,30 @@ export class PopupState {
     return (this._tokens as any)[this.nexus] as Token[];
   }
 
+  getAllSwapableTokens(platform: string) {
+    return this.getAllTokens().filter(
+      (t) =>
+        t.external && t.external.findIndex((e) => e.platform == platform) >= 0
+    );
+  }
+
   getToken(symbol: string) {
     return this.getAllTokens().find((t) => t.symbol == symbol);
+  }
+
+  getTokenHash(symbol: string, chain: string) {
+    const ch = chain == "eth" ? "ethereum" : chain;
+    const token = this.getToken(symbol);
+    if (token && token.external) {
+      let ext = token.external.find((e) => e.platform == ch);
+      if (ext) return ext.hash;
+    }
+    return undefined;
+  }
+
+  isSwappable(symbol: string, swapToChain: string) {
+    const hash = this.getTokenHash(symbol, swapToChain);
+    return hash != null;
   }
 
   decimals(symbol: string): number {
@@ -1073,6 +1101,11 @@ export class PopupState {
   isNFT(symbol: string) {
     const token = this.getToken(symbol);
     return token && token.flags && !token.flags.includes("Fungible");
+  }
+
+  isBurnable(symbol: string) {
+    const token = this.getToken(symbol);
+    return token && token.flags && token.flags.includes("Burnable");
   }
 
   formatBalance(symbol: string, amount: string): string {

@@ -79,6 +79,7 @@
     "assets": "Assets",
     "activity": "Activity",
     "swaps": "Swaps",
+    "multiChain": "multi<br/>chain",
     "unstake": "Unstake",
     "unstakeTitle": "Unstake",
     "stake": "Stake",
@@ -164,7 +165,7 @@
     "or": "or",
     "swapAmount": "Swap Amount",
     "needGasToSwap": "A swap to NEO costs {0} GAS in fees.",
-    "needEthToSwap": "A swap to Ethereum costs approx. {0} ETH in fees.",
+    "needEthToSwap": "An ETH swap costs approx. {0} ETH in fees.<br>An ERC20 swap costs approx. {1} ETH in fees.",
     "swapInProgressTitle": "Swap in progress",
     "swapBeingProcessed": "Your swap is being processed.",
     "needsConfirmations": "It needs 12 confirmations to appear.",
@@ -172,10 +173,12 @@
     "here": "here",
     "assetsIn": "Known assets in",
     "sendInProgress": "Send in progress",
-    "sendBeingProcessed": "Your send is being processed.",
+    "sendBeingProcessed": "Your asset transfer is being processed.",
     "exportPrivateKey": "export your hex private key",
     "andImportInMetamask": "and import in Metamask",
-    "multiChain": "multi<br/>chain"
+    "crossChain": "CROSS CHAIN TRANSFERS",
+    "sameChain": "SAME CHAIN TRANSFERS",
+    "sendOn": "Send on"
   },
   "nfts": {
     "selected": "selected",

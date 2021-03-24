@@ -52,7 +52,9 @@
 
     <v-dialog v-model="requestPasswordDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t("wallets.enterPassword") }}</v-card-title>
+        <v-card-title class="headline">{{
+          $t("wallets.enterPassword")
+        }}</v-card-title>
 
         <v-card-text>
           <span>
@@ -99,7 +101,9 @@
 
     <v-dialog v-model="showPrivateKeyDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ $t("wallets.titlePrivateKey") }}</v-card-title>
+        <v-card-title class="headline">{{
+          $t("wallets.titlePrivateKey")
+        }}</v-card-title>
 
         <v-card-text>
           <span>
@@ -261,7 +265,6 @@ export default class extends Vue {
   }
 
   exportPrivateKey() {
-    console.log("export private key", this.reqAccount, this.password);
     if (!this.reqAccount) return;
 
     try {

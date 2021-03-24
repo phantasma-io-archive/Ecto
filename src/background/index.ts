@@ -286,6 +286,15 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           if (!account.balances) {
             account.balances = [];
           }
+
+          if (!account.balances.find((b) => b.symbol == "SOUL"))
+            account.balances.unshift({
+              chain: "main",
+              symbol: "SOUL",
+              amount: "0",
+              decimals: 8,
+            });
+
           let balances = account.balances.map((x) => {
             return {
               value: x.amount,
@@ -301,7 +310,17 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
             let ethAddress = curAccount?.ethAddress;
             if (ethAddress) {
               external = ethAddress;
-              await getEthBalances(ethAddress, state.nexus == "mainnet");
+              const ethBals = await getEthBalances(
+                ethAddress,
+                state.nexus == "mainnet"
+              );
+              balances = ethBals.map((b: any) => {
+                return {
+                  symbol: b.symbol,
+                  value: b.amount.toString(),
+                  decimals: state.decimals(b.symbol),
+                };
+              });
             } else {
               platform = "phantasma";
             }
@@ -311,19 +330,21 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
             let neoAddress = curAccount?.neoAddress;
             if (neoAddress) {
               external = neoAddress;
-              await getNeoBalances(neoAddress, state.nexus == "mainnet");
+              const neoBals = await getNeoBalances(
+                neoAddress,
+                state.nexus == "mainnet"
+              );
+              balances = neoBals.map((b: any) => {
+                return {
+                  symbol: b.symbol,
+                  value: b.amount,
+                  decimals: state.decimals(b.symbol),
+                };
+              });
             } else {
               platform = "phantasma";
             }
           }
-
-          if (!account.balances.find((b) => b.symbol == "SOUL"))
-            account.balances.unshift({
-              chain: "main",
-              symbol: "SOUL",
-              amount: "0",
-              decimals: 8,
-            });
 
           console.log("got account: " + JSON.stringify(account));
           let response: IGetAccountResponse = {
@@ -353,13 +374,36 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           const version = req.version;
           const token = args[args.length - 1];
 
-          const nexus = args[1];
-          const chain = args[2];
-          const script = args[3];
-          let payload = args[4];
+          let nexus = "";
+          let payload = "";
+          let chain = "";
+          let script = "";
+          let platform = "phantasma";
+          let signature = "Ed25519";
+
+          if (version == "1") {
+            nexus = args[1];
+            chain = args[2];
+            script = args[3];
+            payload = args[4];
+          } else if (version == "2") {
+            chain = args[1];
+            script = args[2];
+            payload = args[3];
+            signature = args[4];
+            platform = args[5];
+          }
+
           payload = payload == null || payload == "" ? state.payload : payload;
 
-          let txdata = JSON.stringify({ nexus, chain, script, payload });
+          let txdata = JSON.stringify({
+            nexus,
+            chain,
+            script,
+            payload,
+            signature,
+            platform,
+          });
           let b64txdata = btoa(txdata);
 
           chrome.tabs.get(msg.tabid, (tab) => {
@@ -405,6 +449,10 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
           const hexdata = args[1];
           const signKind = args[2];
+          let platform = "phantasma";
+
+          if (version == "2" && args.length > 3)
+            platform = args[3].toLocaleLowerCase();
 
           chrome.tabs.get(msg.tabid, (tab) => {
             const url = tab.url || "http://unknown";

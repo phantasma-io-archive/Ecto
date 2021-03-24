@@ -146,6 +146,7 @@ export interface Token {
   currentSupply: string; //Amount of minted tokens
   maxSupply: string; //Max amount of tokens that can be minted
   platform: string; //Platform of token
+  external?: { hash: string; platform: string }[];
   hash: string; //Hash of token
   flags: string;
 }

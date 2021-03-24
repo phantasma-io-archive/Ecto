@@ -197,7 +197,10 @@
                       small
                       text
                       style="padding: 0 6px;"
-                      v-if="state.isNFT(item.symbol)"
+                      v-if="
+                        state.isNFT(item.symbol) &&
+                          state.isBurnable(item.symbol)
+                      "
                       @click="burnAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-fire</v-icon> {{ $t("home.burn") }}</v-btn
@@ -284,33 +287,42 @@
             v-if="account && account.neoAddress && account.ethAddress"
             style="overflow: auto; height: 459px"
           >
-            <div v-if="state.allSwaps.length > 0" class="pa-4">
-              <div
-                style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
-              >
-                <v-badge
-                  v-if="state.allSwaps.length > 0"
-                  :content="state.allSwaps.length"
-                  color="#17b1e8"
-                  style="margin-left:0.5rem;"
-                  >{{ $t("home.pendingSwaps") }}</v-badge
+            <div style="text-align:center">
+              <v-expansion-panels focusable hover multiple>
+                <div
+                  style="width: 100%; height: 16px; margin-top: 8px; background: linear-gradient(45deg, #28ceaf, #17b1e8); color: white"
                 >
-              </div>
-              <div
-                v-for="(swap, idx) in state.allSwaps"
-                :key="swap.sourceHash + 'a' + idx"
-                class="pa-1"
-              >
-                <span v-if="!state.balanceShown">***</span>
-                <span v-else>{{ formatSymbol(swap.value, swap.symbol) }}</span>
-                {{ $t("home.from") }} {{ formatChain(swap.sourcePlatform) }}
-                {{ $t("home.to") }}
-                {{ formatChain(swap.destinationPlatform) }}
-                <a href="#" @click.prevent="claimSwap(swap)">{{
-                  $t("home.claim")
-                }}</a>
-              </div>
-              <!--<div
+                  {{ $t("home.crossChain") }}
+                </div>
+                <div v-if="state.allSwaps.length > 0" class="pa-4">
+                  <div
+                    style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
+                  >
+                    <v-badge
+                      v-if="state.allSwaps.length > 0"
+                      :content="state.allSwaps.length"
+                      color="#17b1e8"
+                      style="margin-left:0.5rem;"
+                      >{{ $t("home.pendingSwaps") }}</v-badge
+                    >
+                  </div>
+                  <div
+                    v-for="(swap, idx) in state.allSwaps"
+                    :key="swap.sourceHash + 'a' + idx"
+                    class="pa-1"
+                  >
+                    <span v-if="!state.balanceShown">***</span>
+                    <span v-else>{{
+                      formatSymbol(swap.value, swap.symbol)
+                    }}</span>
+                    {{ $t("home.from") }} {{ formatChain(swap.sourcePlatform) }}
+                    {{ $t("home.to") }}
+                    {{ formatChain(swap.destinationPlatform) }}
+                    <a href="#" @click.prevent="claimSwap(swap)">{{
+                      $t("home.claim")
+                    }}</a>
+                  </div>
+                  <!--<div
                 v-for="(cs, idx) in state.claimablePendingSwaps"
                 :key="cs.hash + 'c' + idx"
                 class="pa-1"
@@ -328,9 +340,7 @@
                   $t("home.claim")
                 }}</a>
               </div>-->
-            </div>
-            <div style="text-align:center">
-              <v-expansion-panels focusable hover multiple>
+                </div>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row>
@@ -408,71 +418,6 @@
                                 @click.prevent="askSwapFromNeo(bal)"
                                 >{{ $t("home.swap") }}</a
                               >
-                            </v-list-item-action>
-                          </v-list-item>
-                        </v-list-item-group>
-                      </v-list>
-                    </div>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel
-                  v-if="state.neoBalances && state.neoBalances.length > 0"
-                >
-                  <v-expansion-panel-header>
-                    <v-row>
-                      <v-col class="mt-2"> {{ "Send on" }} NEO </v-col>
-                      <v-col cols="4" class="pl-0 pr-0">
-                        <img
-                          class="ma-1"
-                          src="assets/neo.png"
-                          style="vertical-align: middle; max-width:24px"
-                        />
-                        <v-icon>mdi-arrow-right-bold</v-icon
-                        ><img
-                          class="ma-1"
-                          src="assets/neo.png"
-                          style="vertical-align: middle; max-width:24px"
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content class="pa-2">
-                    <div>
-                      {{ $t("home.assetsIn") }}
-                      <strong v-if="!state.balanceShown"
-                        >************************************</strong
-                      >
-                      <strong v-else>{{ account.neoAddress }}</strong
-                      ><v-btn
-                        icon
-                        x-small
-                        @click="copyToClipboard(account.neoAddress)"
-                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
-                      >
-                      <v-list>
-                        <v-list-item-group>
-                          <v-list-item
-                            v-for="bal in state.neoBalances"
-                            :key="bal.symbol"
-                          >
-                            <v-list-item-content>
-                              <v-img
-                                class="mr-3"
-                                :src="getAssetIcon(bal)"
-                                max-width="24px"
-                              ></v-img
-                              ><span
-                                v-if="!state.balanceShown"
-                                style="display:contents;"
-                                >*** {{ bal.symbol }}</span
-                              ><span v-else style="display:contents;">{{
-                                formatSymbol(bal.amount, bal.symbol)
-                              }}</span>
-                            </v-list-item-content>
-                            <v-list-item-action>
-                              <a href="#" @click.prevent="askSendNeo(bal)">{{
-                                $t("home.send").toLowerCase()
-                              }}</a>
                             </v-list-item-action>
                           </v-list-item>
                         </v-list-item-group>
@@ -566,82 +511,6 @@
                     {{ $t("home.withYourKey") }} <br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel
-                  v-if="state.ethBalances && state.ethBalances.length > 0"
-                >
-                  <v-expansion-panel-header>
-                    <v-row>
-                      <v-col class="mt-2"> {{ "Send on" }} Ethereum </v-col>
-                      <v-col cols="4" class="pl-0 pr-0">
-                        <img
-                          class="ma-1"
-                          src="assets/eth.png"
-                          style="vertical-align: middle; max-width:24px"
-                        />
-                        <v-icon>mdi-arrow-right-bold</v-icon
-                        ><img
-                          class="ma-1"
-                          src="assets/eth.png"
-                          style="vertical-align: middle; max-width:24px"
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content class="pa-3">
-                    <div>
-                      {{ $t("home.assetsIn") }}
-                      <strong v-if="!state.balanceShown"
-                        >************************************</strong
-                      >
-                      <strong v-else>{{ account.ethAddress }}</strong
-                      ><v-btn
-                        icon
-                        x-small
-                        @click="copyToClipboard(account.ethAddress)"
-                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
-                      >
-                      <v-list>
-                        <v-list-item-group>
-                          <v-list-item
-                            v-for="bal in state.ethBalances"
-                            :key="bal.symbol"
-                            style="cursor: default"
-                          >
-                            <v-list-item-content>
-                              <v-img
-                                class="mr-3"
-                                :src="getAssetIcon(bal)"
-                                max-width="24px"
-                              ></v-img
-                              >{{ formatSymbol(bal.amount, bal.symbol) }}
-                            </v-list-item-content>
-                            <v-list-item-action style="display: inline">
-                              <a href="#" @click.prevent="askSendEth(bal)">{{
-                                $t("home.send").toLowerCase()
-                              }}</a>
-                            </v-list-item-action>
-                          </v-list-item>
-                        </v-list-item-group>
-                      </v-list>
-                    </div>
-                    {{ $t("home.or") }}
-                    <a href="#" @click.prevent="askExportPrivateKeyHex">{{
-                      $t("home.exportPrivateKey")
-                    }}</a>
-                    {{ $t("home.andImportInMetamask")
-                    }}<v-btn
-                      icon
-                      x-small
-                      @click="
-                        openWindow(
-                          'https://metamask.zendesk.com/hc/en-us/articles/360015489331-How-to-import-an-Account'
-                        )
-                      "
-                      ><v-icon size="16">mdi-information-outline</v-icon></v-btn
-                    >
-                    <br />
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row style="vertical-align:middle">
@@ -715,14 +584,171 @@
                     >-->
                     <br />
                     <br />
-                    {{
-                      $t("home.needEthToSwap", [
-                        (
-                          Math.round(100000 * ethGasPrices[1] * 1.2) / 1e9
-                        ).toFixed(4),
-                      ])
-                    }}
+                    <span
+                      v-html="
+                        $t('home.needEthToSwap', [
+                          (
+                            Math.round(21000 * ethGasPrices[1] * 1.2) / 1e9
+                          ).toFixed(4),
+                          (
+                            Math.round(100000 * ethGasPrices[1] * 1.2) / 1e9
+                          ).toFixed(4),
+                        ])
+                      "
+                    ></span>
                     <!-- Each swap costs 0.001 ETH -->
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <div
+                  v-if="
+                    (state.neoBalances && state.neoBalances.length > 0) ||
+                      (state.ethBalances && state.ethBalances.length > 0)
+                  "
+                  style="width: 100%; height: 16px; background: linear-gradient(45deg, #28ceaf, #17b1e8); color: white"
+                >
+                  {{ $t("home.sameChain") }}
+                </div>
+                <v-expansion-panel
+                  v-if="state.neoBalances && state.neoBalances.length > 0"
+                >
+                  <v-expansion-panel-header>
+                    <v-row>
+                      <v-col class="mt-2"> {{ $t("home.sendOn") }} NEO </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/neo.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/neo.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-2">
+                    <div>
+                      {{ $t("home.assetsIn") }}
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
+                      >
+                      <strong v-else>{{ account.neoAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.neoAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                      <v-list>
+                        <v-list-item-group>
+                          <v-list-item
+                            v-for="bal in state.neoBalances"
+                            :key="bal.symbol"
+                          >
+                            <v-list-item-content>
+                              <v-img
+                                class="mr-3"
+                                :src="getAssetIcon(bal)"
+                                max-width="24px"
+                              ></v-img
+                              ><span
+                                v-if="!state.balanceShown"
+                                style="display:contents;"
+                                >*** {{ bal.symbol }}</span
+                              ><span v-else style="display:contents;">{{
+                                formatSymbol(bal.amount, bal.symbol)
+                              }}</span>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                              <a href="#" @click.prevent="askSendNeo(bal)">{{
+                                $t("home.send").toLowerCase()
+                              }}</a>
+                            </v-list-item-action>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+                    </div>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel
+                  v-if="state.ethBalances && state.ethBalances.length > 0"
+                >
+                  <v-expansion-panel-header>
+                    <v-row>
+                      <v-col class="mt-2">
+                        {{ $t("home.sendOn") }} Ethereum
+                      </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/eth.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/eth.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-3">
+                    <div>
+                      {{ $t("home.assetsIn") }}
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
+                      >
+                      <strong v-else>{{ account.ethAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.ethAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                      <v-list>
+                        <v-list-item-group>
+                          <v-list-item
+                            v-for="bal in state.ethBalances"
+                            :key="bal.symbol"
+                            style="cursor: default"
+                          >
+                            <v-list-item-content>
+                              <v-img
+                                class="mr-3"
+                                :src="getAssetIcon(bal)"
+                                max-width="24px"
+                              ></v-img
+                              >{{ formatSymbol(bal.amount, bal.symbol) }}
+                            </v-list-item-content>
+                            <v-list-item-action style="display: inline">
+                              <a href="#" @click.prevent="askSendEth(bal)">{{
+                                $t("home.send").toLowerCase()
+                              }}</a>
+                            </v-list-item-action>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+                    </div>
+                    {{ $t("home.or") }}
+                    <a href="#" @click.prevent="askExportPrivateKeyHex">{{
+                      $t("home.exportPrivateKey")
+                    }}</a>
+                    {{ $t("home.andImportInMetamask")
+                    }}<v-btn
+                      icon
+                      x-small
+                      @click="
+                        openWindow(
+                          'https://metamask.zendesk.com/hc/en-us/articles/360015489331-How-to-import-an-Account'
+                        )
+                      "
+                      ><v-icon size="16">mdi-information-outline</v-icon></v-btn
+                    >
+                    <br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
               </v-expansion-panels>
@@ -2043,6 +2069,8 @@ export default class extends Vue {
   }
 
   isSwappable(symbol: string, swapToChain: string) {
+    const isSwappableToken = state.isSwappable(symbol, swapToChain);
+    if (isSwappableToken) return true;
     if (swapToChain == "eth")
       return (
         symbol == "KCAL" ||
@@ -2388,7 +2416,7 @@ export default class extends Vue {
   }
 
   async sendFromNeo() {
-    if (this.swapToChain === "pha") {
+    if (this.swapToChain === "phantasma") {
       const platforms = await state.api.getPlatforms();
       const interopAddr = platforms.find((p) => p.platform == "neo")
         ?.interop[0];
@@ -2481,7 +2509,7 @@ export default class extends Vue {
     const gasPrice = this.ethGasPrices[this.swapGasIndex] * 10 ** 9; //100000000000;
     const gasLimit = this.sendSymbol == "ETH" ? 21000 : 100000;
 
-    if (this.swapToChain === "pha") {
+    if (this.swapToChain === "phantasma") {
       const platforms = await state.api.getPlatforms();
       const interopAddr = platforms.find((p) => p.platform == "ethereum")
         ?.interop[0];
@@ -2491,6 +2519,12 @@ export default class extends Vue {
       }
       console.log("Interop address is ", interopAddr.external);
       this.sendDestination = interopAddr.external;
+    }
+
+    if (this.sendDestination == "") {
+      this.errorDialog = true;
+      this.errorMessage = "Error in destination address";
+      return;
     }
 
     const destAddr = this.sendDestination // interopAddr.external //"0x259D17A3E6658B79CE7F6F87CAC614A696056E79"
@@ -2513,7 +2547,7 @@ export default class extends Vue {
         nonce: nonceRes,
         gasPrice: "0x" + gasPrice.toString(16), //"0x09184e72a000",
         gasLimit: "0x" + gasLimit.toString(16), //"0x2710",
-        to: "0x" + state.getEthContract(this.sendSymbol), // ropsten SOUL contract
+        to: "0x" + state.getEthContract(this.sendSymbol),
         value: "0x0", // no eth to transfer
         data: "0xa9059cbb" + destAddr + amountStr,
       };
@@ -2980,11 +3014,7 @@ export default class extends Vue {
     event.stopImmediatePropagation();
     console.log("Going to burn: " + item.symbol);
 
-    if (
-      item.symbol == "TTRS" ||
-      item.symbol == "CROWN" ||
-      item.symbol == "GHOST"
-    ) {
+    if (state.isNFT(item.symbol) && state.isBurnable(item.symbol)) {
       this.goto("/nfts/" + item.symbol + "/burn");
       return;
     }
