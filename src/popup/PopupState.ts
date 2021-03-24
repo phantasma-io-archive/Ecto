@@ -375,7 +375,7 @@ export class PopupState {
           var lastUpdate = (this._tokens as any)[nexus + "LastUpdate"];
           const secsSinceLastUpdate = (now - lastUpdate) / 1000;
           console.log("Last update was ", secsSinceLastUpdate, "secs ago");
-          if (secsSinceLastUpdate > 60 * 60 * 8) {
+          if (secsSinceLastUpdate > 60 * 60 * 2) {
             let tokens = await this.api.getTokens();
             // remove script, we don't need it
             tokens.forEach((t: any) => {
