@@ -334,7 +334,7 @@
                 <div
                   style="width: 100%; height: 16px; margin-top: 8px; background: linear-gradient(45deg, #28ceaf, #17b1e8); color: white"
                 >
-                  CROSS-CHAIN TRANSFERS
+                  {{ $t("home.crossChain") }}
                 </div>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
@@ -579,13 +579,14 @@
                     >-->
                     <br />
                     <br />
-                    {{
-                      $t("home.needEthToSwap", [
+                    <span v-html="$t('home.needEthToSwap', [
+                        (
+                          Math.round(21000 * ethGasPrices[1] * 1.2) / 1e9
+                        ).toFixed(4),
                         (
                           Math.round(100000 * ethGasPrices[1] * 1.2) / 1e9
                         ).toFixed(4),
-                      ])
-                    }}
+                      ])"></span>
                     <!-- Each swap costs 0.001 ETH -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -596,14 +597,14 @@
                   "
                   style="width: 100%; height: 16px; background: linear-gradient(45deg, #28ceaf, #17b1e8); color: white"
                 >
-                  SAME CHAIN TRANSFERS
+                  {{ $t("home.sameChain") }}
                 </div>
                 <v-expansion-panel
                   v-if="state.neoBalances && state.neoBalances.length > 0"
                 >
                   <v-expansion-panel-header>
                     <v-row>
-                      <v-col class="mt-2"> {{ "Send on" }} NEO </v-col>
+                      <v-col class="mt-2"> {{ $t("home.sendOn") }} NEO </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
                           class="ma-1"
@@ -668,7 +669,7 @@
                 >
                   <v-expansion-panel-header>
                     <v-row>
-                      <v-col class="mt-2"> {{ "Send on" }} Ethereum </v-col>
+                      <v-col class="mt-2"> {{ $t("home.sendOn") }} Ethereum </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
                           class="ma-1"
