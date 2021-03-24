@@ -1257,7 +1257,7 @@
       <v-card>
         <v-card-title class="headline">{{
           swapFromChain == swapToChain
-            ? $t("home.send")
+            ? $t("home.send") + " " + sendSymbol
             : $t("home.swapUppercase") + " " + sendSymbol
         }}</v-card-title>
 
