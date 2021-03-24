@@ -1257,7 +1257,7 @@
       <v-card>
         <v-card-title class="headline">{{
           swapFromChain == swapToChain
-            ? $t("home.send")
+            ? $t("home.send") + " " + sendSymbol
             : $t("home.swapUppercase") + " " + sendSymbol
         }}</v-card-title>
 
@@ -2376,6 +2376,12 @@ export default class extends Vue {
         state.decimals(bal.symbol)
       ).replace(/ /gi, "")
     ) as number;
+    if (this.sendSymbol == "ETH") {
+      const ethFee = (
+        Math.round(21000 * this.ethGasPrices[1] * 1.2) / 1e9
+      ).toFixed(4);
+      this.sendMaxAmount -= parseFloat(parseFloat(ethFee).toFixed(3));
+    }
     this.swapAmountDialog = true;
 
     const res = await fetch("https://gasprice.poa.network/");
@@ -3138,6 +3144,7 @@ export default class extends Vue {
   }
 
   selectAssetToSwap(chain: string, customDest: boolean) {
+    this.swapFromChain = "phantasma";
     this.swapToCustomDest = customDest;
     this.swapToChain = chain;
     this.selectAssetToSwapDialog = true;
