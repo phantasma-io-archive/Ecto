@@ -146,7 +146,7 @@
     "selectAsset": "varlık seçin",
     "selectAssetUppercase": "Varlık seç",
     "selectAssetAndDest": "varlık ve hedef seçin",
-    "swapExplanation": "Değişimleri aktive etmek için WIF veya özel anahtarınızı bir kereye mahsus girmeniz gereklidir. Bu sayede cüzdanınızla ilintili NEO ve Ethereum adresleri oluşturulur.",
+    "swapExplanation": "Değişimleri aktive etmek için WIF veya HEX özel anahtarınızı bir kereye mahsus girmeniz gereklidir. Bu sayede cüzdanınızla ilintili NEO ve Ethereum adresleri oluşturulur.",
     "continue": "devam",
     "labelDestinationAddress": " hedef adres",
     "availableToSwap": "Takip eden varlıklar şuraya geçirilebilir,",
