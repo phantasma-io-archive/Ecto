@@ -170,15 +170,15 @@
         "swapBeingProcessed": "A tua troca está a ser processada.",
         "needsConfirmations": "Necesita 12 confirmações para aparecer.",
         "checkTransaction": "Podes verificar a tua transação",
-        "here": "here",
-        "assetsIn": "Known assets in",
-        "sendInProgress": "Send in progress",
-        "sendBeingProcessed": "Your send is being processed.",
-        "exportPrivateKey": "export your hex private key",
-        "andImportInMetamask": "and import in Metamask",
-        "crossChain": "CROSS CHAIN TRANSFERS",
-        "sameChain": "SAME CHAIN TRANSFERS",
-        "sendOn": "Send on"
+        "here": "aqui",
+        "assetsIn": "Fundos encontrados em",
+        "sendInProgress": "Envio em progresso",
+        "sendBeingProcessed": "O teu envio está a ser processado.",
+        "exportPrivateKey": "exporta a tua chave privada hexadecimal",
+        "andImportInMetamask": "e importa no Metamask",
+        "crossChain": "TRANSFERÊNCIAS ENTRE CHAINS",
+        "sameChain": "TRANSFERÊNCIAS NA MESMA CHAIN",
+        "sendOn": "Envia em"
     },
     "nfts": {
         "selected": "selecionado",
@@ -248,12 +248,12 @@
         "encKey": "Requer password",
         "unverified": "Conta em modo de leitura",
         "verified": "Requer WIF",
-        "keyExplanation": "The private key is the only thing required to allow access to your funds. Keep it safe.",
-        "titlePrivateKey": "Private Key",
-        "labelWIF": "Private key (WIF format)",
-        "labelHEX": "Private key (HEX format)",
-        "enterPassword": "Enter password",
-        "enterPasswordDecrypt": "Enter your password to decrypt the private key"
+        "keyExplanation": "A chave privada é a única coisa necessária para aceder aos teus fundos. Guarda-a num local seguro.",
+        "titlePrivateKey": "Chave privada",
+        "labelWIF": "Chave privada (formato WIF)",
+        "labelHEX": "Chave privada (formato HEX)",
+        "enterPassword": "Insere a password",
+        "enterPasswordDecrypt": "Insere o teu password para decifrar a chave privada"
     },
     "error": {
         "malformed": "Pedido malformado",
