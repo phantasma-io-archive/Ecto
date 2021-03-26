@@ -416,7 +416,7 @@
                               <a
                                 href="#"
                                 @click.prevent="askSwapFromNeo(bal)"
-                                >{{ $t("home.swap") }}</a
+                                >{{ $t("home.send").toLowerCase() }}</a
                               >
                             </v-list-item-action>
                           </v-list-item>
@@ -496,7 +496,7 @@
                               <a
                                 href="#"
                                 @click.prevent="askSwapFromEth(bal)"
-                                >{{ $t("home.swap") }}</a
+                                >{{ $t("home.send").toLowerCase() }}</a
                               >
                             </v-list-item-action>
                           </v-list-item>
@@ -508,7 +508,16 @@
                     <a href="#" @click.prevent="goto('/addwallet')">{{
                       $t("home.importETHWallet")
                     }}</a>
-                    {{ $t("home.withYourKey") }} <br />
+                    {{ $t("home.withYourKey") }}<v-btn
+                      icon
+                      x-small
+                      @click="
+                        openWindow(
+                          'https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key'
+                        )
+                      "
+                      ><v-icon size="16">mdi-information-outline</v-icon></v-btn
+                    ><br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
@@ -1237,7 +1246,7 @@
                   </v-list-item-content>
                   <v-list-item-action>
                     <a href="#" @click="askAmountToSwap(bal)">{{
-                      $t("home.swap")
+                      $t("home.send").toLowerCase()
                     }}</a>
                   </v-list-item-action>
                 </v-list-item>
@@ -1264,7 +1273,7 @@
         <v-card-title class="headline">{{
           swapFromChain == swapToChain
             ? $t("home.send") + " " + sendSymbol
-            : $t("home.swapUppercase") + " " + sendSymbol
+            : $t("home.send") + " " + sendSymbol
         }}</v-card-title>
 
         <v-card-text class="pb-0">
@@ -1272,7 +1281,7 @@
           {{
             swapFromChain == swapToChain
               ? $t("home.sendAmount2")
-              : $t("home.swapHowMany")
+              : $t("home.sendAmount2")
           }}
 
           <v-slider
@@ -1299,7 +1308,7 @@
           >
           <v-row style="margin-top:-25px">
             <v-col class="mt-3">
-              {{ $t("home.swapAmount") }}
+              {{ $t("home.sendAmount") }}
             </v-col>
             <v-col>
               <v-text-field
