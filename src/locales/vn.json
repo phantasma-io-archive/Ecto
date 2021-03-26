@@ -165,7 +165,7 @@
         "or": "hoặc",
         "swapAmount": "Số lượng hoán đổi",
         "needGasToSwap": "Bạn cần {0} GAS trong Phantasma để có thể thanh toán phí hoán đổi.",
-        "needEthToSwap": "An ETH swap costs approx. {0} ETH in fees.<br>An ERC20 swap costs approx. {1} ETH in fees.",
+        "needEthToSwap": "Giao dịch hoán đổi ETH tốn khoảng {0} ETH tính phí. <br> Một giao dịch hoán đổi ERC20 có giá khoảng {1} ETH tính phí.",
         "swapInProgressTitle": "Hoán đổi đang diễn ra",
         "swapBeingProcessed": "Hoán đổi của bạn đang được xử lý.",
         "needsConfirmations": "Nó cần 12 xác nhận để xuất hiện.",
