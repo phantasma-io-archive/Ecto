@@ -78,34 +78,7 @@ import {
 import { state } from "@/popup/PopupState";
 
 function isFungible(symbol: string) {
-  return symbol !== "TTRS" && symbol !== "GHOST" && symbol !== "CROWN";
-}
-
-function decimals(symbol: string) {
-  switch (symbol) {
-    case "KCAL":
-      return 10;
-    case "SOUL":
-      return 8;
-    case "NEO":
-      return 0;
-    case "GAS":
-      return 8;
-    case "GOATI":
-      return 3;
-    case "ETH":
-      return 18;
-    case "MKNI":
-      return 0;
-    case "DYT":
-      return 18;
-    case "MUU":
-      return 18;
-    case "DANK":
-      return 18;
-    default:
-      return 0;
-  }
+  return !state.isNFT(symbol);
 }
 
 function formatNumber(num: any) {
@@ -127,7 +100,7 @@ function formatBalance(amount: string, decimals: number): string {
 }
 
 function formatSymbol(amount: string, symbol: string): string {
-  return formatBalance(amount, decimals(symbol)) + " " + symbol;
+  return formatBalance(amount, state.decimals(symbol)) + " " + symbol;
 }
 
 function formatAddress(addr: string) {
@@ -472,11 +445,7 @@ export default class extends Vue {
           // if (ev.address == this.address) {
           {
             const nftId = data.TokenID;
-            if (
-              data.InfusedSymbol === "TTRS" ||
-              data.InfusedSymbol === "GHOST" ||
-              data.InfusedSymbol === "CROWN"
-            ) {
+            if (state.isNFT(data.InfusedSymbol)) {
               res.push({
                 icon: "mdi-basket-fill",
                 postIcon: "mdi-eye-outline",

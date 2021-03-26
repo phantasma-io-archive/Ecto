@@ -146,6 +146,7 @@ export interface Token {
   currentSupply: string; //Amount of minted tokens
   maxSupply: string; //Max amount of tokens that can be minted
   platform: string; //Platform of token
+  external?: { hash: string; platform: string }[];
   hash: string; //Hash of token
   flags: string;
 }
@@ -523,9 +524,9 @@ export class PhantasmaAPI {
   }
 
   //Returns an array of tokens deployed in Phantasma.
-  async getTokens(): Promise<Token> {
+  async getTokens(): Promise<Token[]> {
     let params: Array<any> = [];
-    return (await this.JSONRPC("getTokens", params)) as Token;
+    return (await this.JSONRPC("getTokens", params)) as Token[];
   }
 
   //Returns info about a specific token deployed in Phantasma.
