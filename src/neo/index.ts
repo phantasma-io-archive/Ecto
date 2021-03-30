@@ -64,11 +64,9 @@ export async function getNeoBalances(
     .filter((t) => t.symbol != "GAS" && t.symbol != "NEO");
 
   nep5Tokens.map(async (t) => {
-    const valFixed = await nep5.getTokenBalance(
-      neoRpc,
-      tokens.SOUL,
-      neoAddress
-    );
+    const hash = t.external?.find((e) => e.platform == "neo")?.hash;
+    if (!hash) return;
+    const valFixed = await nep5.getTokenBalance(neoRpc, hash, neoAddress);
     const amount = valFixed.toString();
     console.log(t.symbol, "amount", amount);
     if (amount !== "0")

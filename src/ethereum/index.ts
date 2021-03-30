@@ -103,9 +103,11 @@ export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
     "0x70a08231000000000000000000000000" + ethAddress.substring(2);
 
   erc20Tokens.map(async (t) => {
+    const hash = t.external?.find((e) => e.platform == "ethereum")?.hash;
+    if (!hash) return;
     const ercBalance = await JSONRPC(rpcUrl, "eth_call", [
       {
-        to: "0x" + (isMainnet ? contractsMainnet.SOUL : contractsRopsten.SOUL),
+        to: "0x" + hash,
         data: ethDataAddr,
       },
       "latest",
