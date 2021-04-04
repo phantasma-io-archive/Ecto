@@ -267,7 +267,20 @@ export default class extends Vue {
       setTimeout(async () => {
         if (tx && tx !== "") {
           const error = await state.checkTxError(tx);
-          if (error) {
+          if (error === "pending") {
+            // retry because tx is pending
+            setTimeout(async () => {
+              const error = await state.checkTxError(tx);
+              if (error) {
+                let shortError =
+                  error.length > 120 ? error.substring(0, 120) + "..." : error;
+                this.$root.$emit("errorMessage", {
+                  msg: this.$t("app.errorMessage"),
+                  details: shortError,
+                });
+              }
+            }, 2500);
+          } else if (error) {
             let shortError =
               error.length > 120 ? error.substring(0, 120) + "..." : error;
             this.$root.$emit("errorMessage", {
