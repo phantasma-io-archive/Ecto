@@ -321,11 +321,7 @@ export class PopupState {
         case "goati":
           return 0.1;
         case "usdc":
-          return this._currenciesRate["usd-coin"][curSym]
-        case "dai":
-          return this._currenciesRate["dai"][curSym]
-        case "usdt":
-          return this._currenciesRate["tether"][curSym]
+          return this._currenciesRate["usd-coin"][curSym];
       }
     } catch {
       console.log("Error getting rates for " + symbol + " in " + curSym);
