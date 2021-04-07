@@ -1928,7 +1928,53 @@ export default class extends Vue {
   }
 
   getAssetIcon(item: Balance) {
+    if (this.isNewLogo(item.symbol.toLowerCase())) return `assets/default.png`;
     return `assets/${item.symbol}.png`;
+  }
+
+  isNewLogo(symbol: string) {
+    switch (symbol) {
+      case "brc":
+        return false;
+      case "crown":
+        return false;
+      case "dai":
+        return false;
+      case "dank":
+        return false;
+      case "dyt":
+        return false;
+      case "eth":
+        return false;
+      case "game":
+        return false;
+      case "gas":
+        return false;
+      case "gfest":
+        return false;
+      case "ghost":
+        return false;
+      case "goati":
+        return false;
+      case "kcal":
+        return false;
+      case "mkni":
+        return false;
+      case "muu":
+        return false;
+      case "neo":
+        return false;
+      case "soul":
+        return false;
+      case "ttrs":
+        return false;
+      case "usdc":
+        return false;
+      case "usdt":
+        return false;
+      default:
+        return true;
+    }
   }
 
   getAmount(balance: Balance) {
