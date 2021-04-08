@@ -5,7 +5,7 @@
 
       <v-list-item link @click="goto('/wallets')">
         <v-list-item-content>
-          <v-list-item-title>{{ $t('addWallet.add') }}</v-list-item-title>
+          <v-list-item-title>{{ $t("addWallet.add") }}</v-list-item-title>
           <v-list-item-subtitle></v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -25,8 +25,8 @@
       </v-overlay>
 
       <v-tabs v-model="tabIndex" background-color="white" color="#17b1e8" right>
-        <v-tab>{{ $t('addWallet.import') }}</v-tab>
-        <v-tab>{{ $t('addWallet.create') }}</v-tab>
+        <v-tab>{{ $t("addWallet.import") }}</v-tab>
+        <v-tab>{{ $t("addWallet.create") }}</v-tab>
 
         <v-tab-item key="1">
           <v-container
@@ -34,7 +34,7 @@
             style="max-height:500px"
           >
             <div style="padding: 15px">
-              {{ $t('addWallet.description1') }}
+              {{ $t("addWallet.description1") }}
             </div>
 
             <v-form
@@ -52,7 +52,7 @@
                 prepend-icon="mdi-account"
               />
 
-              <span style="padding:120px">{{ $t('addWallet.or') }}</span>
+              <span style="padding:120px">{{ $t("addWallet.or") }}</span>
 
               <v-text-field
                 tabindex="2"
@@ -90,13 +90,13 @@
                     (!(wif.length == 52 || wif.length == 64) ||
                       password.length < 6)
                 "
-                >{{ $t('addWallet.importLong') }}</v-btn
+                >{{ $t("addWallet.importLong") }}</v-btn
               >
             </div>
             <div class="ma-3 mb-6">
-              {{ $t('addWallet.description2') }}
+              {{ $t("addWallet.description2") }}
               <a href="" @click.prevent="tabIndex = 1">
-                {{ $t('addWallet.description3') }}
+                {{ $t("addWallet.description3") }}
               </a>
             </div>
           </v-container>
@@ -104,15 +104,14 @@
 
         <v-tab-item key="2">
           <v-container v-if="createStep === 0">
-            <div v-html="i18n.descriptionLong" style="padding: 80px 20px">
-            </div>
+            <div v-html="i18n.descriptionLong" style="padding: 80px 20px"></div>
             <v-btn block @click="generate">
-              {{ $t('addWallet.generate') }}
+              {{ $t("addWallet.generate") }}
             </v-btn>
           </v-container>
           <v-container v-if="createStep === 1">
             <div style="padding: 20px 8px">
-              {{ $t('addWallet.created') }}
+              {{ $t("addWallet.created") }}
             </div>
             <v-textarea
               v-model="newAddress"
@@ -139,12 +138,12 @@
               rows="2"
             ></v-textarea>
             <v-btn block primary @click="copyWifDialog = true">
-              {{ $t('addWallet.importLong') }}
+              {{ $t("addWallet.importLong") }}
             </v-btn>
             <div class="ma-3 mt-6">
-              {{ $t('addWallet.description4') }}
+              {{ $t("addWallet.description4") }}
               <a href="" @click.prevent="generate">
-                {{ $t('addWallet.description5') }}
+                {{ $t("addWallet.description5") }}
               </a>
             </div>
           </v-container>
@@ -164,7 +163,9 @@
 
           <v-dialog v-model="copyWifDialog" max-width="290">
             <v-card>
-              <v-card-title class="headline">{{ $t('addWallet.backup') }}</v-card-title>
+              <v-card-title class="headline">{{
+                $t("addWallet.backup")
+              }}</v-card-title>
 
               <v-card-text>
                 <span v-html="i18n.recover"></span>
@@ -180,7 +181,7 @@
                   rows="3"
                 ></v-textarea>
                 <v-btn block small @click="copyWifToClipboard"
-                  >{{ $t('addWallet.copy') }}
+                  >{{ $t("addWallet.copy") }}
                   <v-icon right>mdi-content-copy</v-icon></v-btn
                 >
               </v-card-text>
@@ -191,7 +192,7 @@
                   text
                   @click="copyWifDialog = false"
                 >
-                  {{ $t('addWallet.no') }}
+                  {{ $t("addWallet.no") }}
                 </v-btn>
 
                 <v-spacer></v-spacer>
@@ -203,7 +204,7 @@
                     setPassDialog = true;
                   "
                 >
-                  {{ $t('addWallet.backupConfirm') }}
+                  {{ $t("addWallet.backupConfirm") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -211,11 +212,13 @@
 
           <v-dialog v-model="setPassDialog" max-width="290">
             <v-card>
-              <v-card-title class="headline">{{ $t('addWallet.setPassword') }}</v-card-title>
+              <v-card-title class="headline">{{
+                $t("addWallet.setPassword")
+              }}</v-card-title>
 
               <v-card-text>
                 <span>
-                  {{ $t('addWallet.secure') }}
+                  {{ $t("addWallet.secure") }}
                 </span>
                 <v-spacer />
 
@@ -243,7 +246,7 @@
                     setPassDialog = false;
                   "
                 >
-                  {{ $t('addWallet.cancel') }}
+                  {{ $t("addWallet.cancel") }}
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn
@@ -254,7 +257,7 @@
                     importWallet();
                   "
                 >
-                  {{ $t('addWallet.importLong') }}
+                  {{ $t("addWallet.importLong") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -318,16 +321,16 @@ export default class extends Vue {
 
   get i18n() {
     return {
-      descriptionLong: this.$t('addWallet.descriptionLong'),
-      recover: this.$t('addWallet.recover')
+      descriptionLong: this.$t("addWallet.descriptionLong"),
+      recover: this.$t("addWallet.recover"),
     };
   }
 
   async importWallet() {
     console.log("Going to import wallet");
-    this.errorMessage1 = this.$i18n.t('addWallet.errorMessage1').toString();
-    this.errorMessage2 = this.$i18n.t('addWallet.errorMessage2').toString();
-    this.errorMessage3 = this.$i18n.t('addWallet.errorMessage3').toString();
+    this.errorMessage1 = this.$i18n.t("addWallet.errorMessage1").toString();
+    this.errorMessage2 = this.$i18n.t("addWallet.errorMessage2").toString();
+    this.errorMessage3 = this.$i18n.t("addWallet.errorMessage3").toString();
     if (this.wif.length == 52 && this.password.length >= 6) {
       try {
         this.isLoading = true;
@@ -346,6 +349,9 @@ export default class extends Vue {
         this.errorMessage = this.errorMessage2;
         this.errorDialog = true;
       }
+    } else if (this.addressOrName.length >= 52) {
+      this.errorMessage = this.errorMessage3;
+      this.errorDialog = true;
     } else {
       try {
         this.isLoading = true;

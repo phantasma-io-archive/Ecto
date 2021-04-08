@@ -109,7 +109,7 @@ export class PopupState {
 
   allSwaps: Swap[] = [];
 
-  payload = "4543542D312E312E30";
+  payload = "4543542D312E312E32";
 
   $i18n: any = {
     t: (s: string) => s,
@@ -320,8 +320,8 @@ export class PopupState {
           return this._currenciesRate["mu-dank"][curSym];
         case "goati":
           return 0.1;
-        case 'usdc':
-          return this._currenciesRate['usd-coin'][curSym]
+        case "usdc":
+          return this._currenciesRate["usd-coin"][curSym];
       }
     } catch {
       console.log("Error getting rates for " + symbol + " in " + curSym);
@@ -454,7 +454,7 @@ export class PopupState {
 
   async fetchRates() {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank%2Cusd-coin&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
+      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank%2Cusd-coin%2Cdai%2Ctether&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
     );
     const resJson = await res.json();
     this._currenciesRate = resJson;
