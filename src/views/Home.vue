@@ -198,8 +198,7 @@
                       text
                       style="padding: 0 6px;"
                       v-if="
-                        state.isNFT(item.symbol) &&
-                          state.isBurnable(item.symbol)
+                        state.isBurnable(item.symbol)
                       "
                       @click="burnAsset($event, item)"
                       :disabled="item.amount == 0"
@@ -1087,6 +1086,108 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="burnDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline"
+          >{{ $t("home.burn") }} {{ burnSymbol }}</v-card-title
+        >
+
+        <v-card-text class="pb-0">
+          {{ $t("home.have") }} {{ burnMaxAmount }} {{ burnSymbol }}.
+          {{ $t("home.burnAmount2") }}
+          <v-slider
+            v-model="burnAmount"
+            :min="0.01"
+            :max="burnMaxAmount"
+            :value="1"
+            :step="
+                state.decimals(sendSymbol) === 0
+                ? 1
+                : 0.01
+            "
+            thumb-label="always"
+            style="margin-top:40px"
+          >
+            <template v-slot:thumb-label="{ value }">
+              {{ Math.round((100 * value) / burnMaxAmount) }}%
+            </template></v-slider
+          >
+          <v-row style="margin-top:-25px">
+            <v-col class="mt-3">
+              {{ $t("home.burnAmount") }}
+            </v-col>
+            <v-col>
+              <v-text-field
+                class="mt-0 mr-2"
+                v-model="burnAmount"
+                :min="1"
+                :max="burnMaxAmount"
+                single-line
+                type="number"
+                :suffix="burnSymbol"
+                style="width:120px"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row style="margin-top:-20px">
+            <v-col class="mt-4">
+              {{ $t("home.remaining") }}
+            </v-col>
+            <v-col>
+              <v-text-field
+                class="mt-0 mr-2"
+                :value="burnMaxAmount - burnAmount"
+                single-line
+                type="number"
+                :suffix="burnSymbol"
+                style="width:120px"
+                disabled
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="burnDialog = false">
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="askBurnConfirmation">
+            {{ $t("home.next") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="burnConfirmationDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">{{
+          $t("home.burnConfirmation")
+        }}</v-card-title>
+
+        <v-card-text>
+          <span>
+            {{ $t("home.burnConfirmation1") }} {{ burnAmount }} {{ burnSymbol }}.
+            <span v-html="$t('home.burnConfirmation2')"></span>
+          </span>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="gray darken-1" text @click="burnConfirmationDialog = false">
+            {{ $t("home.cancel") }}
+          </v-btn>
+
+          <v-btn color="blue darken-1" text @click="askBurn">
+            {{ $t("home.next") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="signTxDialog" max-width="290">
       <v-card>
         <v-card-title class="headline">{{ $t("home.authorize") }}</v-card-title>
@@ -1715,6 +1816,8 @@ export default class extends Vue {
   unstakeDialog = false;
   sendDialog = false;
   sendWhereDialog = false;
+  burnDialog = false;
+  burnConfirmationDialog = false;
   registerNameDialog = false;
   selectAssetToSwapDialog = false;
   swapAmountDialog = false;
@@ -1737,6 +1840,11 @@ export default class extends Vue {
   swapToCustomDest = false;
   swapToChain = "";
   swapFromChain = "";
+
+  burnAmount = 0;
+  burnMaxAmount = 0;
+  burnSymbol = "";
+  burnDecimals = 0;
 
   lastSwapTx = "";
   lastSwapTxUrl = "";
@@ -1928,7 +2036,53 @@ export default class extends Vue {
   }
 
   getAssetIcon(item: Balance) {
+    if (this.isNewLogo(item.symbol.toLowerCase())) return `assets/default.png`;
     return `assets/${item.symbol}.png`;
+  }
+
+  isNewLogo(symbol: string) {
+    switch (symbol) {
+      case "brc":
+        return false;
+      case "crown":
+        return false;
+      case "dai":
+        return false;
+      case "dank":
+        return false;
+      case "dyt":
+        return false;
+      case "eth":
+        return false;
+      case "game":
+        return false;
+      case "gas":
+        return false;
+      case "gfest":
+        return false;
+      case "ghost":
+        return false;
+      case "goati":
+        return false;
+      case "kcal":
+        return false;
+      case "mkni":
+        return false;
+      case "muu":
+        return false;
+      case "neo":
+        return false;
+      case "soul":
+        return false;
+      case "ttrs":
+        return false;
+      case "usdc":
+        return false;
+      case "usdt":
+        return false;
+      default:
+        return true;
+    }
   }
 
   getAmount(balance: Balance) {
@@ -2136,10 +2290,21 @@ export default class extends Vue {
     this.sendWhereDialog = true;
   }
 
+  askBurnConfirmation() {
+    this.burnDialog = false;
+    this.burnConfirmationDialog = true;
+  }
+
   askSend() {
     this.sendWhereDialog = false;
     this.signTxDialog = true;
     this.signTxCallback = this.sendFT;
+  }
+
+  askBurn() {
+    this.burnConfirmationDialog = false;
+    this.signTxDialog = true;
+    this.signTxCallback = this.burnFT;
   }
 
   askRegisterName() {
@@ -3018,6 +3183,74 @@ export default class extends Vue {
     }, 2500);
   }
 
+  async burnFT() {
+    if (!this.account) return;
+
+    console.log("burning " + this.burnAmount + ' of ' + this.burnSymbol);
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 2100;
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    sb.callInterop("Runtime.BurnTokens", [address, this.burnSymbol, Math.floor(this.burnAmount * 10 ** this.burnDecimals)]);
+    sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      if (this.needsWif) {
+        tx = await state.signTx(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxWithPassword(txdata, address, this.password);
+      }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2500);
+  }
+
+  burnAsset(event: Event, item: Balance) {
+    event.stopImmediatePropagation();
+    console.log("Going to burn: " + item.symbol);
+
+    if (state.isNFT(item.symbol)) {
+      this.goto("/nfts/" + item.symbol + "/burn");
+      return;
+    }
+
+    this.burnSymbol = item.symbol;
+    this.burnDecimals = item.decimals;
+    this.burnMaxAmount = parseFloat(
+      this.formatBalance(item.amount, item.decimals).replace(/ /gi, "")
+    );
+    if (this.burnSymbol == "KCAL")
+      this.burnMaxAmount = this.burnMaxAmount - 0.01;
+    this.burnDialog = true;
+  }
+
   transferAsset(event: Event, item: Balance) {
     event.stopImmediatePropagation();
     console.log("Going to transfer: " + item.symbol);
@@ -3035,16 +3268,6 @@ export default class extends Vue {
     if (this.sendSymbol == "KCAL")
       this.sendMaxAmount = this.sendMaxAmount - 0.01;
     this.sendDialog = true;
-  }
-
-  burnAsset(event: Event, item: Balance) {
-    event.stopImmediatePropagation();
-    console.log("Going to burn: " + item.symbol);
-
-    if (state.isNFT(item.symbol) && state.isBurnable(item.symbol)) {
-      this.goto("/nfts/" + item.symbol + "/burn");
-      return;
-    }
   }
 
   async sendFT() {
