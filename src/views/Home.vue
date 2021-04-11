@@ -2080,6 +2080,8 @@ export default class extends Vue {
         return false;
       case "usdt":
         return false;
+      case "sem":
+        return false;
       default:
         return true;
     }
