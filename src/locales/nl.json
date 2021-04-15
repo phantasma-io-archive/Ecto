@@ -183,7 +183,8 @@
         "andImportInMetamask": "en importeer in Metamask",
         "crossChain": "OVERDRACHTEN TUSSEN CHAINS",
         "sameChain": "OVERDRACHTEN OP DEZELFDE CHAIN",
-        "sendOn": "Verstuur op"
+        "sendOn": "Verstuur op",
+        "cosmicSwap": "You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?"
     },
     "nfts": {
         "selected": "gekozen",

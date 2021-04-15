@@ -183,7 +183,8 @@
         "andImportInMetamask": "e importala en Metamask",
         "crossChain": "TRANSFERENCIA ENTRE CHAINS",
         "sameChain": "TRANSFERENCIA NORMAL",
-        "sendOn": "Enviar en"
+        "sendOn": "Enviar en",
+        "cosmicSwap": "You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?"
     },
     "nfts": {
         "selected": "seleccionado",

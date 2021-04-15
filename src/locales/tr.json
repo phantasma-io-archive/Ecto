@@ -183,7 +183,8 @@
     "andImportInMetamask": "ve Metamask'a aktarın.",
     "crossChain": "ZİNCİR DEĞİŞİM İŞLEMLERİ",
     "sameChain": "DİĞER ZİNCİRLERDE TRANSFERLER",
-    "sendOn": "Burada Gönder-Al,"
+    "sendOn": "Burada Gönder-Al,",
+    "cosmicSwap": "Hesabınızda yeterli KCAL bulunmamaktadır. Biraz SOUL kullanarak kozmik değişim yapılsın mı?"
   },
   "nfts": {
     "selected": "Seçildi",
