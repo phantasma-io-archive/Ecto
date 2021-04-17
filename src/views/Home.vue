@@ -1241,8 +1241,7 @@
         </v-card-text>
 
         <v-card-text v-if="isMissingKCAL">
-          You do not have enough KCAL to perform this transaction. Use some SOUL
-          to perform a cosmic swap?
+          {{ $t("home.cosmicSwap") }}
         </v-card-text>
 
         <v-card-actions v-if="isMissingKCAL">

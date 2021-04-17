@@ -183,7 +183,8 @@
         "andImportInMetamask": "og importer i Metamask",
         "crossChain": "OVERFØRING MELLOM ULIKE BLOKKKJEDER",
         "sameChain": "SEND PÅ SAMME BLOKKJEDE",
-        "sendOn": "Send på"
+        "sendOn": "Send på",
+        "cosmicSwap": "You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?"
     },
     "nfts": {
         "selected": "valgte",

@@ -38,7 +38,10 @@
           >
         </v-row>
 
-        <div style="padding-right: 30px">
+        <div 
+          class="mt-3"
+          style="padding-right: 30px"
+        >
           {{ $t("sign.description") }}
           <strong>{{ currentAccountDescription }}</strong
           >?
@@ -51,6 +54,7 @@
           @keyup.native.enter="signtx"
           @submit.prevent
           style="margin: 0px 28px 10px 15px"
+          class="mt-6"
         >
           <v-text-field
             tabindex="1"
