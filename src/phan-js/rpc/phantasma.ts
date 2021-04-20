@@ -289,12 +289,20 @@ export class PhantasmaAPI {
       var http = new XMLHttpRequest();
 
       http.open("GET", host + "/rpc", true);
+      http.timeout = 4500;
       http.onreadystatechange = function() {
         if (http.readyState == 4 && http.status == 200) {
           var ended = new Date().getTime();
           var milliseconds = ended - started;
           resolve(milliseconds);
         }
+
+        http.ontimeout = function() {
+          resolve(100000);
+        };
+        http.onerror = function() {
+          resolve(100000);
+        };
       };
       try {
         http.send(null);
