@@ -20,6 +20,15 @@ const tokens = {
   GAS: "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
 };
 
+let isPrimaryRpcDead = false;
+
+function getNeoRpc(isMainnet: boolean) {
+  if (!isMainnet) return "http://mankinighost.phantasma.io:30333";
+  return !isPrimaryRpcDead
+    ? "http://seed.neoeconomy.io:10332"
+    : "http://jpc.phantasma.io:10332";
+}
+
 function ab2hexstring(arr: ArrayBuffer | ArrayLike<number>): string {
   if (typeof arr !== "object") {
     throw new Error(`ab2hexstring expects an array.Input was ${arr}`);
@@ -50,10 +59,18 @@ export async function getNeoBalances(
   neoAddress: string,
   isMainnet: boolean
 ): Promise<any[]> {
-  const neoRpc = isMainnet
-    ? "http://seed.neoeconomy.io:10332"
-    : "http://mankinighost.phantasma.io:30333";
-  const account = await rpc.Query.getAccountState(neoAddress).execute(neoRpc);
+  let neoRpc = getNeoRpc(isMainnet);
+
+  let account = null;
+  try {
+    account = await rpc.Query.getAccountState(neoAddress).execute(neoRpc);
+  } catch {
+    isPrimaryRpcDead = true;
+    console.log("primary neo rpc", neoRpc, "is not working");
+    neoRpc = getNeoRpc(isMainnet);
+    console.log("trying secondary neo rpc", neoRpc);
+    account = await rpc.Query.getAccountState(neoAddress).execute(neoRpc);
+  }
 
   console.log("neo account", account);
 
@@ -168,9 +185,7 @@ async function sendNep5(
   );
 
   // Send raw transaction
-  const neoRpc = isMainnet
-    ? "http://seed.neoeconomy.io:10332"
-    : "http://mankinighost.phantasma.io:30333";
+  const neoRpc = getNeoRpc(isMainnet);
   const client = new rpc.RPCClient(neoRpc);
   const res = await client.sendRawTransaction(rawTransaction);
   console.log("sendNep5 Raw Tx", res, rawTransaction);
@@ -207,9 +222,7 @@ async function sendNative(
   }
 
   // Send raw transaction
-  const neoRpc = isMainnet
-    ? "http://seed.neoeconomy.io:10332"
-    : "http://mankinighost.phantasma.io:30333";
+  const neoRpc = getNeoRpc(isMainnet);
   const client = new rpc.RPCClient(neoRpc);
 
   const transaction = await createTxWithNeoScan();

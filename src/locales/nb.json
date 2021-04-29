@@ -184,7 +184,8 @@
         "crossChain": "OVERFØRING MELLOM ULIKE BLOKKKJEDER",
         "sameChain": "SEND PÅ SAMME BLOKKJEDE",
         "sendOn": "Send på",
-        "cosmicSwap": "You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?"
+        "cosmicSwap": "You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?",
+        "viewOnExplorer": "view address on explorer"
     },
     "nfts": {
         "selected": "valgte",

@@ -197,9 +197,7 @@
                       small
                       text
                       style="padding: 0 6px;"
-                      v-if="
-                        state.isBurnable(item.symbol)
-                      "
+                      v-if="state.isBurnable(item.symbol)"
                       @click="burnAsset($event, item)"
                       :disabled="item.amount == 0"
                       ><v-icon>mdi-fire</v-icon> {{ $t("home.burn") }}</v-btn
@@ -378,6 +376,14 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
@@ -391,6 +397,14 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -463,6 +477,14 @@
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://etherscan.io/address/' + account.ethAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
@@ -476,6 +498,14 @@
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://etherscan.io/address/' + account.ethAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -507,7 +537,8 @@
                     <a href="#" @click.prevent="goto('/addwallet')">{{
                       $t("home.importETHWallet")
                     }}</a>
-                    {{ $t("home.withYourKey") }}<v-btn
+                    {{ $t("home.withYourKey")
+                    }}<v-btn
                       icon
                       x-small
                       @click="
@@ -650,6 +681,14 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -717,6 +756,14 @@
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://etherscan.io/address/' + account.ethAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -1100,11 +1147,7 @@
             :min="0.01"
             :max="burnMaxAmount"
             :value="1"
-            :step="
-                state.decimals(sendSymbol) === 0
-                ? 1
-                : 0.01
-            "
+            :step="state.decimals(sendSymbol) === 0 ? 1 : 0.01"
             thumb-label="always"
             style="margin-top:40px"
           >
@@ -1169,7 +1212,8 @@
 
         <v-card-text>
           <span>
-            {{ $t("home.burnConfirmation1") }} {{ burnAmount }} {{ burnSymbol }}.
+            {{ $t("home.burnConfirmation1") }} {{ burnAmount }}
+            {{ burnSymbol }}.
             <span v-html="$t('home.burnConfirmation2')"></span>
           </span>
         </v-card-text>
@@ -1177,7 +1221,11 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn color="gray darken-1" text @click="burnConfirmationDialog = false">
+          <v-btn
+            color="gray darken-1"
+            text
+            @click="burnConfirmationDialog = false"
+          >
             {{ $t("home.cancel") }}
           </v-btn>
 
@@ -2542,15 +2590,7 @@ export default class extends Vue {
     ) as number;
     this.swapAmountDialog = true;
 
-    const res = await fetch("https://gasprice.poa.network/");
-
-    const resJson = await res.json();
-
-    this.ethGasPrices[0] = resJson.slow;
-    this.ethGasPrices[1] = resJson.standard;
-    this.ethGasPrices[2] = parseFloat(
-      ((resJson.fast + resJson.instant) / 2).toFixed(2)
-    );
+    await this.fetchEthGasPrices();
   }
 
   async askSendEth(bal: ISymbolAmount) {
@@ -2571,15 +2611,7 @@ export default class extends Vue {
     }
     this.swapAmountDialog = true;
 
-    const res = await fetch("https://gasprice.poa.network/");
-
-    const resJson = await res.json();
-
-    this.ethGasPrices[0] = resJson.slow;
-    this.ethGasPrices[1] = resJson.standard;
-    this.ethGasPrices[2] = parseFloat(
-      ((resJson.fast + resJson.instant) / 2).toFixed(2)
-    );
+    await this.fetchEthGasPrices();
   }
 
   askSwapFromNeo(bal: ISymbolAmount) {
@@ -2648,7 +2680,7 @@ export default class extends Vue {
       console.log("hash from sendNeo", hash);
 
       const neoApi = isMainnet
-        ? "https://neoscan.io/transaction/"
+        ? "https://dora.coz.io/transaction/neo2/"
         : "http://mankinighost.phantasma.io:4000/transaction/";
       this.lastSwapTxUrl = neoApi + hash;
       this.swapInProgressDialog = true;
@@ -3187,7 +3219,7 @@ export default class extends Vue {
   async burnFT() {
     if (!this.account) return;
 
-    console.log("burning " + this.burnAmount + ' of ' + this.burnSymbol);
+    console.log("burning " + this.burnAmount + " of " + this.burnSymbol);
 
     const address = this.account.address;
     const gasPrice = 100000;
@@ -3197,7 +3229,11 @@ export default class extends Vue {
 
     sb.beginScript();
     sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
-    sb.callInterop("Runtime.BurnTokens", [address, this.burnSymbol, Math.floor(this.burnAmount * 10 ** this.burnDecimals)]);
+    sb.callInterop("Runtime.BurnTokens", [
+      address,
+      this.burnSymbol,
+      Math.floor(this.burnAmount * 10 ** this.burnDecimals),
+    ]);
     sb.spendGas(address);
     const script = sb.endScript();
 
@@ -3407,15 +3443,7 @@ export default class extends Vue {
       ).replace(/ /gi, "")
     );
 
-    const res = await fetch("https://gasprice.poa.network/");
-
-    const resJson = await res.json();
-
-    this.ethGasPrices[0] = resJson.slow;
-    this.ethGasPrices[1] = resJson.standard;
-    this.ethGasPrices[2] = parseFloat(
-      ((resJson.fast + resJson.instant) / 2).toFixed(2)
-    );
+    await this.fetchEthGasPrices();
 
     if (this.sendSymbol == "GAS") {
       this.sendMaxAmount -= 0.1;
@@ -3451,15 +3479,54 @@ export default class extends Vue {
   }
 
   async onSwapsTab() {
-    const res = await fetch("https://gasprice.poa.network/");
+    await this.fetchEthGasPrices();
+  }
 
-    const resJson = await res.json();
+  async fetchEthGasPrices() {
+    const minPrices = [10, 30, 50];
+    const prices = [10, 30, 50];
+    let hasSetPrices = false;
 
-    this.ethGasPrices[0] = resJson.slow;
-    this.ethGasPrices[1] = resJson.standard;
-    this.ethGasPrices[2] = parseFloat(
-      ((resJson.fast + resJson.instant) / 2).toFixed(2)
-    );
+    try {
+      const res = await fetch("https://gasprice.poa.network/");
+      const resJson = await res.json();
+
+      if (resJson) {
+        const slow = resJson.slow;
+        const standard = resJson.standard;
+        const fast = (resJson.fast + resJson.instant) / 2;
+        if (slow > minPrices[0]) prices[0] = slow;
+        if (standard > minPrices[1]) prices[1] = standard;
+        if (fast > minPrices[2]) prices[2] = fast;
+        hasSetPrices = true;
+      }
+    } catch {
+      console.log("Error fetching gas prices from gasprice.poa.network");
+    }
+
+    try {
+      const res = await fetch("https://www.etherchain.org/api/gasPriceOracle");
+      const resJson = await res.json();
+
+      if (resJson) {
+        const slow = resJson.safeLow;
+        const standard = resJson.standard;
+        const fast = (resJson.fast + resJson.fastest) / 2;
+        if (slow > minPrices[0])
+          prices[0] = hasSetPrices ? (prices[0] + slow) / 2 : slow;
+        if (standard > minPrices[1])
+          prices[1] = hasSetPrices ? (prices[1] + standard) / 2 : standard;
+        if (fast > minPrices[2]) {
+          prices[2] = hasSetPrices ? prices[2] + fast / 2 : fast;
+        }
+      }
+    } catch {
+      console.log("Error fetching gas prices from etherchain");
+    }
+
+    this.ethGasPrices[0] = parseFloat(prices[0].toFixed(1));
+    this.ethGasPrices[1] = parseFloat(prices[1].toFixed(1));
+    this.ethGasPrices[2] = parseFloat(prices[2].toFixed(1));
   }
 
   async loadMoreTxs() {

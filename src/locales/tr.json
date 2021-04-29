@@ -184,7 +184,8 @@
     "crossChain": "ZİNCİR DEĞİŞİM İŞLEMLERİ",
     "sameChain": "DİĞER ZİNCİRLERDE TRANSFERLER",
     "sendOn": "Burada Gönder-Al,",
-    "cosmicSwap": "Hesabınızda yeterli KCAL bulunmamaktadır. Biraz SOUL kullanarak kozmik değişim yapılsın mı?"
+    "cosmicSwap": "Hesabınızda yeterli KCAL bulunmamaktadır. Biraz SOUL kullanarak kozmik değişim yapılsın mı?",
+    "viewOnExplorer": "view address on explorer"
   },
   "nfts": {
     "selected": "Seçildi",
