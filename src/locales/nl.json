@@ -184,7 +184,8 @@
         "crossChain": "OVERDRACHTEN TUSSEN CHAINS",
         "sameChain": "OVERDRACHTEN OP DEZELFDE CHAIN",
         "sendOn": "Verstuur op",
-        "cosmicSwap": "Onvoldoende KCAL om deze transactie uit te voeren. Gebruik SOUL voor deze transactie?"
+        "cosmicSwap": "Onvoldoende KCAL om deze transactie uit te voeren. Gebruik SOUL voor deze transactie?",
+        "viewOnExplorer": "view address on explorer"
     },
     "nfts": {
         "selected": "gekozen",

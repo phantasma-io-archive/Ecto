@@ -376,6 +376,14 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
@@ -389,6 +397,14 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -461,6 +477,14 @@
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://etherscan.io/address/' + account.ethAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
@@ -474,6 +498,14 @@
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://etherscan.io/address/' + account.ethAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -649,6 +681,14 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -716,6 +756,14 @@
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://etherscan.io/address/' + account.ethAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -2632,7 +2680,7 @@ export default class extends Vue {
       console.log("hash from sendNeo", hash);
 
       const neoApi = isMainnet
-        ? "https://neoscan.io/transaction/"
+        ? "https://dora.coz.io/transaction/neo2/"
         : "http://mankinighost.phantasma.io:4000/transaction/";
       this.lastSwapTxUrl = neoApi + hash;
       this.swapInProgressDialog = true;
