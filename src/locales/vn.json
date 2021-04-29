@@ -183,7 +183,9 @@
         "andImportInMetamask": "và nhập trong Metamask",
         "crossChain": "CHUYỂN ĐỔI CHUỖI CHÉO",
         "sameChain": "CÙNG CHUYỂN ĐỔI CHUỖI",
-        "sendOn": "Gửi tiếp"
+        "sendOn": "Gửi tiếp",
+        "cosmicSwap": "You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?",
+        "viewOnExplorer": "view address on explorer"
     },
     "nfts": {
         "selected": "đã chọn",

@@ -183,7 +183,9 @@
         "andImportInMetamask": "и импортировать в Metamask",
         "crossChain": "КРОСС-ЧЕЙН ПЕРЕСЫЛКИ",
         "sameChain": "ПЕРЕСЫЛКИ В РАМКАХ ОДНОГО БЛОКЧЕЙНА",
-        "sendOn": "Отправить в"
+        "sendOn": "Отправить в",
+        "cosmicSwap": "You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?",
+        "viewOnExplorer": "view address on explorer"
     },
     "nfts": {
         "selected": "выбрано",

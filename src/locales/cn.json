@@ -183,7 +183,9 @@
         "andImportInMetamask": "输入到Metamask",
         "crossChain": "异链传送",
         "sameChain": "同链传送",
-        "sendOn": "发送到"
+        "sendOn": "发送到",
+        "cosmicSwap": "You do not have enough KCAL to perform this transaction. Use some SOUL to perform a cosmic swap?",
+        "viewOnExplorer": "view address on explorer"
     },
     "nfts": {
         "selected": "已选择",
