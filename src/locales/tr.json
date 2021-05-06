@@ -164,7 +164,7 @@
     "swapDestination": "Taşıma hedefi",
     "write": "Yaz",
     "destinationAddress": "Hedef adres",
-    "enableSwaps": "Zincir değiştirmeyi aktive et",
+    "enableSwaps": "Kısmı aktive et",
     "insertSwapsWIF": "Değişim açık adreslerini oluşturmak için WIF'inizi girin.",
     "insertSwapsPassword": "Değişim açık adreslerini oluşturmak için şifrenizi girin.",
     "generate": "Oluştur",
