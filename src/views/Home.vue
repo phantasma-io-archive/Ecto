@@ -381,7 +381,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                            state.isMainnet ? 'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress : 'http://http://mankinighost.phantasma.io:4000/address/' + account.neoAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                     </div>
@@ -402,7 +402,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                            state.isMainnet ? 'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress : 'http://http://mankinighost.phantasma.io:4000/address/' + account.neoAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
@@ -482,7 +482,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://etherscan.io/address/' + account.ethAddress
+                            state.isMainnet ? 'https://etherscan.io/address/' + account.ethAddress : 'https://ropsten.etherscan.io/address/' + account.ethAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                     </div>
@@ -503,7 +503,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://etherscan.io/address/' + account.ethAddress
+                            state.isMainnet ? 'https://etherscan.io/address/' + account.ethAddress : 'https://ropsten.etherscan.io/address/' + account.ethAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
@@ -594,7 +594,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://bscscan.com/address/' + account.bscAddress
+                            state.isMainnet ? 'https://bscscan.com/address/' + account.bscAddress : 'https://testnet.bscscan.com/address/' + account.bscAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                     </div>
@@ -615,7 +615,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://bscscan.io/address/' + account.bscAddress
+                            state.isMainnet ? 'https://bscscan.com/address/' + account.bscAddress : 'https://testnet.bscscan.com/address/' + account.bscAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
@@ -850,7 +850,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress
+                            state.isMainnet ? 'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress : 'http://http://mankinighost.phantasma.io:4000/address/' + account.neoAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
@@ -925,7 +925,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://etherscan.io/address/' + account.ethAddress
+                            state.isMainnet ? 'https://etherscan.io/address/' + account.ethAddress : 'https://ropsten.etherscan.io/address/' + account.ethAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
@@ -945,68 +945,6 @@
                             </v-list-item-content>
                             <v-list-item-action style="display: inline">
                               <a href="#" @click.prevent="askSendEth(bal)">{{
-                                $t("home.send").toLowerCase()
-                              }}</a>
-                            </v-list-item-action>
-                          </v-list-item>
-                        </v-list-item-group>
-                      </v-list>
-                    </div>
-                    {{ $t("home.or") }}
-                    <a href="#" @click.prevent="askExportPrivateKeyHex">{{
-                      $t("home.exportPrivateKey")
-                    }}</a>
-                    {{ $t("home.andImportInMetamask")
-                    }}<v-btn
-                      icon
-                      x-small
-                      @click="
-                        openWindow(
-                          'https://metamask.zendesk.com/hc/en-us/articles/360015489331-How-to-import-an-Account'
-                        )
-                      "
-                      ><v-icon size="16">mdi-information-outline</v-icon></v-btn
-                    >
-                    <br />
-                  </v-expansion-panel-content>
-                  <v-expansion-panel-content class="pa-3">
-                    <div>
-                      {{ $t("home.assetsIn") }}
-                      <strong v-if="!state.balanceShown"
-                        >************************************</strong
-                      >
-                      <strong v-else>{{ account.bscAddress }}</strong
-                      ><v-btn
-                        icon
-                        x-small
-                        @click="copyToClipboard(account.bscAddress)"
-                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
-                      >
-                      <br >
-                      <a 
-                        href="#"
-                        @click="
-                          openWindow(
-                            'https://bscscan.com/address/' + account.bscAddress
-                          )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
-                      <v-list>
-                        <v-list-item-group>
-                          <v-list-item
-                            v-for="bal in state.bscBalances"
-                            :key="bal.symbol"
-                            style="cursor: default"
-                          >
-                            <v-list-item-content>
-                              <v-img
-                                class="mr-3"
-                                :src="getAssetIcon(bal)"
-                                max-width="24px"
-                              ></v-img
-                              >{{ formatSymbol(bal.amount, bal.symbol) }}
-                            </v-list-item-content>
-                            <v-list-item-action style="display: inline">
-                              <a href="#" @click.prevent="askSendBsc(bal)">{{
                                 $t("home.send").toLowerCase()
                               }}</a>
                             </v-list-item-action>
@@ -1073,7 +1011,7 @@
                         href="#"
                         @click="
                           openWindow(
-                            'https://bscscan.com/address/' + account.bscAddress
+                            state.isMainnet ? 'https://bscscan.com/address/' + account.bscAddress : 'https://testnet.bscscan.com/address/' + account.bscAddress
                           )
                         ">{{ $t("home.viewOnExplorer") }}</a>
                       <v-list>
