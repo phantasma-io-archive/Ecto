@@ -281,7 +281,7 @@
 
         <v-tab-item key="3">
           <div
-            v-if="account && account.neoAddress && account.ethAddress"
+            v-if="account && account.neoAddress && account.ethAddress && account.bscAddress"
             style="overflow: auto; height: 459px"
           >
             <div style="text-align:center">
@@ -552,6 +552,118 @@
                 </v-expansion-panel>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
+                    <v-row>
+                      <v-col class="mt-2">
+                        {{ $t("home.swapFrom") }} BSC
+                      </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/bnb.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/soul.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-3">
+                    <div
+                      v-if="
+                        !state.bscBalances || state.bscBalances.length === 0
+                      "
+                    >
+                      {{ $t("home.noSwapsBSC") }}<br /><br />
+                      {{ $t("home.sendAssetsSwap") }}
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
+                      >
+                      <strong v-else>{{ account.bscAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.bscAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://bscscan.com/address/' + account.bscAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
+                    </div>
+                    <div v-else>
+                      {{ $t("home.swappableAssets") }}
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
+                      >
+                      <strong v-else>{{ account.bscAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.bscAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://bscscan.io/address/' + account.bscAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
+                      <v-list>
+                        <v-list-item-group>
+                          <v-list-item
+                            v-for="bal in state.bscBalances"
+                            :key="bal.symbol"
+                            style="cursor: default"
+                          >
+                            <v-list-item-content>
+                              <v-img
+                                class="mr-3"
+                                :src="getAssetIcon(bal)"
+                                max-width="24px"
+                              ></v-img
+                              >{{ formatSymbol(bal.amount, bal.symbol) }}
+                            </v-list-item-content>
+                            <v-list-item-action style="display: inline">
+                              <a
+                                href="#"
+                                @click.prevent="askSwapFromBsc(bal)"
+                                >{{ $t("home.send").toLowerCase() }}</a
+                              >
+                            </v-list-item-action>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+                    </div>
+                    <br />
+                    {{ $t("home.or") }}
+                    <a href="#" @click.prevent="goto('/addwallet')">{{
+                      $t("home.importBSCWallet")
+                    }}</a>
+                    {{ $t("home.withYourKey")
+                    }}<v-btn
+                      icon
+                      x-small
+                      @click="
+                        openWindow(
+                          'https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key'
+                        )
+                      "
+                      ><v-icon size="16">mdi-information-outline</v-icon></v-btn
+                    ><br />
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
                     <v-row style="vertical-align:middle">
                       <v-col class="mt-2"> {{ $t("home.swapTo") }} NEO </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
@@ -638,10 +750,62 @@
                     <!-- Each swap costs 0.001 ETH -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <v-row>
+                      <v-col class="mt-2">
+                        {{ $t("home.swapTo") }} BSC
+                      </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/soul.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/bnb.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-3">
+                    {{ $t("home.swapToBSC") }}<br />
+                    <a
+                      href="#"
+                      @click.prevent="selectAssetToSwap('bsc', false)"
+                      >{{ $t("home.selectAsset") }}</a
+                    ><!--<br /><br />
+                    {{ $t("home.swapToAnotherBSC") }}<br />
+                    <a
+                      href="#"
+                      @click.prevent="selectAssetToSwap('bsc', true)"
+                      >{{ $t("home.selectAssetAndDest") }}</a
+                    >-->
+                    <br />
+                    <br />
+                    <span
+                      v-html="
+                        $t('home.needBnbToSwap', [
+                          (
+                            Math.round(21000 * bscGasPrices[1] * 1.2) / 1e9
+                          ).toFixed(4),
+                          (
+                            Math.round(100000 * bscGasPrices[1] * 1.2) / 1e9
+                          ).toFixed(4),
+                        ])
+                      "
+                    ></span>
+                    <!-- Each swap costs 0.001 ETH -->
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
                 <div
                   v-if="
                     (state.neoBalances && state.neoBalances.length > 0) ||
-                      (state.ethBalances && state.ethBalances.length > 0)
+                      (state.ethBalances && state.ethBalances.length > 0) |
+                      (state.bscBalances && state.bscBalances.length > 0)
                   "
                   style="width: 100%; height: 16px; background: linear-gradient(45deg, #28ceaf, #17b1e8); color: white"
                 >
@@ -781,6 +945,154 @@
                             </v-list-item-content>
                             <v-list-item-action style="display: inline">
                               <a href="#" @click.prevent="askSendEth(bal)">{{
+                                $t("home.send").toLowerCase()
+                              }}</a>
+                            </v-list-item-action>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+                    </div>
+                    {{ $t("home.or") }}
+                    <a href="#" @click.prevent="askExportPrivateKeyHex">{{
+                      $t("home.exportPrivateKey")
+                    }}</a>
+                    {{ $t("home.andImportInMetamask")
+                    }}<v-btn
+                      icon
+                      x-small
+                      @click="
+                        openWindow(
+                          'https://metamask.zendesk.com/hc/en-us/articles/360015489331-How-to-import-an-Account'
+                        )
+                      "
+                      ><v-icon size="16">mdi-information-outline</v-icon></v-btn
+                    >
+                    <br />
+                  </v-expansion-panel-content>
+                  <v-expansion-panel-content class="pa-3">
+                    <div>
+                      {{ $t("home.assetsIn") }}
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
+                      >
+                      <strong v-else>{{ account.bscAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.bscAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://bscscan.com/address/' + account.bscAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
+                      <v-list>
+                        <v-list-item-group>
+                          <v-list-item
+                            v-for="bal in state.bscBalances"
+                            :key="bal.symbol"
+                            style="cursor: default"
+                          >
+                            <v-list-item-content>
+                              <v-img
+                                class="mr-3"
+                                :src="getAssetIcon(bal)"
+                                max-width="24px"
+                              ></v-img
+                              >{{ formatSymbol(bal.amount, bal.symbol) }}
+                            </v-list-item-content>
+                            <v-list-item-action style="display: inline">
+                              <a href="#" @click.prevent="askSendBsc(bal)">{{
+                                $t("home.send").toLowerCase()
+                              }}</a>
+                            </v-list-item-action>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+                    </div>
+                    {{ $t("home.or") }}
+                    <a href="#" @click.prevent="askExportPrivateKeyHex">{{
+                      $t("home.exportPrivateKey")
+                    }}</a>
+                    {{ $t("home.andImportInMetamask")
+                    }}<v-btn
+                      icon
+                      x-small
+                      @click="
+                        openWindow(
+                          'https://metamask.zendesk.com/hc/en-us/articles/360015489331-How-to-import-an-Account'
+                        )
+                      "
+                      ><v-icon size="16">mdi-information-outline</v-icon></v-btn
+                    >
+                    <br />
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel
+                  v-if="state.bscBalances && state.bscBalances.length > 0"
+                >
+                  <v-expansion-panel-header>
+                    <v-row>
+                      <v-col class="mt-2">
+                        {{ $t("home.sendOn") }} BSC
+                      </v-col>
+                      <v-col cols="4" class="pl-0 pr-0">
+                        <img
+                          class="ma-1"
+                          src="assets/bnb.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                        <v-icon>mdi-arrow-right-bold</v-icon
+                        ><img
+                          class="ma-1"
+                          src="assets/bnb.png"
+                          style="vertical-align: middle; max-width:24px"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content class="pa-3">
+                    <div>
+                      {{ $t("home.assetsIn") }}
+                      <strong v-if="!state.balanceShown"
+                        >************************************</strong
+                      >
+                      <strong v-else>{{ account.bscAddress }}</strong
+                      ><v-btn
+                        icon
+                        x-small
+                        @click="copyToClipboard(account.bscAddress)"
+                        ><v-icon size="16">mdi-content-copy</v-icon></v-btn
+                      >
+                      <br >
+                      <a 
+                        href="#"
+                        @click="
+                          openWindow(
+                            'https://bscscan.com/address/' + account.bscAddress
+                          )
+                        ">{{ $t("home.viewOnExplorer") }}</a>
+                      <v-list>
+                        <v-list-item-group>
+                          <v-list-item
+                            v-for="bal in state.bscBalances"
+                            :key="bal.symbol"
+                            style="cursor: default"
+                          >
+                            <v-list-item-content>
+                              <v-img
+                                class="mr-3"
+                                :src="getAssetIcon(bal)"
+                                max-width="24px"
+                              ></v-img
+                              >{{ formatSymbol(bal.amount, bal.symbol) }}
+                            </v-list-item-content>
+                            <v-list-item-action style="display: inline">
+                              <a href="#" @click.prevent="askSendBsc(bal)">{{
                                 $t("home.send").toLowerCase()
                               }}</a>
                             </v-list-item-action>
@@ -1011,11 +1323,11 @@
 
           <v-slider
             v-model="sendAmount"
-            :min="sendSymbol === 'ETH' ? 0.0001 : 0.01"
+            :min="sendSymbol === 'ETH' || sendSymbol === 'BNB' ? 0.0001 : 0.01"
             :max="sendMaxAmount"
             :value="1"
             :step="
-              sendSymbol === 'ETH'
+              sendSymbol === 'ETH' || sendSymbol === 'BNB'
                 ? 0.0001
                 : state.decimals(sendSymbol) === 0
                 ? 1
@@ -1374,7 +1686,7 @@
         <v-card-text class="pb-0">
           <span>
             {{ $t("home.availableToSwap") }}
-            {{ swapToChain.toUpperCase() === "ETH" ? "Ethereum" : "NEO" }}.
+            {{ swapToChain.toUpperCase() === "ETH" ? "Ethereum" : swapToChain.toUpperCase() === "BSC" ? "BSC" : "NEO" }}.
           </span>
           <br />
           <v-list style="margin-left:-8px; margin-right:-8px;">
@@ -1434,11 +1746,11 @@
 
           <v-slider
             v-model="sendAmount"
-            :min="sendSymbol === 'ETH' ? 0.0001 : 0.01"
+            :min="sendSymbol === 'ETH' || sendSymbol === 'BNB' ? 0.0001 : 0.01"
             :max="sendMaxAmount"
             :value="1"
             :step="
-              sendSymbol === 'ETH'
+              sendSymbol === 'ETH' || sendSymbol === 'BNB'
                 ? 0.0001
                 : state.decimals(sendSymbol) === 0
                 ? 1
@@ -1486,6 +1798,44 @@
                 disabled
               ></v-text-field>
             </v-col> -->
+            <template v-if="swapFromChain === 'bsc'">
+              <div class="mx-auto" style="display:inherit">
+                <v-icon class="mr-2">mdi-tortoise</v-icon>
+                <div
+                  class="pa-1"
+                  style="border:16px; background-color:#eee; border-radius:32px"
+                >
+                  <v-icon
+                    @click="swapGasIndex = 0"
+                    class="mr-3"
+                    :color="swapGasIndex == 0 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 0 ? "-medium" : "" }}</v-icon
+                  ><v-icon
+                    @click="swapGasIndex = 1"
+                    class="mr-3"
+                    :color="swapGasIndex == 1 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 1 ? "-medium" : "" }}</v-icon
+                  ><v-icon
+                    @click="swapGasIndex = 2"
+                    :color="swapGasIndex == 2 ? 'blue darken-3' : ''"
+                    >mdi-circle{{ swapGasIndex !== 2 ? "-medium" : "" }}</v-icon
+                  >
+                </div>
+                <v-icon class="ml-2">mdi-rabbit</v-icon>
+              </div>
+              <br />
+              <div class="mx-auto" style="font-size:13px">
+                {{
+                  swapGasIndex == 0
+                    ? $t("home.feeSlow")
+                    : swapGasIndex == 1
+                    ? $t("home.feeStandard")
+                    : $t("home.feeFast")
+                }}
+                {{ bscGasPrices[swapGasIndex] }} Gwei (~{{ state.currencySymbol
+                }}{{ getFeeBsc(bscGasPrices[swapGasIndex], sendSymbol) }})
+              </div>
+            </template>
             <template v-if="swapFromChain === 'eth'">
               <div class="mx-auto" style="display:inherit">
                 <v-icon class="mr-2">mdi-tortoise</v-icon>
@@ -1588,6 +1938,23 @@
               ETH (~{{ state.currencySymbol
               }}{{ getFeeEth(ethGasPrices[1], sendSymbol) }})
             </div>
+            <div
+              v-if="swapToChain === 'bsc' && swapFromChain !== 'bsc'"
+              class="mx-auto"
+            >
+              {{ $t("home.swapNeed") }}
+              {{
+                (
+                  Math.round(
+                    (sendSymbol == "BNB" ? 21000 : 100000) *
+                      bscGasPrices[1] *
+                      1.2
+                  ) / 1e9
+                ).toFixed(4)
+              }}
+              BNB (~{{ state.currencySymbol
+              }}{{ getFeeBsc(bscGasPrices[1], sendSymbol) }})
+            </div>
           </v-row>
         </v-card-text>
 
@@ -1647,6 +2014,9 @@
               (swapToChain == 'neo' && !sendDestination.startsWith('A')) ||
                 (swapToChain == 'eth' &&
                   (!sendDestination.startsWith('0x') ||
+                    sendDestination.length != 42)) ||
+                (swapToChain == 'bsc' &&
+                  (!sendDestination.startsWith('0x') ||
                     sendDestination.length != 42))
             "
             @click="
@@ -1678,7 +2048,7 @@
               ? $t("home.sendBeingProcessed")
               : $t("home.swapBeingProcessed")
           }}
-          {{ swapFromChain == "eth" ? $t("home.needsConfirmations") : "" }}
+          {{ swapFromChain == "eth" || swapFromChain == "bsc" ? $t("home.needsConfirmations") : "" }}
           {{ $t("home.checkTransaction") }}
           <a :href="lastSwapTxUrl" target="_blank" rel="noopener noreferrer">{{
             $t("home.here")
@@ -1842,6 +2212,7 @@ import TransactionComponent from "@/components/TransactionComponent.vue";
 import { Watch } from "vue-property-decorator";
 import { getScriptHashFromAddress, sendNeo } from "@/neo";
 import { getEthBalances, JSONRPC } from "@/ethereum";
+import { getBscBalances } from "@/bsc";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
 
 @Component({
@@ -1870,6 +2241,7 @@ export default class extends Vue {
   swapAmountDialog = false;
   destinationSwapDialog = false;
   generateSwapAddressDialog = false;
+  swapFromBscDialog = false;
   swapFromEthDialog = false;
   swapFromNeoDialog = false;
   swapInProgressDialog = false;
@@ -1904,6 +2276,7 @@ export default class extends Vue {
 
   swapToClaim: Swap | null = null;
 
+  bscGasPrices: number[] = [5, 15, 25];
   ethGasPrices: number[] = [50, 70, 100];
   neoGasPrices: number[] = [0.0, 0.0011, 0.1];
   swapGasIndex = 1;
@@ -2060,6 +2433,16 @@ export default class extends Vue {
     return feesValue.toFixed(2);
   }
 
+  getFeeBsc(gwei: number, symbol: string) {
+    const gasLimit = symbol == "BNB" ? 21000 : 100000;
+    const currencyPrice = state.getRate("BNB");
+    const decimals = 18;
+    const decimalsGas = 9;
+    const fees = (gwei * 10 ** decimalsGas * gasLimit) / 10 ** decimals;
+    const feesValue = fees * currencyPrice;
+    return feesValue.toFixed(2);
+  }
+
   formatHash(hash: string) {
     return (
       hash.substring(0, 8) +
@@ -2129,6 +2512,10 @@ export default class extends Vue {
         return false;
       case "sem":
         return false;
+      case "bnb":
+        return false;
+      case "busd":
+        return false;
       default:
         return true;
     }
@@ -2138,7 +2525,7 @@ export default class extends Vue {
     return this.formatBalance(
       balance.amount,
       balance.decimals,
-      balance.symbol == "ETH" ? 3 : 2
+      balance.symbol == "ETH" || balance.symbol == "BNB" ? 3 : 2
     );
   }
 
@@ -2151,7 +2538,7 @@ export default class extends Vue {
       this.formatBalance(
         value,
         state.decimals(symbol),
-        symbol == "ETH" ? 3 : 2
+        symbol == "ETH" || symbol == "BNB" ? 3 : 2
       ) +
       " " +
       symbol
@@ -2164,6 +2551,8 @@ export default class extends Vue {
         return "NEO";
       case "ethereum":
         return "Ethereum";
+      case "bsc":
+        return "BSC";
       case "phantasma":
         return "Phantasma";
       default:
@@ -2304,6 +2693,9 @@ export default class extends Vue {
       );
     else if (swapToChain == "neo")
       return symbol == "SOUL" || symbol == "NEO" || symbol == "GAS";
+
+    else if (swapToChain == "bsc")
+      return symbol == "SOUL" || symbol == "KCAL" || symbol == "BNB" || symbol == "BUSD";
     return false;
   }
 
@@ -2364,7 +2756,7 @@ export default class extends Vue {
 
   onSwapAmountClick() {
     this.swapAmountDialog = false;
-    // if (this.swapToChain == "neo" || this.swapToChain == "eth") {
+    // if (this.swapToChain == "neo" || this.swapToChain == "eth" || this.swapToChain == "bsc") {
     //   this.swapFromChain = "phantasma";
     // }
     console.log(
@@ -2382,6 +2774,7 @@ export default class extends Vue {
       this.destinationSwapDialog = true;
       this.sendDestination = "";
       if (this.swapToChain == "eth") this.signTxCallback = this.sendFromEth;
+      if (this.swapToChain == "bsc") this.signTxCallback = this.sendFromBsc;
       else this.signTxCallback = this.sendFromNeo;
       return;
     }
@@ -2391,6 +2784,10 @@ export default class extends Vue {
       console.log("next => sendFromEth");
       this.signTxDialog = true;
       this.signTxCallback = this.sendFromEth;
+    } else if (this.swapFromChain == "bsc") {
+      console.log("next => sendFromBsc");
+      this.signTxDialog = true;
+      this.signTxCallback = this.sendFromBsc;
     } else if (this.swapFromChain == "neo") {
       console.log("next => sendFromNeo");
       this.signTxDialog = true;
@@ -2404,6 +2801,16 @@ export default class extends Vue {
       } else {
         this.signTxDialog = true;
         this.sendDestination = this.account!.ethAddress;
+      }
+    } else if (this.swapToChain == "bsc") {
+      console.log("swap to bsc");
+      this.signTxCallback = this.swapToBsc;
+      if (this.swapToCustomDest || !this.account!.bscAddress) {
+        this.destinationSwapDialog = true;
+        this.sendDestination = "";
+      } else {
+        this.signTxDialog = true;
+        this.sendDestination = this.account!.bscAddress;
       }
     } else if (this.swapToChain == "neo") {
       console.log("swap to neo");
@@ -2467,6 +2874,7 @@ export default class extends Vue {
     if (
       swap.destinationPlatform == "neo" ||
       swap.destinationPlatform == "ethereum" ||
+      swap.destinationPlatform == "bsc" ||
       (swap.destinationPlatform == "phantasma" && swap.sourcePlatform == "neo")
     ) {
       this.isLoading = true;
@@ -2492,6 +2900,11 @@ export default class extends Vue {
         this.swapToClaim = swap;
         this.signTxDialog = true;
         this.signTxCallback = this.settleFromEthereumTx;
+      }
+      if (swap.sourcePlatform == "bsc") {
+        this.swapToClaim = swap;
+        this.signTxDialog = true;
+        this.signTxCallback = this.settleFromBscTx;
       }
     }
   }
@@ -2578,6 +2991,88 @@ export default class extends Vue {
     }, 2850);
   }
 
+  async settleFromBscTx() {
+    console.log("settle from bsc tx", this.swapToClaim);
+    if (!this.swapToClaim || !this.account) return;
+
+    const swapTxHash = this.swapToClaim.sourceHash;
+
+    const symbol = this.swapToClaim.symbol;
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 2100;
+
+    let transcodeAddress = "";
+
+    try {
+      if (this.needsWif) transcodeAddress = state.getTranscodeAddress(this.wif);
+      else
+        transcodeAddress = state.getTranscodeAddressWithPassword(this.password);
+      console.log("transcodeAddr", transcodeAddress);
+    } catch (err) {
+      this.closeSignTx();
+      this.errorDialog = true;
+      this.errorMessage = err;
+      return;
+    }
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+    sb.callContract("interop", "SettleTransaction", [
+      transcodeAddress,
+      "bsc",
+      "bsc",
+      hexToByteArray(reverseHex(swapTxHash)),
+    ]);
+
+    sb.callContract("swap", "SwapFee", [transcodeAddress, symbol, 1000000000]);
+    sb.allowGas(transcodeAddress, sb.nullAddress, gasPrice, minGasLimit);
+    sb.callInterop("Runtime.TransferBalance", [
+      transcodeAddress,
+      address,
+      symbol,
+    ]);
+
+    sb.spendGas(transcodeAddress);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    console.log("script", script);
+
+    try {
+      this.isLoading = true;
+      this.signTxDialog = false;
+      let tx = "";
+      if (this.needsWif) {
+        tx = await state.signTxEth(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxEthWithPassword(txdata, this.password);
+      }
+      console.log("tx successful: " + tx);
+      setTimeout(() => this.$root.$emit("checkTx", tx), 2000);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2850);
+  }
+
   async askSwapFromEth(bal: ISymbolAmount) {
     this.sendSymbol = bal.symbol;
     this.swapFromChain = "eth";
@@ -2612,6 +3107,38 @@ export default class extends Vue {
     this.swapAmountDialog = true;
 
     await this.fetchEthGasPrices();
+  }
+
+  async askSwapFromBsc(bal: ISymbolAmount) {
+    this.sendSymbol = bal.symbol;
+    this.swapFromChain = "bsc";
+    this.swapToChain = "phantasma";
+    this.sendMaxAmount = parseFloat(
+      this.formatBalance(
+        bal.amount.toString(),
+        state.decimals(bal.symbol)
+      ).replace(/ /gi, "")
+    ) as number;
+    this.swapAmountDialog = true;
+  }
+
+  async askSendBsc(bal: ISymbolAmount) {
+    this.sendSymbol = bal.symbol;
+    this.swapFromChain = "bsc";
+    this.swapToChain = "bsc";
+    this.sendMaxAmount = parseFloat(
+      this.formatBalance(
+        bal.amount.toString(),
+        state.decimals(bal.symbol)
+      ).replace(/ /gi, "")
+    ) as number;
+    if (this.sendSymbol == "BNB") {
+      const bnbFee = (
+        Math.round(21000 * this.bscGasPrices[1] * 1.2) / 1e9
+      ).toFixed(4);
+      this.sendMaxAmount -= parseFloat(parseFloat(bnbFee).toFixed(3));
+    }
+    this.swapAmountDialog = true;
   }
 
   askSwapFromNeo(bal: ISymbolAmount) {
@@ -2894,6 +3421,222 @@ export default class extends Vue {
 
       if (this.swapToCustomDest)
         await state.addPendingSwap("ethereum", this.sendDestination, tx);
+    } catch (err) {
+      this.errorDialog = true;
+      this.errorMessage = err;
+    }
+
+    // // close dialog when it's done
+    this.closeSignTx();
+
+    // refresh balances in 2.5 secs
+    setTimeout(async () => {
+      await this.state.refreshCurrentAccount();
+      this.isLoading = false;
+    }, 2700);
+  }
+
+  async sendFromBsc() {
+    if (!this.account || !this.account.bscAddress) {
+      console.log("error");
+      return;
+    }
+
+    console.log("Sending from BSC", this.sendAmount, this.sendSymbol);
+    console.log("BSC Address", this.account.bscAddress);
+
+    const isMainnet = state.isMainnet;
+
+    const nonceRes = await JSONRPC(
+      "https://" +
+        (isMainnet ? "bsc-dataseed.binance.org/" : "data-seed-prebsc-1-s1.binance.org:8545/"),
+      "eth_getTransactionCount",
+      [this.account.bscAddress, "pending"]
+    );
+
+    console.log("nonce", nonceRes);
+
+    let privateKey: Buffer;
+
+    try {
+      privateKey = Buffer.from(
+        getPrivateKeyFromWif(
+          this.needsWif ? this.wif : state.getWifFromPassword(this.password)
+        ),
+        "hex"
+      );
+    } catch (err) {
+      this.closeSignTx();
+      this.errorDialog = true;
+      this.errorMessage = err;
+      return;
+    }
+
+    const decimals = state.decimals(this.sendSymbol);
+
+    const amount = Math.floor(this.sendAmount * 10 ** decimals); // amount bep-20
+    const gasPrice = this.bscGasPrices[this.swapGasIndex] * 10 ** 9; //100000000000;
+    const gasLimit = this.sendSymbol == "BNB" ? 21000 : 100000;
+
+    if (this.swapToChain === "phantasma") {
+      const platforms = await state.api.getPlatforms();
+      const interopAddr = platforms.find((p) => p.platform == "bsc")
+        ?.interop[0];
+
+      if (!interopAddr) {
+        throw new Error("No available interop address for swap");
+      }
+      console.log("Interop address is ", interopAddr.external);
+      this.sendDestination = interopAddr.external;
+    }
+
+    if (this.sendDestination == "") {
+      this.errorDialog = true;
+      this.errorMessage = "Error in destination address";
+      return;
+    }
+
+    const destAddr = this.sendDestination // interopAddr.external //"0x259D17A3E6658B79CE7F6F87CAC614A696056E79"
+      .substring(2)
+      .padStart(64, "0")
+      .toLowerCase();
+    const amountStr = amount.toString(16).padStart(64, "0");
+
+    let txParams: any = {};
+    if (this.sendSymbol == "BNB") {
+      txParams = {
+        nonce: nonceRes,
+        gasPrice: "0x" + gasPrice.toString(16), //"0x09184e72a000",
+        gasLimit: "0x" + gasLimit.toString(16), //"0x2710",
+        to: this.sendDestination, // interopAddr.external,
+        value: "0x" + amount.toString(16),
+      };
+    } else {
+      txParams = {
+        nonce: nonceRes,
+        gasPrice: "0x" + gasPrice.toString(16), //"0x09184e72a000",
+        gasLimit: "0x" + gasLimit.toString(16), //"0x2710",
+        to: "0x" + state.getBscContract(this.sendSymbol),
+        value: "0x0", // no eth to transfer
+        data: "0xa9059cbb" + destAddr + amountStr,
+      };
+    }
+
+    // The second parameter is not necessary if these values are used
+    const tx = new EthereumTx(txParams, {
+      chain: isMainnet ? "0x38" : "0x61",
+    });
+    tx.sign(privateKey);
+    const serializedTx = tx
+      .serialize()
+      .toString("hex")
+      .toUpperCase();
+
+    console.log("%c" + serializedTx, "color:blue;font-size:20px");
+
+    const txRes = await JSONRPC(
+      "https://" +
+        (isMainnet ? "bsc-dataseed.binance.org/" : "data-seed-prebsc-1-s1.binance.org:8545/"),
+      "eth_sendRawTransaction",
+      ["0x" + serializedTx]
+    );
+
+    this.closeSignTx();
+
+    if (txRes.error) {
+      this.errorDialog = true;
+      this.errorMessage = txRes.error;
+      return;
+    }
+
+    this.swapInProgressDialog = true;
+
+    this.lastSwapTx = txRes;
+    this.lastSwapTxUrl =
+      (isMainnet
+        ? "https://bscscan.com/tx/"
+        : "https://testnet.bscscan.com/tx/") + txRes;
+
+    console.log("%c" + txRes, "color:green;font-size:20px");
+  }
+
+  async swapToBsc() {
+    console.log(
+      "swap from pha to bsc",
+      this.sendAmount,
+      this.sendSymbol,
+      this.sendDestination
+    );
+
+    if (!this.account) return;
+
+    if (typeof this.sendDestination == "object") {
+      this.sendDestination = (this.sendDestination as any).value;
+    }
+
+    this.sendDecimals = state.decimals(this.sendSymbol);
+
+    const ethHexBytes = "04" + this.sendDestination.substring(2).toUpperCase();
+
+    let ethInteropBytes = [0x22];
+    for (let i = 0; i < 34 * 2; i += 2) {
+      const hexdig = ethHexBytes.substr(i, 2);
+      if (hexdig == "") {
+        ethInteropBytes.push(0);
+      } else ethInteropBytes.push(parseInt(hexdig, 16));
+    }
+
+    console.log("ethInteropBytes", ethInteropBytes);
+
+    console.log(
+      "sending",
+      Math.floor(this.sendAmount * 10 ** this.sendDecimals),
+      "of",
+      this.sendSymbol,
+      "to",
+      ethInteropBytes
+    );
+
+    const address = this.account.address;
+    const gasPrice = 100000;
+    const minGasLimit = 2100;
+
+    let sb = new ScriptBuilder();
+
+    sb.beginScript();
+    sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+    sb.callInterop("Runtime.TransferTokens", [
+      address,
+      ethInteropBytes,
+      this.sendSymbol,
+      Math.floor(this.sendAmount * 10 ** this.sendDecimals),
+    ]);
+    sb.spendGas(address);
+    const script = sb.endScript();
+
+    const txdata: TxArgsData = {
+      nexus: state.nexus,
+      chain: "main",
+      script,
+      payload: state.payload,
+    };
+
+    console.log("script", script);
+
+    try {
+      this.isLoading = true;
+      let tx = "";
+      this.signTxDialog = false;
+      if (this.needsWif) {
+        tx = await state.signTx(txdata, this.wif);
+      } else if (this.needsPass) {
+        tx = await state.signTxWithPassword(txdata, address, this.password);
+      }
+      console.log("tx successful: " + tx);
+      this.$root.$emit("checkTx", tx);
+
+      if (this.swapToCustomDest)
+        await state.addPendingSwap("bsc", this.sendDestination, tx);
     } catch (err) {
       this.errorDialog = true;
       this.errorMessage = err;
@@ -3439,7 +4182,7 @@ export default class extends Vue {
       this.formatBalance(
         bal.amount,
         bal.decimals,
-        bal.symbol == "ETH" ? 3 : 2
+        bal.symbol == "ETH" || bal.symbol == "BNB" ? 3 : 2
       ).replace(/ /gi, "")
     );
 
@@ -3453,6 +4196,12 @@ export default class extends Vue {
         Math.round(21000 * this.ethGasPrices[1] * 1.2) / 1e9
       ).toFixed(4);
       this.sendMaxAmount -= parseFloat(parseFloat(ethFee).toFixed(3));
+    }
+    if (this.sendSymbol == "BNB") {
+      const bnbFee = (
+        Math.round(21000 * this.bscGasPrices[1] * 1.2) / 1e9
+      ).toFixed(4);
+      this.sendMaxAmount -= parseFloat(parseFloat(bnbFee).toFixed(3));
     }
     if (this.sendMaxAmount < 0) this.sendMaxAmount = 0;
     this.swapAmountDialog = true;
