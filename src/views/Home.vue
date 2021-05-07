@@ -2150,8 +2150,9 @@ import TransactionComponent from "@/components/TransactionComponent.vue";
 import { Watch } from "vue-property-decorator";
 import { getScriptHashFromAddress, sendNeo } from "@/neo";
 import { getEthBalances, JSONRPC } from "@/ethereum";
-import { getBscBalances } from "@/bsc";
+import { getBscBalances, JSONRPCBSC } from "@/bsc";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
+import Common from 'ethereumjs-common';
 
 @Component({
   components: { ErrorDialog: ErrorDialogVue, TransactionComponent },
@@ -2694,9 +2695,17 @@ export default class extends Vue {
 
   onSwapAmountClick() {
     this.swapAmountDialog = false;
-    // if (this.swapToChain == "neo" || this.swapToChain == "eth" || this.swapToChain == "bsc") {
-    //   this.swapFromChain = "phantasma";
-    // }
+
+    // send from chain to same chain
+    if (this.swapFromChain == this.swapToChain) {
+      this.destinationSwapDialog = true;
+      this.sendDestination = "";
+      if (this.swapToChain == "eth") this.signTxCallback = this.sendFromEth;
+      else if (this.swapToChain == "bsc") this.signTxCallback = this.sendFromBsc;
+      else this.signTxCallback = this.sendFromNeo;
+      return;
+    }
+
     console.log(
       "onSwapAmountClick",
       this.sendAmount,
@@ -2706,16 +2715,6 @@ export default class extends Vue {
       "to",
       this.swapToChain
     );
-
-    // send from chain to same chain
-    if (this.swapFromChain == this.swapToChain) {
-      this.destinationSwapDialog = true;
-      this.sendDestination = "";
-      if (this.swapToChain == "eth") this.signTxCallback = this.sendFromEth;
-      if (this.swapToChain == "bsc") this.signTxCallback = this.sendFromBsc;
-      else this.signTxCallback = this.sendFromNeo;
-      return;
-    }
 
     // send to swap
     if (this.swapFromChain == "eth") {
@@ -3113,12 +3112,13 @@ export default class extends Vue {
       this.sendDestination = interopAddr!.external;
     }
 
-    console.log(
-      "swap from neo to pha",
-      this.sendAmount,
-      this.sendSymbol,
-      this.sendDestination
-    );
+    if (!this.account || !this.account.neoAddress) {
+      console.log("error");
+      return;
+    }
+
+    console.log("Sending from NEO", this.sendAmount, this.sendSymbol);
+    console.log("NEO Address", this.account.neoAddress);
 
     let wif = this.wif;
 
@@ -3385,7 +3385,7 @@ export default class extends Vue {
 
     const isMainnet = state.isMainnet;
 
-    const nonceRes = await JSONRPC(
+    const nonceRes = await JSONRPCBSC(
       "https://" +
         (isMainnet ? "bsc-dataseed.binance.org/" : "data-seed-prebsc-1-s1.binance.org:8545/"),
       "eth_getTransactionCount",
@@ -3461,8 +3461,13 @@ export default class extends Vue {
     }
 
     // The second parameter is not necessary if these values are used
+    const common = Common.forCustomChain('mainnet', {
+      name: 'bnb',
+      networkId: isMainnet ? 56 : 97,
+      chainId: isMainnet ? 56 : 97,
+    }, 'petersburg');
     const tx = new EthereumTx(txParams, {
-      chain: isMainnet ? "0x38" : "0x61",
+      common
     });
     tx.sign(privateKey);
     const serializedTx = tx
@@ -3472,7 +3477,7 @@ export default class extends Vue {
 
     console.log("%c" + serializedTx, "color:blue;font-size:20px");
 
-    const txRes = await JSONRPC(
+    const txRes = await JSONRPCBSC(
       "https://" +
         (isMainnet ? "bsc-dataseed.binance.org/" : "data-seed-prebsc-1-s1.binance.org:8545/"),
       "eth_sendRawTransaction",

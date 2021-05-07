@@ -26,7 +26,7 @@ export function getBscContract(symbol: string, isMainnet: boolean) {
   else return contractsTestnet[symbol];
 }
 
-export async function JSONRPC(
+export async function JSONRPCBSC(
   host: string,
   method: string,
   params: Array<any>
@@ -84,7 +84,7 @@ export async function getBscBalances(bscAddress: string, isMainnet: boolean) {
     "https://" +
     (isMainnet ? "bsc-dataseed.binance.org/" : "data-seed-prebsc-1-s1.binance.org:8545/")
 
-  const bnbBalance = await JSONRPC(rpcUrl, "eth_getBalance", [
+  const bnbBalance = await JSONRPCBSC(rpcUrl, "eth_getBalance", [
     bscAddress,
     "latest",
   ]);
@@ -99,7 +99,7 @@ export async function getBscBalances(bscAddress: string, isMainnet: boolean) {
   bep20Tokens.map(async (t) => {
     const hash = t.external?.find((e) => e.platform == "bsc")?.hash;
     if (!hash) return;
-    const bepBalance = await JSONRPC(rpcUrl, "eth_call", [
+    const bepBalance = await JSONRPCBSC(rpcUrl, "eth_call", [
       {
         to: "0x" + hash,
         data: bscDataAddr,
