@@ -20,15 +20,12 @@ import {
 
 import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
 import {
+  getChecksumAddress,
   getEthAddressFromWif,
   getEthBalances,
   getEthContract,
 } from "@/ethereum";
-import {
-  getBscAddressFromWif,
-  getBscBalances,
-  getBscContract,
-} from "@/bsc";
+import { getBscAddressFromWif, getBscBalances, getBscContract } from "@/bsc";
 import base58 from "bs58";
 import { byteArrayToHex } from "@/phan-js/utils";
 
@@ -669,6 +666,19 @@ export class PopupState {
     this._accounts[this._currentAccountIndex].data = await this.getAccountData(
       account.address
     );
+
+    // fix non-checksum ethereum addresses
+    if (
+      account.ethAddress &&
+      account.ethAddress.toLocaleLowerCase() == account.ethAddress
+    ) {
+      account.ethAddress = getChecksumAddress(account.ethAddress);
+    }
+
+    // copy ETH address to BSC
+    if (account.ethAddress && !account.bscAddress) {
+      account.bscAddress = account.ethAddress;
+    }
 
     const allNfts = this.getAllTokens().filter(
       (t) => t.flags && !t.flags.includes("Fungible")
