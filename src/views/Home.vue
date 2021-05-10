@@ -2287,7 +2287,7 @@ export default class extends Vue {
 
   swapToClaim: Swap | null = null;
 
-  bscGasPrices: number[] = [5, 15, 25];
+  bscGasPrices: number[] = [10, 20, 30];
   ethGasPrices: number[] = [50, 70, 100];
   neoGasPrices: number[] = [0.0, 0.0011, 0.1];
   swapGasIndex = 1;
