@@ -2984,9 +2984,9 @@ export default class extends Vue {
       this.signTxDialog = false;
       let tx = "";
       if (this.needsWif) {
-        tx = await state.signTxEth(txdata, this.wif);
+        tx = await state.signTxEth(txdata, this.wif, true);
       } else if (this.needsPass) {
-        tx = await state.signTxEthWithPassword(txdata, this.password);
+        tx = await state.signTxEthWithPassword(txdata, this.password, true);
       }
       console.log("tx successful: " + tx);
       setTimeout(() => this.$root.$emit("checkTx", tx), 2000);

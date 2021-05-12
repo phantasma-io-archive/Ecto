@@ -2,6 +2,11 @@ import { eddsa } from "elliptic";
 import { ScriptBuilder } from "../vm";
 const curve = new eddsa("ed25519");
 
+interface ISignature {
+  signature: string;
+  kind: number;
+}
+
 export class Transaction {
   nexusName: string;
   chainName: string;
@@ -9,7 +14,7 @@ export class Transaction {
   expiration: Date;
   payload: string;
 
-  signatures: Array<string>;
+  signatures: Array<ISignature>;
 
   constructor(
     nexusName: string,
@@ -29,10 +34,10 @@ export class Transaction {
 
   public sign(privateKey: string) {
     const signature = this.getSign(this.toString(false), privateKey);
-    this.signatures.unshift(signature);
+    this.signatures.unshift({ signature, kind: 1 });
   }
 
-  public toString(withSignature: boolean, signatureType: number = 1): string {
+  public toString(withSignature: boolean): string {
     const utc = Date.UTC(
       this.expiration.getUTCFullYear(),
       this.expiration.getUTCMonth(),
@@ -62,15 +67,16 @@ export class Transaction {
     if (withSignature) {
       sb.emitVarInt(this.signatures.length);
       this.signatures.forEach((sig) => {
-        if (signatureType == 1) {
+        console.log("adding signature ", sig);
+        if (sig.kind == 1) {
           sb.appendByte(1); // Signature Type
-          sb.emitVarInt(sig.length / 2);
-          sb.appendHexEncoded(sig);
-        } else if (signatureType == 2) {
+          sb.emitVarInt(sig.signature.length / 2);
+          sb.appendHexEncoded(sig.signature);
+        } else if (sig.kind == 2) {
           sb.appendByte(2); // ECDSA Signature
           sb.appendByte(1); // Curve type secp256k1
-          sb.emitVarInt(sig.length / 2);
-          sb.appendHexEncoded(sig);
+          sb.emitVarInt(sig.signature.length / 2);
+          sb.appendHexEncoded(sig.signature);
         }
       });
     }

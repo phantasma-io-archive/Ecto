@@ -972,7 +972,11 @@ export class PopupState {
     return signData(data, privateKey);
   }
 
-  async signTxEth(txdata: TxArgsData, wif: string): Promise<string> {
+  async signTxEth(
+    txdata: TxArgsData,
+    wif: string,
+    alsoSignWithPha: boolean = false
+  ): Promise<string> {
     const account = this.currentAccount;
     if (!account) throw new Error("Account not valid");
 
@@ -1013,9 +1017,13 @@ export class PopupState {
     const signature = sig.r + sig.s;
     console.log("signature", signature);
 
-    tx.signatures.unshift(signature);
+    tx.signatures.unshift({ signature, kind: 2 });
 
-    const rawTx = tx.toString(true, 2);
+    if (alsoSignWithPha) {
+      tx.sign(getPrivateKeyFromWif(wif));
+    }
+
+    const rawTx = tx.toString(true);
 
     console.log("%c" + rawTx, "color:red");
 
@@ -1025,10 +1033,15 @@ export class PopupState {
     return hash;
   }
 
-  async signTxEthWithPassword(txdata: TxArgsData, password: string) {
+  async signTxEthWithPassword(
+    txdata: TxArgsData,
+    password: string,
+    alsoSignWithPha: boolean = false
+  ) {
     const hash = await this.signTxEth(
       txdata,
-      this.getWifFromPassword(password)
+      this.getWifFromPassword(password),
+      alsoSignWithPha
     );
     return hash;
   }
