@@ -154,32 +154,24 @@
                     <div
                       style="position:absolute; bottom:5px; right:128px; color:gray"
                     >
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-icon v-bind="attrs" v-on="on"
-                            >mdi-link-box-variant-outline</v-icon
-                          >
-                        </template>
-                        <div
-                          style="width: 150px; max-width:240px; overflow: hidden"
-                        >
-                          <div
-                            class="overline"
-                            style="color:#17b1e8; font-size: 11px !important;text-shadow: 1px 1px 20px #000000, 1px 1px 2px #000000;"
-                            @click="
-                              openWindow(
-                                state.isMainnet
-                                  ? 'https://ghostmarket.io/asset/pha/ghost/' +
-                                      item.id + '/'
-                                  : 'https://testnet.ghostmarket.io/asset/pha/ghost/' +
-                                      item.id + '/'
-                              )
-                            "
-                          >
-                            View More
-                          </div>
-                        </div>
-                      </v-tooltip>
+                      <v-icon
+                        @click.native="
+                          openWindow(
+                            state.isMainnet
+                              ? 'https://ghostmarket.io/asset/pha/' +
+                                  sendSymbol +
+                                  '/' +
+                                  item.id +
+                                  '/'
+                              : 'https://testnet.ghostmarket.io/asset/pha/' +
+                                  sendSymbol +
+                                  '/' +
+                                  item.id +
+                                  '/'
+                          )
+                        "
+                        >mdi-open-in-new</v-icon
+                      >
                     </div>
                   </div>
 
@@ -899,6 +891,10 @@ export default class extends Vue {
       await this.state.refreshCurrentAccount();
       this.isLoading = false;
     }, 2500);
+  }
+
+  openWindow(url: string) {
+    window.open(url, "_blank");
   }
 }
 </script>
