@@ -159,12 +159,12 @@
                           openWindow(
                             state.isMainnet
                               ? 'https://ghostmarket.io/asset/pha/' +
-                                  sendSymbol +
+                                  sendSymbol.toLowerCase() +
                                   '/' +
                                   item.id +
                                   '/'
                               : 'https://testnet.ghostmarket.io/asset/pha/' +
-                                  sendSymbol +
+                                  sendSymbol.toLowerCase() +
                                   '/' +
                                   item.id +
                                   '/'
