@@ -2959,15 +2959,28 @@ export default class extends Vue {
       hexToByteArray(reverseHex(swapTxHash)),
     ]);
 
-    sb.callContract("swap", "SwapFee", [transcodeAddress, symbol, 1000000000]);
-    sb.allowGas(transcodeAddress, sb.nullAddress, gasPrice, minGasLimit);
-    sb.callInterop("Runtime.TransferBalance", [
-      transcodeAddress,
-      address,
-      symbol,
-    ]);
+    const destinationBalance = await state.getAccountData(address)
+    const destinationAddressKCALBalance = destinationBalance.balances.filter((t) => t.symbol == "KCAL");
 
-    sb.spendGas(transcodeAddress);
+    if (destinationAddressKCALBalance && destinationAddressKCALBalance[0] && parseFloat(destinationAddressKCALBalance[0].amount) > 1000000000) {
+      sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+      sb.callInterop("Runtime.TransferBalance", [
+        transcodeAddress,
+        address,
+        symbol,
+      ]);
+      sb.spendGas(address);
+    } else {
+      sb.callContract("swap", "SwapFee", [transcodeAddress, symbol, 1000000000]);
+      sb.allowGas(transcodeAddress, sb.nullAddress, gasPrice, minGasLimit);
+      sb.callInterop("Runtime.TransferBalance", [
+        transcodeAddress,
+        address,
+        symbol,
+      ]);
+      sb.spendGas(transcodeAddress);
+    }
+
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
