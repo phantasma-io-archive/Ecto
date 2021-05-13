@@ -737,7 +737,7 @@ export class PopupState {
         let ethSwaps = await this.api.getSwapsForAddress(ethAddress);
         console.log("ethBals", this.ethBalances);
         console.log("ethSwaps", ethSwaps);
-        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending");
+        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending" && (s.sourcePlatform === "ethereum" || s.destinationPlatform === "ethereum"));
         console.log("ethSwaps", ethSwaps);
         if (!(ethSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(ethSwaps);
@@ -752,7 +752,7 @@ export class PopupState {
         let bscSwaps = await this.api.getSwapsForAddress(bscAddress);
         console.log("bscBals", this.bscBalances);
         console.log("bscSwaps", bscSwaps);
-        bscSwaps = bscSwaps.filter((s) => s.destinationHash === "pending");
+        bscSwaps = bscSwaps.filter((s) => s.destinationHash === "pending" && (s.sourcePlatform === "bsc" || s.destinationPlatform === "bsc"));
         console.log("bscSwaps", bscSwaps);
         if (!(bscSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(bscSwaps);
