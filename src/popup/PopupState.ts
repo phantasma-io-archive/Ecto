@@ -20,15 +20,12 @@ import {
 
 import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
 import {
+  getChecksumAddress,
   getEthAddressFromWif,
   getEthBalances,
   getEthContract,
 } from "@/ethereum";
-import {
-  getBscAddressFromWif,
-  getBscBalances,
-  getBscContract,
-} from "@/bsc";
+import { getBscAddressFromWif, getBscBalances, getBscContract } from "@/bsc";
 import base58 from "bs58";
 import { byteArrayToHex } from "@/phan-js/utils";
 
@@ -670,6 +667,19 @@ export class PopupState {
       account.address
     );
 
+    // fix non-checksum ethereum addresses
+    if (
+      account.ethAddress &&
+      account.ethAddress.toLocaleLowerCase() == account.ethAddress
+    ) {
+      account.ethAddress = getChecksumAddress(account.ethAddress);
+    }
+
+    // copy ETH address to BSC
+    if (account.ethAddress && !account.bscAddress) {
+      account.bscAddress = account.ethAddress;
+    }
+
     const allNfts = this.getAllTokens().filter(
       (t) => t.flags && !t.flags.includes("Fungible")
     );
@@ -727,7 +737,12 @@ export class PopupState {
         let ethSwaps = await this.api.getSwapsForAddress(ethAddress);
         console.log("ethBals", this.ethBalances);
         console.log("ethSwaps", ethSwaps);
-        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending");
+        ethSwaps = ethSwaps.filter(
+          (s) =>
+            s.destinationHash === "pending" &&
+            (s.sourcePlatform === "ethereum" ||
+              s.destinationPlatform === "ethereum")
+        );
         console.log("ethSwaps", ethSwaps);
         if (!(ethSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(ethSwaps);
@@ -742,7 +757,11 @@ export class PopupState {
         let bscSwaps = await this.api.getSwapsForAddress(bscAddress);
         console.log("bscBals", this.bscBalances);
         console.log("bscSwaps", bscSwaps);
-        bscSwaps = bscSwaps.filter((s) => s.destinationHash === "pending");
+        bscSwaps = bscSwaps.filter(
+          (s) =>
+            s.destinationHash === "pending" &&
+            (s.sourcePlatform === "bsc" || s.destinationPlatform === "bsc")
+        );
         console.log("bscSwaps", bscSwaps);
         if (!(bscSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(bscSwaps);
@@ -962,7 +981,11 @@ export class PopupState {
     return signData(data, privateKey);
   }
 
-  async signTxEth(txdata: TxArgsData, wif: string): Promise<string> {
+  async signTxEth(
+    txdata: TxArgsData,
+    wif: string,
+    alsoSignWithPha: boolean = false
+  ): Promise<string> {
     const account = this.currentAccount;
     if (!account) throw new Error("Account not valid");
 
@@ -1003,9 +1026,13 @@ export class PopupState {
     const signature = sig.r + sig.s;
     console.log("signature", signature);
 
-    tx.signatures.unshift(signature);
+    tx.signatures.unshift({ signature, kind: 2 });
 
-    const rawTx = tx.toString(true, 2);
+    if (alsoSignWithPha) {
+      tx.sign(getPrivateKeyFromWif(wif));
+    }
+
+    const rawTx = tx.toString(true);
 
     console.log("%c" + rawTx, "color:red");
 
@@ -1015,10 +1042,15 @@ export class PopupState {
     return hash;
   }
 
-  async signTxEthWithPassword(txdata: TxArgsData, password: string) {
+  async signTxEthWithPassword(
+    txdata: TxArgsData,
+    password: string,
+    alsoSignWithPha: boolean = false
+  ) {
     const hash = await this.signTxEth(
       txdata,
-      this.getWifFromPassword(password)
+      this.getWifFromPassword(password),
+      alsoSignWithPha
     );
     return hash;
   }
@@ -1200,7 +1232,7 @@ export class PopupState {
       const id = ids[k];
       const lookupId = token + "@" + id;
       const nft = this.nfts[lookupId];
-      if (!nft) {
+      if (!nft || nft.img.startsWith("placeholder-")) {
         // search for it
         allNftsToQuery.push(id);
       }
@@ -1253,18 +1285,10 @@ export class PopupState {
           (kv) => kv.Key == "ImageURL"
         )?.Value;
 
-        const imgUrl = imgUrlUnformated?.startsWith("ipfs://")
-          ? imgUrlUnformated.replace("ipfs://", "https://gateway.ipfs.io/ipfs/")
-          : imgUrlUnformated?.startsWith("ipfs-video://")
-          ? "placeholder-nft-video.png"
-          : "placeholder-nft-img.png";
-
-        console.log("ImageURL", imgUrl);
-
         let nftDef = {
           id: nftId,
           mint: nft.mint,
-          img: imgUrl,
+          img: imgUrlUnformated,
           type: nft.properties.find((kv) => kv.Key == "Type")?.Value,
           name: nft.properties.find((kv) => kv.Key == "Name")?.Value,
           infusion: nft.infusion,

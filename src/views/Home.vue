@@ -281,7 +281,7 @@
 
         <v-tab-item key="3">
           <div
-            v-if="account && account.neoAddress && account.ethAddress && account.bscAddress"
+            v-if="account && account.neoAddress && account.ethAddress"
             style="overflow: auto; height: 459px"
           >
             <div style="text-align:center">
@@ -376,14 +376,20 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress : 'http://http://mankinighost.phantasma.io:4000/address/' + account.neoAddress
+                            state.isMainnet
+                              ? 'https://dora.coz.io/address/neo2/mainnet/' +
+                                  account.neoAddress
+                              : 'http://http://mankinighost.phantasma.io:4000/address/' +
+                                  account.neoAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
@@ -397,14 +403,20 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress : 'http://http://mankinighost.phantasma.io:4000/address/' + account.neoAddress
+                            state.isMainnet
+                              ? 'https://dora.coz.io/address/neo2/mainnet/' +
+                                  account.neoAddress
+                              : 'http://http://mankinighost.phantasma.io:4000/address/' +
+                                  account.neoAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -470,42 +482,58 @@
                       <strong v-if="!state.balanceShown"
                         >************************************</strong
                       >
-                      <strong v-else>{{ account.ethAddress }}</strong
+                      <strong v-else style="font-size: 11px">{{
+                        account.ethAddress
+                      }}</strong
                       ><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://etherscan.io/address/' + account.ethAddress : 'https://ropsten.etherscan.io/address/' + account.ethAddress
+                            state.isMainnet
+                              ? 'https://etherscan.io/address/' +
+                                  account.ethAddress
+                              : 'https://ropsten.etherscan.io/address/' +
+                                  account.ethAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
                       <strong v-if="!state.balanceShown"
                         >************************************</strong
                       >
-                      <strong v-else>{{ account.ethAddress }}</strong
+                      <strong v-else style="font-size: 11px">{{
+                        account.ethAddress
+                      }}</strong
                       ><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://etherscan.io/address/' + account.ethAddress : 'https://ropsten.etherscan.io/address/' + account.ethAddress
+                            state.isMainnet
+                              ? 'https://etherscan.io/address/' +
+                                  account.ethAddress
+                              : 'https://ropsten.etherscan.io/address/' +
+                                  account.ethAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -582,42 +610,58 @@
                       <strong v-if="!state.balanceShown"
                         >************************************</strong
                       >
-                      <strong v-else>{{ account.bscAddress }}</strong
+                      <strong v-else style="font-size: 11px">{{
+                        account.bscAddress
+                      }}</strong
                       ><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.bscAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://bscscan.com/address/' + account.bscAddress : 'https://testnet.bscscan.com/address/' + account.bscAddress
+                            state.isMainnet
+                              ? 'https://bscscan.com/address/' +
+                                  account.bscAddress
+                              : 'https://testnet.bscscan.com/address/' +
+                                  account.bscAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                     </div>
                     <div v-else>
                       {{ $t("home.swappableAssets") }}
                       <strong v-if="!state.balanceShown"
                         >************************************</strong
                       >
-                      <strong v-else>{{ account.bscAddress }}</strong
+                      <strong v-else style="font-size: 11px">{{
+                        account.bscAddress
+                      }}</strong
                       ><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.bscAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://bscscan.com/address/' + account.bscAddress : 'https://testnet.bscscan.com/address/' + account.bscAddress
+                            state.isMainnet
+                              ? 'https://bscscan.com/address/' +
+                                  account.bscAddress
+                              : 'https://testnet.bscscan.com/address/' +
+                                  account.bscAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -753,9 +797,7 @@
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row>
-                      <v-col class="mt-2">
-                        {{ $t("home.swapTo") }} BSC
-                      </v-col>
+                      <v-col class="mt-2"> {{ $t("home.swapTo") }} BSC </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
                           class="ma-1"
@@ -805,7 +847,7 @@
                   v-if="
                     (state.neoBalances && state.neoBalances.length > 0) ||
                       (state.ethBalances && state.ethBalances.length > 0) |
-                      (state.bscBalances && state.bscBalances.length > 0)
+                        (state.bscBalances && state.bscBalances.length > 0)
                   "
                   style="width: 100%; height: 16px; background: linear-gradient(45deg, #28ceaf, #17b1e8); color: white"
                 >
@@ -845,14 +887,20 @@
                         @click="copyToClipboard(account.neoAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://dora.coz.io/address/neo2/mainnet/' + account.neoAddress : 'http://http://mankinighost.phantasma.io:4000/address/' + account.neoAddress
+                            state.isMainnet
+                              ? 'https://dora.coz.io/address/neo2/mainnet/' +
+                                  account.neoAddress
+                              : 'http://http://mankinighost.phantasma.io:4000/address/' +
+                                  account.neoAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -913,21 +961,29 @@
                       <strong v-if="!state.balanceShown"
                         >************************************</strong
                       >
-                      <strong v-else>{{ account.ethAddress }}</strong
+                      <strong v-else style="font-size: 11px">{{
+                        account.ethAddress
+                      }}</strong
                       ><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.ethAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://etherscan.io/address/' + account.ethAddress : 'https://ropsten.etherscan.io/address/' + account.ethAddress
+                            state.isMainnet
+                              ? 'https://etherscan.io/address/' +
+                                  account.ethAddress
+                              : 'https://ropsten.etherscan.io/address/' +
+                                  account.ethAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -975,9 +1031,7 @@
                 >
                   <v-expansion-panel-header>
                     <v-row>
-                      <v-col class="mt-2">
-                        {{ $t("home.sendOn") }} BSC
-                      </v-col>
+                      <v-col class="mt-2"> {{ $t("home.sendOn") }} BSC </v-col>
                       <v-col cols="4" class="pl-0 pr-0">
                         <img
                           class="ma-1"
@@ -999,21 +1053,29 @@
                       <strong v-if="!state.balanceShown"
                         >************************************</strong
                       >
-                      <strong v-else>{{ account.bscAddress }}</strong
+                      <strong v-else style="font-size: 11px">{{
+                        account.bscAddress
+                      }}</strong
                       ><v-btn
                         icon
                         x-small
                         @click="copyToClipboard(account.bscAddress)"
                         ><v-icon size="16">mdi-content-copy</v-icon></v-btn
                       >
-                      <br >
-                      <a 
+                      <br />
+                      <a
                         href="#"
                         @click="
                           openWindow(
-                            state.isMainnet ? 'https://bscscan.com/address/' + account.bscAddress : 'https://testnet.bscscan.com/address/' + account.bscAddress
+                            state.isMainnet
+                              ? 'https://bscscan.com/address/' +
+                                  account.bscAddress
+                              : 'https://testnet.bscscan.com/address/' +
+                                  account.bscAddress
                           )
-                        ">{{ $t("home.viewOnExplorer") }}</a>
+                        "
+                        >{{ $t("home.viewOnExplorer") }}</a
+                      >
                       <v-list>
                         <v-list-item-group>
                           <v-list-item
@@ -1624,7 +1686,13 @@
         <v-card-text class="pb-0">
           <span>
             {{ $t("home.availableToSwap") }}
-            {{ swapToChain.toUpperCase() === "ETH" ? "Ethereum" : swapToChain.toUpperCase() === "BSC" ? "BSC" : "NEO" }}.
+            {{
+              swapToChain.toUpperCase() === "ETH"
+                ? "Ethereum"
+                : swapToChain.toUpperCase() === "BSC"
+                ? "BSC"
+                : "NEO"
+            }}.
           </span>
           <br />
           <v-list style="margin-left:-8px; margin-right:-8px;">
@@ -1986,7 +2054,11 @@
               ? $t("home.sendBeingProcessed")
               : $t("home.swapBeingProcessed")
           }}
-          {{ swapFromChain == "eth" || swapFromChain == "bsc" ? $t("home.needsConfirmations") : "" }}
+          {{
+            swapFromChain == "eth" || swapFromChain == "bsc"
+              ? $t("home.needsConfirmations")
+              : ""
+          }}
           {{ $t("home.checkTransaction") }}
           <a :href="lastSwapTxUrl" target="_blank" rel="noopener noreferrer">{{
             $t("home.here")
@@ -2152,7 +2224,7 @@ import { getScriptHashFromAddress, sendNeo } from "@/neo";
 import { getEthBalances, JSONRPC } from "@/ethereum";
 import { getBscBalances, JSONRPCBSC } from "@/bsc";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
-import Common from 'ethereumjs-common';
+import Common from "ethereumjs-common";
 
 @Component({
   components: { ErrorDialog: ErrorDialogVue, TransactionComponent },
@@ -2215,7 +2287,7 @@ export default class extends Vue {
 
   swapToClaim: Swap | null = null;
 
-  bscGasPrices: number[] = [5, 15, 25];
+  bscGasPrices: number[] = [10, 20, 30];
   ethGasPrices: number[] = [50, 70, 100];
   neoGasPrices: number[] = [0.0, 0.0011, 0.1];
   swapGasIndex = 1;
@@ -2632,9 +2704,13 @@ export default class extends Vue {
       );
     else if (swapToChain == "neo")
       return symbol == "SOUL" || symbol == "NEO" || symbol == "GAS";
-
     else if (swapToChain == "bsc")
-      return symbol == "SOUL" || symbol == "KCAL" || symbol == "BNB" || symbol == "BUSD";
+      return (
+        symbol == "SOUL" ||
+        symbol == "KCAL" ||
+        symbol == "BNB" ||
+        symbol == "BUSD"
+      );
     return false;
   }
 
@@ -2701,7 +2777,8 @@ export default class extends Vue {
       this.destinationSwapDialog = true;
       this.sendDestination = "";
       if (this.swapToChain == "eth") this.signTxCallback = this.sendFromEth;
-      else if (this.swapToChain == "bsc") this.signTxCallback = this.sendFromBsc;
+      else if (this.swapToChain == "bsc")
+        this.signTxCallback = this.sendFromBsc;
       else this.signTxCallback = this.sendFromNeo;
       return;
     }
@@ -2882,15 +2959,28 @@ export default class extends Vue {
       hexToByteArray(reverseHex(swapTxHash)),
     ]);
 
-    sb.callContract("swap", "SwapFee", [transcodeAddress, symbol, 1000000000]);
-    sb.allowGas(transcodeAddress, sb.nullAddress, gasPrice, minGasLimit);
-    sb.callInterop("Runtime.TransferBalance", [
-      transcodeAddress,
-      address,
-      symbol,
-    ]);
+    const destinationBalance = await state.getAccountData(address)
+    const destinationAddressKCALBalance = destinationBalance.balances.filter((t) => t.symbol == "KCAL");
 
-    sb.spendGas(transcodeAddress);
+    if (destinationAddressKCALBalance && destinationAddressKCALBalance[0] && parseFloat(destinationAddressKCALBalance[0].amount) > 1000000000) {
+      sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
+      sb.callInterop("Runtime.TransferBalance", [
+        transcodeAddress,
+        address,
+        symbol,
+      ]);
+      sb.spendGas(address);
+    } else {
+      sb.callContract("swap", "SwapFee", [transcodeAddress, symbol, 1000000000]);
+      sb.allowGas(transcodeAddress, sb.nullAddress, gasPrice, minGasLimit);
+      sb.callInterop("Runtime.TransferBalance", [
+        transcodeAddress,
+        address,
+        symbol,
+      ]);
+      sb.spendGas(transcodeAddress);
+    }
+
     const script = sb.endScript();
 
     const txdata: TxArgsData = {
@@ -2907,9 +2997,9 @@ export default class extends Vue {
       this.signTxDialog = false;
       let tx = "";
       if (this.needsWif) {
-        tx = await state.signTxEth(txdata, this.wif);
+        tx = await state.signTxEth(txdata, this.wif, true);
       } else if (this.needsPass) {
-        tx = await state.signTxEthWithPassword(txdata, this.password);
+        tx = await state.signTxEthWithPassword(txdata, this.password, true);
       }
       console.log("tx successful: " + tx);
       setTimeout(() => this.$root.$emit("checkTx", tx), 2000);
@@ -3387,7 +3477,9 @@ export default class extends Vue {
 
     const nonceRes = await JSONRPCBSC(
       "https://" +
-        (isMainnet ? "bsc-dataseed.binance.org/" : "data-seed-prebsc-1-s1.binance.org:8545/"),
+        (isMainnet
+          ? "bsc-dataseed.binance.org/"
+          : "data-seed-prebsc-1-s1.binance.org:8545/"),
       "eth_getTransactionCount",
       [this.account.bscAddress, "pending"]
     );
@@ -3461,13 +3553,17 @@ export default class extends Vue {
     }
 
     // The second parameter is not necessary if these values are used
-    const common = Common.forCustomChain('mainnet', {
-      name: 'bnb',
-      networkId: isMainnet ? 56 : 97,
-      chainId: isMainnet ? 56 : 97,
-    }, 'petersburg');
+    const common = Common.forCustomChain(
+      "mainnet",
+      {
+        name: "bnb",
+        networkId: isMainnet ? 56 : 97,
+        chainId: isMainnet ? 56 : 97,
+      },
+      "petersburg"
+    );
     const tx = new EthereumTx(txParams, {
-      common
+      common,
     });
     tx.sign(privateKey);
     const serializedTx = tx
@@ -3479,7 +3575,9 @@ export default class extends Vue {
 
     const txRes = await JSONRPCBSC(
       "https://" +
-        (isMainnet ? "bsc-dataseed.binance.org/" : "data-seed-prebsc-1-s1.binance.org:8545/"),
+        (isMainnet
+          ? "bsc-dataseed.binance.org/"
+          : "data-seed-prebsc-1-s1.binance.org:8545/"),
       "eth_sendRawTransaction",
       ["0x" + serializedTx]
     );

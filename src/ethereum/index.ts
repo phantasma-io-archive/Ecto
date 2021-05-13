@@ -1,4 +1,5 @@
 import WIF from "wif";
+import * as ethUtil from "ethereumjs-util";
 import { Transaction as EthereumTx } from "ethereumjs-tx";
 import EthWallet from "ethereumjs-wallet";
 import { isMainThread } from "worker_threads";
@@ -73,7 +74,11 @@ function ab2hexstring(arr: ArrayBuffer | ArrayLike<number>): string {
 export function getEthAddressFromWif(wif: string): string {
   const pk = ab2hexstring(WIF.decode(wif, 128).privateKey);
   const ethWallet = EthWallet.fromPrivateKey(Buffer.from(pk, "hex"));
-  return ethWallet.getAddressString();
+  return ethWallet.getChecksumAddressString();
+}
+
+export function getChecksumAddress(address: string) {
+  return ethUtil.toChecksumAddress(address);
 }
 
 export async function getEthBalances(ethAddress: string, isMainnet: boolean) {
