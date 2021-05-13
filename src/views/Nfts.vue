@@ -181,27 +181,10 @@
                     tile
                     style="background-color: #9991"
                   >
-                    <v-img
-                      contain
-                      :class="{
-                        placeholder: item.img.startsWith('placeholder'),
-                      }"
-                      :src="getResource(item.img)"
-                      :lazy-src="getResource(item.img)"
-                      height="84px"
-                    ></v-img>
+                    <NFTMedia :media="item.img" height="118px" />
                   </v-avatar>
                 </div>
-
-                <!-- <v-img
-                  :src="item.item_info.image_url + '?width=128'"
-                  :lazy-src="item.item_info.image_url + '?width=128'"
-                  height="80px"
-                ></v-img>
-                {{ item.item_info.name_english }}<br />
-                #{{ item.mint }} -->
               </v-card>
-              <!-- </v-col> -->
             </template>
           </v-virtual-scroll>
         </v-row>
@@ -440,8 +423,9 @@ import {
 import { state, TxArgsData, PopupState } from "@/popup/PopupState";
 import { Script } from "vm";
 import ErrorDialogVue from "@/components/ErrorDialog.vue";
+import NFTMedia from "@/components/NFTMedia.vue";
 
-@Component({ components: { ErrorDialog: ErrorDialogVue } })
+@Component({ components: { ErrorDialog: ErrorDialogVue, NFTMedia } })
 export default class extends Vue {
   requestInProcess = false;
   isLoading = true;

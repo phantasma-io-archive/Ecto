@@ -737,7 +737,12 @@ export class PopupState {
         let ethSwaps = await this.api.getSwapsForAddress(ethAddress);
         console.log("ethBals", this.ethBalances);
         console.log("ethSwaps", ethSwaps);
-        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending" && (s.sourcePlatform === "ethereum" || s.destinationPlatform === "ethereum"));
+        ethSwaps = ethSwaps.filter(
+          (s) =>
+            s.destinationHash === "pending" &&
+            (s.sourcePlatform === "ethereum" ||
+              s.destinationPlatform === "ethereum")
+        );
         console.log("ethSwaps", ethSwaps);
         if (!(ethSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(ethSwaps);
@@ -752,7 +757,11 @@ export class PopupState {
         let bscSwaps = await this.api.getSwapsForAddress(bscAddress);
         console.log("bscBals", this.bscBalances);
         console.log("bscSwaps", bscSwaps);
-        bscSwaps = bscSwaps.filter((s) => s.destinationHash === "pending" && (s.sourcePlatform === "bsc" || s.destinationPlatform === "bsc"));
+        bscSwaps = bscSwaps.filter(
+          (s) =>
+            s.destinationHash === "pending" &&
+            (s.sourcePlatform === "bsc" || s.destinationPlatform === "bsc")
+        );
         console.log("bscSwaps", bscSwaps);
         if (!(bscSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(bscSwaps);
@@ -1223,7 +1232,7 @@ export class PopupState {
       const id = ids[k];
       const lookupId = token + "@" + id;
       const nft = this.nfts[lookupId];
-      if (!nft) {
+      if (!nft || nft.img.startsWith("placeholder-")) {
         // search for it
         allNftsToQuery.push(id);
       }
@@ -1276,18 +1285,10 @@ export class PopupState {
           (kv) => kv.Key == "ImageURL"
         )?.Value;
 
-        const imgUrl = imgUrlUnformated?.startsWith("ipfs://")
-          ? imgUrlUnformated.replace("ipfs://", "https://gateway.ipfs.io/ipfs/")
-          : imgUrlUnformated?.startsWith("ipfs-video://")
-          ? "placeholder-nft-video.png"
-          : "placeholder-nft-img.png";
-
-        console.log("ImageURL", imgUrl);
-
         let nftDef = {
           id: nftId,
           mint: nft.mint,
-          img: imgUrl,
+          img: imgUrlUnformated,
           type: nft.properties.find((kv) => kv.Key == "Type")?.Value,
           name: nft.properties.find((kv) => kv.Key == "Name")?.Value,
           infusion: nft.infusion,
