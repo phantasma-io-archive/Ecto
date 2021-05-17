@@ -20,10 +20,12 @@ import {
 
 import { getNeoAddressFromWif, getNeoBalances } from "@/neo";
 import {
+  getChecksumAddress,
   getEthAddressFromWif,
   getEthBalances,
   getEthContract,
 } from "@/ethereum";
+import { getBscAddressFromWif, getBscBalances, getBscContract } from "@/bsc";
 import base58 from "bs58";
 import { byteArrayToHex } from "@/phan-js/utils";
 
@@ -52,6 +54,7 @@ export interface WalletAccount {
   address: string;
   ethAddress?: string;
   neoAddress?: string;
+  bscAddress?: string;
   type: string;
   data: Account;
   wif?: string;
@@ -106,10 +109,11 @@ export class PopupState {
 
   ethBalances: ISymbolAmount[] = [];
   neoBalances: ISymbolAmount[] = [];
+  bscBalances: ISymbolAmount[] = [];
 
   allSwaps: Swap[] = [];
 
-  payload = "4543542D312E312E34";
+  payload = "4543542D312E322E30";
 
   $i18n: any = {
     t: (s: string) => s,
@@ -322,6 +326,10 @@ export class PopupState {
           return 0.1;
         case "usdc":
           return this._currenciesRate["usd-coin"][curSym];
+        case "bnb":
+          return this._currenciesRate["binancecoin"][curSym];
+        case "busd":
+          return this._currenciesRate["binance-usd"][curSym];
       }
     } catch {
       console.log("Error getting rates for " + symbol + " in " + curSym);
@@ -454,7 +462,7 @@ export class PopupState {
 
   async fetchRates() {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank%2Cusd-coin%2Cdai%2Ctether&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
+      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank%2Cusd-coin%2Cdai%2Ctether%2Cbinancecoin%2Cbinance-usd&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
     );
     const resJson = await res.json();
     this._currenciesRate = resJson;
@@ -533,6 +541,7 @@ export class PopupState {
     let address = getAddressFromWif(wif);
     let ethAddress = getEthAddressFromWif(wif);
     let neoAddress = getNeoAddressFromWif(wif);
+    let bscAddress = getBscAddressFromWif(wif);
     const accountData = await this.getAccountData(address);
     const hasPass = password != null && password != "";
     const matchAccount = this.accounts.filter(
@@ -546,6 +555,7 @@ export class PopupState {
         address: accountData.address,
         ethAddress,
         neoAddress,
+        bscAddress,
         type: "encKey",
         encKey,
         data: accountData,
@@ -555,6 +565,7 @@ export class PopupState {
         address: accountData.address,
         ethAddress,
         neoAddress,
+        bscAddress,
         type: "wif",
         wif,
         data: accountData,
@@ -578,6 +589,7 @@ export class PopupState {
     let address = getAddressFromWif(wif);
     let ethAddress = getEthAddressFromWif(wif);
     let neoAddress = getNeoAddressFromWif(wif);
+    let bscAddress = getBscAddressFromWif(wif);
     const accountData = await this.getAccountData(address);
     const matchAccount = this.accounts.filter(
       (a) => a.address == accountData.address
@@ -591,6 +603,7 @@ export class PopupState {
         address: accountData.address,
         ethAddress,
         neoAddress,
+        bscAddress,
         type: "encKey",
         encKey,
         data: accountData,
@@ -600,6 +613,7 @@ export class PopupState {
         address: accountData.address,
         ethAddress,
         neoAddress,
+        bscAddress,
         type: "wif",
         wif,
         data: accountData,
@@ -653,6 +667,19 @@ export class PopupState {
       account.address
     );
 
+    // fix non-checksum ethereum addresses
+    if (
+      account.ethAddress &&
+      account.ethAddress.toLocaleLowerCase() == account.ethAddress
+    ) {
+      account.ethAddress = getChecksumAddress(account.ethAddress);
+    }
+
+    // copy ETH address to BSC
+    if (account.ethAddress && !account.bscAddress) {
+      account.bscAddress = account.ethAddress;
+    }
+
     const allNfts = this.getAllTokens().filter(
       (t) => t.flags && !t.flags.includes("Fungible")
     );
@@ -686,6 +713,7 @@ export class PopupState {
   async refreshSwapInfo() {
     const neoAddress = this.currentAccount!.neoAddress;
     const ethAddress = this.currentAccount!.ethAddress;
+    const bscAddress = this.currentAccount!.bscAddress;
     const isMainnet = this.isMainnet;
 
     this.allSwaps = [];
@@ -709,12 +737,36 @@ export class PopupState {
         let ethSwaps = await this.api.getSwapsForAddress(ethAddress);
         console.log("ethBals", this.ethBalances);
         console.log("ethSwaps", ethSwaps);
-        ethSwaps = ethSwaps.filter((s) => s.destinationHash === "pending");
+        ethSwaps = ethSwaps.filter(
+          (s) =>
+            s.destinationHash === "pending" &&
+            (s.sourcePlatform === "ethereum" ||
+              s.destinationPlatform === "ethereum")
+        );
         console.log("ethSwaps", ethSwaps);
         if (!(ethSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(ethSwaps);
       } catch (err) {
         console.log("error in eth balances and swaps", err);
+      }
+    }
+
+    if (bscAddress) {
+      try {
+        this.bscBalances = await getBscBalances(bscAddress, isMainnet);
+        let bscSwaps = await this.api.getSwapsForAddress(bscAddress);
+        console.log("bscBals", this.bscBalances);
+        console.log("bscSwaps", bscSwaps);
+        bscSwaps = bscSwaps.filter(
+          (s) =>
+            s.destinationHash === "pending" &&
+            (s.sourcePlatform === "bsc" || s.destinationPlatform === "bsc")
+        );
+        console.log("bscSwaps", bscSwaps);
+        if (!(bscSwaps as any).error)
+          this.allSwaps = this.allSwaps.concat(bscSwaps);
+      } catch (err) {
+        console.log("error in bsc balances and swaps", err);
       }
     }
 
@@ -826,9 +878,11 @@ export class PopupState {
   addSwapAddress(wif: string) {
     const ethAddress = getEthAddressFromWif(wif);
     const neoAddress = getNeoAddressFromWif(wif);
+    const bscAddress = getBscAddressFromWif(wif);
 
     this._accounts[this._currentAccountIndex].ethAddress = ethAddress;
     this._accounts[this._currentAccountIndex].neoAddress = neoAddress;
+    this._accounts[this._currentAccountIndex].bscAddress = bscAddress;
 
     chrome.storage.local.set({ accounts: this._accounts });
   }
@@ -927,7 +981,11 @@ export class PopupState {
     return signData(data, privateKey);
   }
 
-  async signTxEth(txdata: TxArgsData, wif: string): Promise<string> {
+  async signTxEth(
+    txdata: TxArgsData,
+    wif: string,
+    alsoSignWithPha: boolean = false
+  ): Promise<string> {
     const account = this.currentAccount;
     if (!account) throw new Error("Account not valid");
 
@@ -968,9 +1026,13 @@ export class PopupState {
     const signature = sig.r + sig.s;
     console.log("signature", signature);
 
-    tx.signatures.unshift(signature);
+    tx.signatures.unshift({ signature, kind: 2 });
 
-    const rawTx = tx.toString(true, 2);
+    if (alsoSignWithPha) {
+      tx.sign(getPrivateKeyFromWif(wif));
+    }
+
+    const rawTx = tx.toString(true);
 
     console.log("%c" + rawTx, "color:red");
 
@@ -980,12 +1042,21 @@ export class PopupState {
     return hash;
   }
 
-  async signTxEthWithPassword(txdata: TxArgsData, password: string) {
+  async signTxEthWithPassword(
+    txdata: TxArgsData,
+    password: string,
+    alsoSignWithPha: boolean = false
+  ) {
     const hash = await this.signTxEth(
       txdata,
-      this.getWifFromPassword(password)
+      this.getWifFromPassword(password),
+      alsoSignWithPha
     );
     return hash;
+  }
+
+  getBscContract(symbol: string) {
+    return getBscContract(symbol, this.isMainnet);
   }
 
   getEthContract(symbol: string) {
@@ -1097,6 +1168,10 @@ export class PopupState {
         return 18;
       case "USDC":
         return 6;
+      case "BNB":
+        return 18;
+      case "BUSD":
+        return 18;
       default:
         return 0;
     }
@@ -1157,7 +1232,7 @@ export class PopupState {
       const id = ids[k];
       const lookupId = token + "@" + id;
       const nft = this.nfts[lookupId];
-      if (!nft) {
+      if (!nft || nft.img.startsWith("placeholder-")) {
         // search for it
         allNftsToQuery.push(id);
       }
@@ -1210,18 +1285,10 @@ export class PopupState {
           (kv) => kv.Key == "ImageURL"
         )?.Value;
 
-        const imgUrl = imgUrlUnformated?.startsWith("ipfs://")
-          ? imgUrlUnformated.replace("ipfs://", "https://gateway.ipfs.io/ipfs/")
-          : imgUrlUnformated?.startsWith("ipfs-video://")
-          ? "placeholder-nft-video.png"
-          : "placeholder-nft-img.png";
-
-        console.log("ImageURL", imgUrl);
-
         let nftDef = {
           id: nftId,
           mint: nft.mint,
-          img: imgUrl,
+          img: imgUrlUnformated,
           type: nft.properties.find((kv) => kv.Key == "Type")?.Value,
           name: nft.properties.find((kv) => kv.Key == "Name")?.Value,
           infusion: nft.infusion,

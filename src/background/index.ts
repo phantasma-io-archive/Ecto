@@ -6,6 +6,7 @@ import VueI18n from "vue-i18n";
 import { messages, defaultLocale } from "@/i18n";
 import { getEthBalances } from "@/ethereum";
 import { getNeoBalances } from "@/neo";
+import { getBscBalances } from "@/bsc";
 
 Vue.use(VueI18n);
 
@@ -303,9 +304,29 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
             };
           });
 
-          let external = ""; // external address (neo or eth) if platform is not phantasma
+          let external = ""; // external address (neo or eth or bsc) if platform is not phantasma
 
           const curAccount = currentAccount();
+          if (platform == "bsc") {
+            let bscAddress = curAccount?.bscAddress;
+            if (bscAddress) {
+              external = bscAddress;
+              const bscBals = await getBscBalances(
+                bscAddress,
+                state.nexus == "mainnet"
+              );
+              balances = bscBals.map((b: any) => {
+                return {
+                  symbol: b.symbol,
+                  value: b.amount.toString(),
+                  decimals: state.decimals(b.symbol),
+                };
+              });
+            } else {
+              platform = "phantasma";
+            }
+          }
+
           if (platform == "ethereum") {
             let ethAddress = curAccount?.ethAddress;
             if (ethAddress) {

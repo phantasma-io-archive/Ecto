@@ -39,14 +39,12 @@
           <div style="text-shadow: 1px 1px 10px #000000, 1px 1px 2px #000000;">
             {{ getNftInfo(item.nftId, item.symbol).title }}
           </div>
-          <div>
-            <v-img
-              class="mx-auto"
-              contain
-              :src="getNftInfo(item.nftId, item.symbol).image"
-              width="177px"
-              height="126px"
-            ></v-img>
+          <div style="text-align: center; margin-top: 8px">
+            <NFTMedia
+              center
+              :media="getNftInfo(item.nftId, item.symbol).image"
+              height="118px"
+            />
           </div>
           <div
             style="position:absolute; bottom:5px; right:10px; color: #eee; text-shadow: 1px 1px 20px #000000, 1px 1px 2px #000000;"
@@ -76,6 +74,7 @@ import {
   getInfusionEventData,
 } from "@/phan-js/vm/EventData";
 import { state } from "@/popup/PopupState";
+import NFTMedia from "@/components/NFTMedia.vue";
 
 function isFungible(symbol: string) {
   return !state.isNFT(symbol);
@@ -109,7 +108,7 @@ function formatAddress(addr: string) {
   );
 }
 
-@Component
+@Component({ components: { NFTMedia } })
 export default class extends Vue {
   @Prop({ required: true }) tx!: TransactionData;
   @Prop({ required: true }) address!: string;
@@ -404,7 +403,14 @@ export default class extends Vue {
               tooltip:
                 this.txFor +
                 " " +
-                formatSymbol("" + (data.endAmount != 0 ? data.endAmount : data.amount).toString(), data.quoteSymbol),
+                formatSymbol(
+                  "" +
+                    (data.endAmount != 0
+                      ? data.endAmount
+                      : data.amount
+                    ).toString(),
+                  data.quoteSymbol
+                ),
               nftId,
               symbol: data.baseSymbol,
             });
@@ -432,7 +438,14 @@ export default class extends Vue {
               tooltip:
                 this.txFor +
                 " " +
-                formatSymbol("" + (data.endAmount != 0 ? data.endAmount : data.amount).toString(), data.quoteSymbol),
+                formatSymbol(
+                  "" +
+                    (data.endAmount != 0
+                      ? data.endAmount
+                      : data.amount
+                    ).toString(),
+                  data.quoteSymbol
+                ),
               nftId,
               symbol: data.baseSymbol,
             });
@@ -474,6 +487,12 @@ export default class extends Vue {
           break;
         }
       }
+    }
+
+    if (res.length == 0) {
+      res.push({
+        text: "Custom Transaction"
+      });
     }
 
     const numEvents = res.length;
