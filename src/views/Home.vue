@@ -578,7 +578,7 @@
                     ><br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel>
+                <!--<v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
@@ -705,7 +705,7 @@
                       ><v-icon size="16">mdi-information-outline</v-icon></v-btn
                     ><br />
                   </v-expansion-panel-content>
-                </v-expansion-panel>
+                </v-expansion-panel>-->
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row style="vertical-align:middle">
@@ -794,7 +794,7 @@
                     <!-- Each swap costs 0.001 ETH -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel>
+                <!--<v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2"> {{ $t("home.swapTo") }} BSC </v-col>
@@ -819,13 +819,13 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('bsc', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    ><!--<br /><br />
+                    >--><!--<br /><br />
                     {{ $t("home.swapToAnotherBSC") }}<br />
                     <a
                       href="#"
                       @click.prevent="selectAssetToSwap('bsc', true)"
                       >{{ $t("home.selectAssetAndDest") }}</a
-                    >-->
+                    >--><!--
                     <br />
                     <br />
                     <span
@@ -839,10 +839,10 @@
                           ).toFixed(4),
                         ])
                       "
-                    ></span>
+                    ></span>-->
                     <!-- Each swap costs 0.001 ETH -->
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                  <!--</v-expansion-panel-content>
+                </v-expansion-panel>-->
                 <div
                   v-if="
                     (state.neoBalances && state.neoBalances.length > 0) ||
@@ -1026,7 +1026,7 @@
                     <br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel
+                <!--<v-expansion-panel
                   v-if="state.bscBalances && state.bscBalances.length > 0"
                 >
                   <v-expansion-panel-header>
@@ -1117,7 +1117,7 @@
                     >
                     <br />
                   </v-expansion-panel-content>
-                </v-expansion-panel>
+                </v-expansion-panel>-->
               </v-expansion-panels>
             </div>
           </div>

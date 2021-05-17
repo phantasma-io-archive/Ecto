@@ -489,6 +489,12 @@ export default class extends Vue {
       }
     }
 
+    if (res.length == 0) {
+      res.push({
+        text: "Custom Transaction"
+      });
+    }
+
     const numEvents = res.length;
 
     if (res.length > 100) {
