@@ -50,6 +50,7 @@
                 autocapitalize="off"
                 spellcheck="false"
                 prepend-icon="mdi-account"
+                :disabled="wif.length != 0"
               />
 
               <span style="padding:120px">{{ $t("addWallet.or") }}</span>
@@ -65,6 +66,7 @@
                 spellcheck="false"
                 prepend-icon="mdi-key"
                 counter
+                :disabled="addressOrName.length != 0"
               />
 
               <v-text-field
@@ -79,6 +81,7 @@
                 :type="showpass ? 'text' : 'password'"
                 :append-icon="showpass ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append="showpass = !showpass"
+                :disabled="addressOrName.length != 0"
               />
             </v-form>
             <div style="padding: 10px 20px">
@@ -224,6 +227,7 @@
 
                 <v-form @keyup.native.enter="doSignTx" @submit.prevent>
                   <v-text-field
+                    class="mt-3"
                     tabindex="1"
                     type="password"
                     :label="$t('addWallet.labelPassword')"
@@ -256,6 +260,7 @@
                     wif = newWif;
                     importWallet();
                   "
+                  :disabled="password.length < 6"
                 >
                   {{ $t("addWallet.importLong") }}
                 </v-btn>
