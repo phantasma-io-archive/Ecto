@@ -38,10 +38,7 @@
           >
         </v-row>
 
-        <div 
-          class="mt-3"
-          style="padding-right: 30px"
-        >
+        <div class="mt-5" style="padding-right: 30px">
           {{ $t("sign.description") }}
           <strong>{{ currentAccountDescription }}</strong
           >?
@@ -53,8 +50,7 @@
           v-if="needsWif"
           @keyup.native.enter="signtx"
           @submit.prevent
-          style="margin: 0px 28px 10px 15px"
-          class="mt-6"
+          style="margin: 42px 28px 10px 15px"
         >
           <v-text-field
             tabindex="1"
@@ -74,7 +70,7 @@
           v-if="needsPass"
           @keyup.native.enter="signtx"
           @submit.prevent
-          style="margin: 0px 28px 10px 15px"
+          style="margin: 42px 28px 10px 15px"
         >
           <v-text-field
             tabindex="1"
@@ -258,13 +254,7 @@ export default class extends Vue {
       this.errorDialog = true;
       this.errorMessage = err;
 
-      // notify that something went bad ??
-      chrome.runtime.sendMessage({
-        uid: "plsres",
-        tabid,
-        sid,
-        data: { id, success: false },
-      });
+      // do notify that something went bad, as we allow for retry
     }
     return false;
   }

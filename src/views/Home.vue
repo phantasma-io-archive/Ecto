@@ -49,7 +49,7 @@
         <v-tab-item key="1">
           <v-container
             class="overflow-y-auto overflow-x-hidden pa-0"
-            style="max-height:450px"
+            style="max-height:460px; margin-bottom: 22px"
           >
             <div
               v-if="
@@ -218,7 +218,7 @@
         </v-tab-item>
 
         <v-tab-item key="2">
-          <div style="overflow: auto; height: 450px">
+          <div style="overflow: auto; height: 460px; margin-bottom: 1px">
             <v-simple-table>
               <template v-slot:default>
                 <tbody>
