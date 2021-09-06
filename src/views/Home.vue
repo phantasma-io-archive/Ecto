@@ -578,7 +578,8 @@
                     ><br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <!--<v-expansion-panel>
+                <!--- TRANSFER FROM BSC -->
+                <v-expansion-panel v-if="false">
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
@@ -705,7 +706,8 @@
                       ><v-icon size="16">mdi-information-outline</v-icon></v-btn
                     ><br />
                   </v-expansion-panel-content>
-                </v-expansion-panel>-->
+                </v-expansion-panel>
+                <!--- TRANSFER TO NEO -->
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row style="vertical-align:middle">
@@ -743,6 +745,7 @@
                     {{ $t("home.needGasToSwap", [0.1]) }}
                   </v-expansion-panel-content>
                 </v-expansion-panel>
+                <!--- TRANSFER TO ETH -->
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row>
@@ -794,7 +797,8 @@
                     <!-- Each swap costs 0.001 ETH -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <!--<v-expansion-panel>
+                <!--- TRANSFER TO BSC -->
+                <v-expansion-panel v-if="false">
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2"> {{ $t("home.swapTo") }} BSC </v-col>
@@ -819,7 +823,7 @@
                       href="#"
                       @click.prevent="selectAssetToSwap('bsc', false)"
                       >{{ $t("home.selectAsset") }}</a
-                    >--><!--<br /><br />
+                    ><!--<br /><br />
                     {{ $t("home.swapToAnotherBSC") }}<br />
                     <a
                       href="#"
@@ -841,8 +845,10 @@
                       "
                     ></span>-->
                     <!-- Each swap costs 0.001 ETH -->
-                  <!--</v-expansion-panel-content>
-                </v-expansion-panel>-->
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <!--- SAME CHAIN SENDS -->
                 <div
                   v-if="
                     (state.neoBalances && state.neoBalances.length > 0) ||
@@ -1026,7 +1032,7 @@
                     <br />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <!--<v-expansion-panel
+                <v-expansion-panel
                   v-if="state.bscBalances && state.bscBalances.length > 0"
                 >
                   <v-expansion-panel-header>
@@ -1117,7 +1123,7 @@
                     >
                     <br />
                   </v-expansion-panel-content>
-                </v-expansion-panel>-->
+                </v-expansion-panel>
               </v-expansion-panels>
             </div>
           </div>
@@ -2959,10 +2965,16 @@ export default class extends Vue {
       hexToByteArray(reverseHex(swapTxHash)),
     ]);
 
-    const destinationBalance = await state.getAccountData(address)
-    const destinationAddressKCALBalance = destinationBalance.balances.filter((t) => t.symbol == "KCAL");
+    const destinationBalance = await state.getAccountData(address);
+    const destinationAddressKCALBalance = destinationBalance.balances.filter(
+      (t) => t.symbol == "KCAL"
+    );
 
-    if (destinationAddressKCALBalance && destinationAddressKCALBalance[0] && parseFloat(destinationAddressKCALBalance[0].amount) > 1000000000) {
+    if (
+      destinationAddressKCALBalance &&
+      destinationAddressKCALBalance[0] &&
+      parseFloat(destinationAddressKCALBalance[0].amount) > 1000000000
+    ) {
       sb.allowGas(address, sb.nullAddress, gasPrice, minGasLimit);
       sb.callInterop("Runtime.TransferBalance", [
         transcodeAddress,
@@ -2971,7 +2983,11 @@ export default class extends Vue {
       ]);
       sb.spendGas(address);
     } else {
-      sb.callContract("swap", "SwapFee", [transcodeAddress, symbol, 1000000000]);
+      sb.callContract("swap", "SwapFee", [
+        transcodeAddress,
+        symbol,
+        1000000000,
+      ]);
       sb.allowGas(transcodeAddress, sb.nullAddress, gasPrice, minGasLimit);
       sb.callInterop("Runtime.TransferBalance", [
         transcodeAddress,
@@ -3617,7 +3633,7 @@ export default class extends Vue {
 
     this.sendDecimals = state.decimals(this.sendSymbol);
 
-    const ethHexBytes = "04" + this.sendDestination.substring(2).toUpperCase();
+    const ethHexBytes = "05" + this.sendDestination.substring(2).toUpperCase();
 
     let ethInteropBytes = [0x22];
     for (let i = 0; i < 34 * 2; i += 2) {
