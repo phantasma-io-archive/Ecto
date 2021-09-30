@@ -48,6 +48,7 @@ interface IAuthorization {
   token: string;
   address: string;
   expireDate: number;
+  version: string;
 }
 
 export interface WalletAccount {
@@ -846,7 +847,8 @@ export class PopupState {
     dapp: string,
     hostname: string,
     token: string,
-    expireDate: Date
+    expireDate: Date,
+    version: string
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const account = this.currentAccount;
@@ -862,6 +864,7 @@ export class PopupState {
         token,
         address,
         expireDate: expireDate.getTime(),
+        version
       });
 
       chrome.storage.local.set({ authorizations: this._authorizations }, () =>

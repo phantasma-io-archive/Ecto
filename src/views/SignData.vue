@@ -161,8 +161,8 @@ export default class extends Vue {
 
     this.dapp = state.getDapp(this.$route.params.token);
 
-    this.url = atob(this.$route.params.url);
-    this.faviconUrl = atob(this.$route.params.favicon);
+    this.url = atob(this.$route.params.url.replace(/_/g, "/"));
+    this.faviconUrl = atob(this.$route.params.favicon.replace(/_/g, "/"));
     this.hostname = new URL(this.url).hostname;
     this.domain = new URL(this.url).protocol + "//" + this.hostname;
 

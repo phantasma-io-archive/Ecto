@@ -38,7 +38,7 @@ const routes: Array<RouteConfig> = [
     component: AddWallet,
   },
   {
-    path: "/authorize/:dapp/:token/:id/:tabid/:sid/:url/:favicon",
+    path: "/authorize/:dapp/:token/:id/:tabid/:sid/:url/:favicon/:version",
     name: "Authorize",
     component: Authorize,
   },

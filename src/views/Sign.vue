@@ -160,8 +160,8 @@ export default class extends Vue {
 
     this.dapp = state.getDapp(this.$route.params.token);
 
-    this.url = atob(this.$route.params.url);
-    this.faviconUrl = atob(this.$route.params.favicon);
+    this.url = atob(this.$route.params.url.replace(/_/g, "/"));
+    this.faviconUrl = atob(this.$route.params.favicon.replace(/_/g, "/"));
     this.hostname = new URL(this.url).hostname;
     this.domain = new URL(this.url).protocol + "//" + this.hostname;
 
@@ -220,7 +220,9 @@ export default class extends Vue {
     const id = this.$route.params.id;
     const tabid = parseInt(this.$route.params.tabid);
     const sid = this.$route.params.sid;
-    const txdata = JSON.parse(atob(this.$route.params.b64txdata));
+    const txdata = JSON.parse(
+      atob(this.$route.params.b64txdata.replace(/_/g, "/"))
+    );
 
     let hash = null;
 

@@ -579,7 +579,7 @@
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <!--- TRANSFER FROM BSC -->
-                <v-expansion-panel v-if="false">
+                <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
@@ -798,7 +798,7 @@
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <!--- TRANSFER TO BSC -->
-                <v-expansion-panel v-if="false">
+                <v-expansion-panel>
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2"> {{ $t("home.swapTo") }} BSC </v-col>
@@ -4243,7 +4243,7 @@ export default class extends Vue {
       ).replace(/ /gi, "")
     );
 
-    await this.fetchEthGasPrices();
+    if (this.swapFromChain == "ETH") await this.fetchEthGasPrices();
 
     if (this.sendSymbol == "GAS") {
       this.sendMaxAmount -= 0.1;

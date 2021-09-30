@@ -65,8 +65,8 @@ function currentAccount() {
     : null;
 }
 
-chrome.tabs.onUpdated.addListener(function(activeInfo) {
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+chrome.tabs.onUpdated.addListener(function (activeInfo) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const tab = tabs[0];
     const tabURL = tab.url;
 
@@ -76,7 +76,7 @@ chrome.tabs.onUpdated.addListener(function(activeInfo) {
       chrome.tabs.sendMessage(
         tab.id,
         { uid: "init", tabid: tab.id },
-        function() {
+        function () {
           console.log(tab.id);
         }
       );
@@ -101,7 +101,7 @@ function getAuthorizationToken(
   const validAuths = authorizations.filter((a) => new Date(a.expireDate) > now);
 
   if (validAuths.length != authorizations.length) {
-    chrome.storage.local.set({ authorizations: validAuths }, () => {});
+    chrome.storage.local.set({ authorizations: validAuths }, () => { });
   }
 
   const auth = validAuths.find((a) => {
@@ -167,7 +167,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
   i18n.locale = state.locale;
 
   if (msg.uid == "plsres") {
@@ -197,7 +197,9 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           const token = genHexString(64);
           const dapp = args[1];
 
+          console.log('authorize', args)
           const version = args.length > 2 ? args[2] : "1";
+          console.log('version', version)
 
           chrome.tabs.get(msg.tabid, (tab) => {
             const url = tab.url || "http://unknown";
@@ -253,9 +255,12 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
                     "/" +
                     msg.sid +
                     "/" +
-                    btoa(url) +
+                    btoa(url).replace(/\//g, '_') +
                     "/" +
-                    btoa(favicon),
+                    btoa(favicon).replace(/\//g, '_') +
+                    "/" +
+                    version
+                  ,
                   width: 320,
                   height: 600,
                 },
@@ -425,7 +430,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
             signature,
             platform,
           });
-          let b64txdata = btoa(txdata);
+          let b64txdata = btoa(txdata).replace(/\//g, '_');
 
           chrome.tabs.get(msg.tabid, (tab) => {
             const url = tab.url || "http://unknown";
@@ -445,15 +450,15 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
                   "/" +
                   msg.sid +
                   "/" +
-                  btoa(url) +
+                  btoa(url).replace(/\//g, '_') +
                   "/" +
-                  btoa(favicon) +
+                  btoa(favicon).replace(/\//g, '_') +
                   "/" +
                   b64txdata,
                 width: 320,
                 height: 600,
               },
-              (wnd) => {}
+              (wnd) => { }
             );
           });
         }
@@ -493,15 +498,15 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
                   "/" +
                   msg.sid +
                   "/" +
-                  btoa(url) +
+                  btoa(url).replace(/\//g, '_') +
                   "/" +
-                  btoa(favicon) +
+                  btoa(favicon).replace(/\//g, '_') +
                   "/" +
                   hexdata,
                 width: 320,
                 height: 600,
               },
-              (wnd) => {}
+              (wnd) => { }
             );
           });
         }
