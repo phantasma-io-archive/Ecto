@@ -4310,14 +4310,18 @@ export default class extends Vue {
       console.log("Error fetching gas prices from gasprice.poa.network");
     }
 
+    this.ethGasPrices[0] = parseFloat(prices[0].toFixed(1));
+    this.ethGasPrices[1] = parseFloat(prices[1].toFixed(1));
+    this.ethGasPrices[2] = parseFloat(prices[2].toFixed(1));
+
     try {
       const res = await fetch("https://www.etherchain.org/api/gasPriceOracle");
       const resJson = await res.json();
 
       if (resJson) {
-        const slow = resJson.safeLow;
-        const standard = resJson.standard;
-        const fast = (resJson.fast + resJson.fastest) / 2;
+        const slow = resJson.currentBaseFee;
+        const standard = 1.5 * resJson.currentBaseFee;
+        const fast = 2 * resJson.currentBaseFee;
         if (slow > minPrices[0])
           prices[0] = hasSetPrices ? (prices[0] + slow) / 2 : slow;
         if (standard > minPrices[1])
