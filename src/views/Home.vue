@@ -4299,8 +4299,8 @@ export default class extends Vue {
 
       if (resJson) {
         const slow = resJson.slow;
-        const standard = resJson.standard;
-        const fast = (resJson.fast + resJson.instant) / 2;
+        const standard = resJson.average;
+        const fast = resJson.fast;
         if (slow > minPrices[0]) prices[0] = slow;
         if (standard > minPrices[1]) prices[1] = standard;
         if (fast > minPrices[2]) prices[2] = fast;
