@@ -963,7 +963,7 @@ export class PopupState {
     dt.setMinutes(dt.getMinutes() + 5);
     console.log(dt);
     const tx = new Transaction(
-      txdata.nexus,
+      txdata.nexus && txdata.nexus != '' ?  txdata.nexus : this.nexus,
       txdata.chain,
       txdata.script,
       dt,

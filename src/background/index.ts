@@ -515,9 +515,18 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
 
       case "invokeScript":
         if (isValidRequest(args)) {
-          let script = args[1];
+          let chain = args[1]
+          let script = args[2];
 
-          // not supported atm
+          const response = await state.api.invokeRawScript(chain, script)
+          console.log('invokeScript', response)
+
+          chrome.tabs.sendMessage(msg.tabid, {
+            uid: "plsres",
+            sid: msg.sid,
+            data: { result: response.result, results: response.results, id, success: true},
+          });
+
         }
         break;
     }
