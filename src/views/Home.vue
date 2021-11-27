@@ -2451,7 +2451,7 @@ export default class extends Vue {
   }
 
   getFeeBsc(gwei: number, symbol: string) {
-    const gasLimit = symbol == "BNB" ? 21000 : 100000;
+    const gasLimit = symbol == "BNB" ? 21000 : 600000;
     const currencyPrice = state.getRate("BNB");
     const decimals = 18;
     const decimalsGas = 9;
