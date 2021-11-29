@@ -729,11 +729,6 @@ export class PopupState {
         if (!(neoSwaps as any).error) this.allSwaps = neoSwaps;
       } catch (err) {
         console.log("error in neo balances and swaps", err);
-        let neoSwaps = await this.api.getSwapsForAddressOld(neoAddress);
-        console.log("neoSwaps", neoSwaps);
-        neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
-        console.log("neoSwaps", neoSwaps);
-        if (!(neoSwaps as any).error) this.allSwaps = neoSwaps;
       }
     }
 
@@ -754,17 +749,6 @@ export class PopupState {
           this.allSwaps = this.allSwaps.concat(ethSwaps);
       } catch (err) {
         console.log("error in eth balances and swaps, trying old method...", err);
-        let ethSwaps = await this.api.getSwapsForAddressOld(ethAddress);
-        console.log("ethSwaps", ethSwaps);
-        ethSwaps = ethSwaps.filter(
-          (s) =>
-            s.destinationHash === "pending" &&
-            (s.sourcePlatform === "ethereum" ||
-              s.destinationPlatform === "ethereum")
-        );
-        console.log("ethSwaps", ethSwaps);
-        if (!(ethSwaps as any).error)
-          this.allSwaps = this.allSwaps.concat(ethSwaps);
       }
     }
 
@@ -784,16 +768,6 @@ export class PopupState {
           this.allSwaps = this.allSwaps.concat(bscSwaps);
       } catch (err) {
         console.log("error in bsc balances and swaps, trying old method...", err);
-        let bscSwaps = await this.api.getSwapsForAddressOld(bscAddress);
-        console.log("bscSwaps", bscSwaps);
-        bscSwaps = bscSwaps.filter(
-          (s) =>
-            s.destinationHash === "pending" &&
-            (s.sourcePlatform === "bsc" || s.destinationPlatform === "bsc")
-        );
-        console.log("bscSwaps", bscSwaps);
-        if (!(bscSwaps as any).error)
-          this.allSwaps = this.allSwaps.concat(bscSwaps);
       }
     }
 
@@ -810,16 +784,6 @@ export class PopupState {
       console.log("allSwaps", this.allSwaps);
     } catch (err) {
       console.log("error in getting pending pha swaps, trying old method...", err);
-      let phaSwaps = await this.api.getSwapsForAddressOld(this.currentAccount!.address);
-      console.log("phaSwaps", phaSwaps);
-      phaSwaps = phaSwaps.filter(
-        (s) =>
-          s.destinationHash === "pending" &&
-          this.allSwaps.findIndex(
-            (p) => p.sourceHash == s.sourceHash && p.symbol == s.symbol
-          ) < 0
-      );
-      console.log("allSwaps", this.allSwaps);
     }
 
     // check external pending swaps, if there are
@@ -1051,8 +1015,6 @@ export class PopupState {
 
     const privateKey = Secp256k1.uint256(pkHex, 16);
     const digest = Secp256k1.uint256(byteArrayToHex(sha256Msg), 16);
-
-    console.log("pk to sign", pkHex, privateKey);
 
     const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
     console.log("public", publicKey);
