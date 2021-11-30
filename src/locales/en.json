@@ -239,7 +239,7 @@
     "notValid": "WIF is not valid for address"
   },
   "signData": {
-    "description": "Do you want to allow to sign tx for",
+    "description": "Do you want to allow to sign data for",
     "request": "Data sign request",
     "signData": "Sign data",
     "password": "Password",
