@@ -1,8 +1,6 @@
 import WIF from "wif";
-import base58 from "bs58";
 import Neon, {
   api,
-  CONST,
   nep5,
   rpc,
   sc,
@@ -10,8 +8,6 @@ import Neon, {
   u,
   wallet,
 } from "@cityofzion/neon-js";
-import { sign } from "crypto";
-import { Transaction } from "ethereumjs-tx";
 import { state } from "@/popup/PopupState";
 
 const tokens = {
@@ -23,11 +19,11 @@ const tokens = {
 let currentNeoRPCIndex = 0;
 
 let neoRpcs = [ 
-    "http://jpc.phantasma.io:10332",
-    "http://seed.neoeconomy.io:10332",
     "http://seed8.ngd.network:10332",
     "http://seed9.ngd.network:10332",
-    "http://seed7.ngd.network:10332"
+    "http://seed7.ngd.network:10332",
+    "http://jpc.phantasma.io:10332",
+    "http://seed.neoeconomy.io:10332",
 ]
 
 function getNeoRpc(isMainnet: boolean) {
