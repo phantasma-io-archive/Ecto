@@ -2533,6 +2533,8 @@ export default class extends Vue {
         return false;
       case "busd":
         return false;
+      case "gm":
+        return false;
       default:
         return true;
     }
