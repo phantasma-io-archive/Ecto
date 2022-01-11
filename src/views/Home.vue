@@ -2529,6 +2529,8 @@ export default class extends Vue {
         return false;
       case "sem":
         return false;
+      case "snft":
+        return false;
       case "bnb":
         return false;
       case "busd":
