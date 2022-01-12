@@ -877,9 +877,15 @@ export class PopupState {
   }
 
   addSwapAddress(wif: string) {
+    const phaAddress = getAddressFromWif(wif)
     const ethAddress = getEthAddressFromWif(wif);
     const neoAddress = getNeoAddressFromWif(wif);
     const bscAddress = getBscAddressFromWif(wif);
+
+    const curAddress = this._accounts[this._currentAccountIndex].address
+
+    if (curAddress != phaAddress)
+      throw new Error(`Wrong WIF (${phaAddress}) for ${curAddress}`)
 
     this._accounts[this._currentAccountIndex].ethAddress = ethAddress;
     this._accounts[this._currentAccountIndex].neoAddress = neoAddress;
@@ -989,6 +995,10 @@ export class PopupState {
   ): Promise<string> {
     const account = this.currentAccount;
     if (!account) throw new Error("Account not valid");
+
+    // check that account matches the WIF
+    if (account.address !== getAddressFromWif(wif))
+      throw new Error("The Phantasma address does not match with swap address. You should reimport it to do swaps.")
 
     const address = account.address;
 
