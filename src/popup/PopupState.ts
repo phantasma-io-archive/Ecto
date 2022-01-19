@@ -331,6 +331,8 @@ export class PopupState {
           return this._currenciesRate["binancecoin"][curSym];
         case "busd":
           return this._currenciesRate["binance-usd"][curSym];
+        case "ghostmarket":
+          return this._currenciesRate["ghostmarket"][curSym];
       }
     } catch {
       console.log("Error getting rates for " + symbol + " in " + curSym);
@@ -463,7 +465,7 @@ export class PopupState {
 
   async fetchRates() {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank%2Cusd-coin%2Cdai%2Ctether%2Cbinancecoin%2Cbinance-usd&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
+      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank%2Cusd-coin%2Cdai%2Ctether%2Cbinancecoin%2Cbinance-usd%2Cghostmarket&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
     );
     const resJson = await res.json();
     this._currenciesRate = resJson;
@@ -1181,6 +1183,8 @@ export class PopupState {
         return 18;
       case "BUSD":
         return 18;
+      case "GM":
+        return 8;
       default:
         return 0;
     }
