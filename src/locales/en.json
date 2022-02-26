@@ -42,12 +42,12 @@
     "cancel": "Cancel",
     "copy": "Copy to clipboard",
     "labelPassword": "New Password",
-    "labelWIF": "WIF or hex private key",
+    "labelWIF": "WIF, hex private key or seed words",
     "labelAddress": "Wallet address or name",
     "labelAddressShort": "Address",
     "hintPassword": "Use at least 6 characters",
     "descriptionLong": "Every <strong>Phantasma wallet</strong> unlocks access to a rich ecosystem of next generation <strong>Smart NFTs</strong>, <strong>powerful dApps</strong>, <strong>lightning fast transactions</strong> and a seamless user experience. <br /><br />The best part?<br /> It's virtually free to use!",
-    "description1": "Import a wallet with its address or name (read only), or private key in WIF or HEX format. When using private key you must protect it using a password.",
+    "description1": "Import wallets using seed words or the private key in WIF or HEX format. The password you set will be requested when using the wallet.",
     "description2": "Or if you don't have a wallet, you can",
     "description3": "create a new one",
     "description4": "Or if you don't like it, you can",
@@ -60,7 +60,12 @@
     "secure": "Insert a password to secure your wallet. You can always use WIF to recover it.",
     "errorMessage1": "Error importing WIF wallet",
     "errorMessage2": "Error importing HEX wallet",
-    "errorMessage3": "Error importing wallet"
+    "errorMessage3": "Error importing wallet",
+    "howManyWallets": "Select how many wallets you want to create with the seed words.",
+    "writeSeedWords": "Please write correctly the following seed words to continue.",
+    "howMany": " How many?",
+    "writeDown": "Please write these seed words down somewhere safe and never share them.",
+    "seedInfo": "They allow anyone to have access to the associated wallets. You can also use them in Poltergeist or metamask."
   },
   "authorize": {
     "description": "wants to connect to Phantasma Link. Each transaction will request your permission. Do you want to allow it?",
