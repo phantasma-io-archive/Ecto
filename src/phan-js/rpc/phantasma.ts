@@ -290,17 +290,17 @@ export class PhantasmaAPI {
 
       http.open("GET", host + "/rpc", true);
       http.timeout = 4500;
-      http.onreadystatechange = function() {
+      http.onreadystatechange = function () {
         if (http.readyState == 4 && http.status == 200) {
           var ended = new Date().getTime();
           var milliseconds = ended - started;
           resolve(milliseconds);
         }
 
-        http.ontimeout = function() {
+        http.ontimeout = function () {
           resolve(100000);
         };
-        http.onerror = function() {
+        http.onerror = function () {
           resolve(100000);
         };
       };
@@ -661,10 +661,17 @@ export class PhantasmaAPI {
   }
 
   //Returns platform swaps for a specific address.
-  async getSwapsForAddress(account: string): Promise<Swap[]> {
+  async getSwapsForAddressOld(account: string): Promise<Swap[]> {
     let params: Array<any> = [account];
     return (await this.JSONRPC("getSwapsForAddress", params)) as Swap[];
   }
+
+  //Returns platform swaps for a specific address.
+  async getSwapsForAddress(account: string, platform: string): Promise<Swap[]> {
+    let params: Array<any> = [account, platform, false];
+    return (await this.JSONRPC("getSwapsForAddress", params)) as Swap[];
+  }
+
 
   //Returns info of a nft.
   async getNFT(symbol: string, nftId: string): Promise<NFT> {

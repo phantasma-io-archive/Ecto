@@ -48,6 +48,7 @@ interface IAuthorization {
   token: string;
   address: string;
   expireDate: number;
+  version: string;
 }
 
 export interface WalletAccount {
@@ -113,13 +114,13 @@ export class PopupState {
 
   allSwaps: Swap[] = [];
 
-  payload = "4543542D312E322E30";
+  payload = "4543542d312e332e37";
 
   $i18n: any = {
     t: (s: string) => s,
   };
 
-  constructor() {}
+  constructor() { }
 
   get accounts() {
     return this._accounts;
@@ -330,6 +331,8 @@ export class PopupState {
           return this._currenciesRate["binancecoin"][curSym];
         case "busd":
           return this._currenciesRate["binance-usd"][curSym];
+        case "ghostmarket":
+          return this._currenciesRate["ghostmarket"][curSym];
       }
     } catch {
       console.log("Error getting rates for " + symbol + " in " + curSym);
@@ -462,7 +465,7 @@ export class PopupState {
 
   async fetchRates() {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank%2Cusd-coin%2Cdai%2Ctether%2Cbinancecoin%2Cbinance-usd&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
+      "https://api.coingecko.com/api/v3/simple/price?ids=phantasma%2Cphantasma-energy%2Cneo%2Cgas%2Ctether%2Cethereum%2Cdai%2Cdynamite%2Cmu-dank%2Cusd-coin%2Cdai%2Ctether%2Cbinancecoin%2Cbinance-usd%2Cghostmarket&vs_currencies=usd%2Ceur%2Cgbp%2Cjpy%2Ccad%2Caud%2Ccny%2Crub"
     );
     const resJson = await res.json();
     this._currenciesRate = resJson;
@@ -702,7 +705,7 @@ export class PopupState {
 
     console.log(
       "Refreshed account " +
-        JSON.stringify(this._accounts[this._currentAccountIndex])
+      JSON.stringify(this._accounts[this._currentAccountIndex])
     );
 
     return new Promise((resolve, reject) => {
@@ -720,8 +723,8 @@ export class PopupState {
     if (neoAddress) {
       try {
         this.neoBalances = await getNeoBalances(neoAddress, isMainnet);
-        let neoSwaps = await this.api.getSwapsForAddress(neoAddress);
         console.log("neoBals", this.neoBalances);
+        let neoSwaps = await this.api.getSwapsForAddress(neoAddress, 'neo');
         console.log("neoSwaps", neoSwaps);
         neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
         console.log("neoSwaps", neoSwaps);
@@ -734,8 +737,8 @@ export class PopupState {
     if (ethAddress) {
       try {
         this.ethBalances = await getEthBalances(ethAddress, isMainnet);
-        let ethSwaps = await this.api.getSwapsForAddress(ethAddress);
         console.log("ethBals", this.ethBalances);
+        let ethSwaps = await this.api.getSwapsForAddress(ethAddress, 'ethereum');
         console.log("ethSwaps", ethSwaps);
         ethSwaps = ethSwaps.filter(
           (s) =>
@@ -747,15 +750,15 @@ export class PopupState {
         if (!(ethSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(ethSwaps);
       } catch (err) {
-        console.log("error in eth balances and swaps", err);
+        console.log("error in eth balances and swaps, trying old method...", err);
       }
     }
 
     if (bscAddress) {
       try {
         this.bscBalances = await getBscBalances(bscAddress, isMainnet);
-        let bscSwaps = await this.api.getSwapsForAddress(bscAddress);
         console.log("bscBals", this.bscBalances);
+        let bscSwaps = await this.api.getSwapsForAddress(bscAddress, 'bsc');
         console.log("bscSwaps", bscSwaps);
         bscSwaps = bscSwaps.filter(
           (s) =>
@@ -766,14 +769,12 @@ export class PopupState {
         if (!(bscSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(bscSwaps);
       } catch (err) {
-        console.log("error in bsc balances and swaps", err);
+        console.log("error in bsc balances and swaps, trying old method...", err);
       }
     }
 
     try {
-      let phaSwaps = await this.api.getSwapsForAddress(
-        this.currentAccount!.address
-      );
+      let phaSwaps = await this.api.getSwapsForAddress(this.currentAccount!.address, 'phantasma');
       console.log("phaSwaps", phaSwaps);
       phaSwaps = phaSwaps.filter(
         (s) =>
@@ -784,7 +785,7 @@ export class PopupState {
       );
       console.log("allSwaps", this.allSwaps);
     } catch (err) {
-      console.log("error in getting pending pha swaps", err);
+      console.log("error in getting pending pha swaps, trying old method...", err);
     }
 
     // check external pending swaps, if there are
@@ -812,7 +813,8 @@ export class PopupState {
     dapp: string,
     hostname: string,
     token: string,
-    expireDate: Date
+    expireDate: Date,
+    version: string
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const account = this.currentAccount;
@@ -828,6 +830,7 @@ export class PopupState {
         token,
         address,
         expireDate: expireDate.getTime(),
+        version
       });
 
       chrome.storage.local.set({ authorizations: this._authorizations }, () =>
@@ -850,7 +853,7 @@ export class PopupState {
       date: new Date().getTime(),
     });
     console.log("pending swaps", JSON.stringify(this._pendingSwaps, null, 2));
-    chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => {});
+    chrome.storage.local.set({ pendingSwaps: this._pendingSwaps }, () => { });
   }
 
   addSwapAddressWithPassword(password: string) {
@@ -876,9 +879,15 @@ export class PopupState {
   }
 
   addSwapAddress(wif: string) {
+    const phaAddress = getAddressFromWif(wif)
     const ethAddress = getEthAddressFromWif(wif);
     const neoAddress = getNeoAddressFromWif(wif);
     const bscAddress = getBscAddressFromWif(wif);
+
+    const curAddress = this._accounts[this._currentAccountIndex].address
+
+    if (curAddress != phaAddress)
+      throw new Error(`Wrong WIF (${phaAddress}) for ${curAddress}`)
 
     this._accounts[this._currentAccountIndex].ethAddress = ethAddress;
     this._accounts[this._currentAccountIndex].neoAddress = neoAddress;
@@ -926,7 +935,7 @@ export class PopupState {
     dt.setMinutes(dt.getMinutes() + 5);
     console.log(dt);
     const tx = new Transaction(
-      txdata.nexus,
+      txdata.nexus && txdata.nexus != '' ?  txdata.nexus : this.nexus,
       txdata.chain,
       txdata.script,
       dt,
@@ -989,6 +998,10 @@ export class PopupState {
     const account = this.currentAccount;
     if (!account) throw new Error("Account not valid");
 
+    // check that account matches the WIF
+    if (account.address !== getAddressFromWif(wif))
+      throw new Error("The Phantasma address does not match with swap address. You should reimport it to do swaps.")
+
     const address = account.address;
 
     const pkHex = getPrivateKeyFromWif(wif);
@@ -1014,8 +1027,6 @@ export class PopupState {
 
     const privateKey = Secp256k1.uint256(pkHex, 16);
     const digest = Secp256k1.uint256(byteArrayToHex(sha256Msg), 16);
-
-    console.log("pk to sign", pkHex, privateKey);
 
     const publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
     console.log("public", publicKey);
@@ -1172,6 +1183,8 @@ export class PopupState {
         return 18;
       case "BUSD":
         return 18;
+      case "GM":
+        return 8;
       default:
         return 0;
     }
@@ -1301,7 +1314,7 @@ export class PopupState {
     this.nfts = Object.assign({}, this.nfts);
 
     if (allNftsToQuery.length > 0)
-      chrome.storage.local.set({ nfts: this.nfts }, () => {});
+      chrome.storage.local.set({ nfts: this.nfts }, () => { });
   }
 }
 

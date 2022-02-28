@@ -40,11 +40,16 @@
           >
         </v-row>
 
-        <div style="padding-right: 30px">
+        <div style="padding-right: 30px" class="py-4">
           {{ $t("signData.description") }}
           <strong>{{ currentAccountDescription }}</strong
           >?
         </div>
+
+        <v-card class="pa-2 ma-3" color="#eee">
+            {{ dataToSign }}
+        </v-card>
+        
 
         <v-spacer />
 
@@ -87,7 +92,7 @@
           />
         </v-form>
 
-        <v-row style="margin-top:50px">
+        <v-row style="margin-top:40px">
           <v-col>
             <v-btn secondary style="width: 85%" @click="refuse()">{{
               $t("signData.refuse")
@@ -161,14 +166,26 @@ export default class extends Vue {
 
     this.dapp = state.getDapp(this.$route.params.token);
 
-    this.url = atob(this.$route.params.url);
-    this.faviconUrl = atob(this.$route.params.favicon);
+    this.url = atob(this.$route.params.url.replace(/_/g, "/"));
+    this.faviconUrl = atob(this.$route.params.favicon.replace(/_/g, "/"));
     this.hostname = new URL(this.url).hostname;
     this.domain = new URL(this.url).protocol + "//" + this.hostname;
 
     if (!state.hasAccount) {
       this.$router.push("/addwallet");
     }
+  }
+
+  get dataToSign() {
+
+    function hex2a(hex: string) {
+      var str = '';
+      for (var i = 0; i < hex.length; i += 2)
+          str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+      return str;
+    }
+
+    return hex2a(this.$route.params.hexdata);
   }
 
   get needsWif() {

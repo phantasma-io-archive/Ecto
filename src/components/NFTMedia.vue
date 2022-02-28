@@ -41,7 +41,8 @@ export default class extends Vue {
   hasError = false;
 
   get isImage() {
-    if (this.media.startsWith("ipfs-video://")) return false;
+    if (this.media.startsWith("ipfs-video://") || this.media.endsWith(".mp4"))
+      return false;
     return true;
   }
 

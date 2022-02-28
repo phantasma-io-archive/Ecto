@@ -3,7 +3,7 @@
     <v-app-bar key="appbar" app color="primary" dark style="font-size:16px">
       <v-icon>mdi-wallet-plus</v-icon><v-spacer />
 
-      <v-list-item link @click="goto('/wallets')">
+      <v-list-item>
         <v-list-item-content>
           <v-list-item-title>{{ $t("addWallet.add") }}</v-list-item-title>
           <v-list-item-subtitle></v-list-item-subtitle>
@@ -41,22 +41,24 @@
               @keyup.native.enter="importWallet"
               style="margin: 0px 28px 10px 15px"
             >
-              <v-text-field
-                tabindex="1"
-                :label="$t('addWallet.labelAddress')"
-                v-model="addressOrName"
-                required
-                autocorrect="off"
-                autocapitalize="off"
-                spellcheck="false"
-                prepend-icon="mdi-account"
-              />
+              <template v-if="showReadOnly">
+                <v-text-field
+                  tabindex="1"
+                  :label="$t('addWallet.labelAddress')"
+                  v-model="addressOrName"
+                  required
+                  autocorrect="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  prepend-icon="mdi-account"
+                  :disabled="wif.length != 0"
+                />
 
-              <span style="padding:120px">{{ $t("addWallet.or") }}</span>
+                <span style="padding:120px">{{ $t("addWallet.or") }}</span>
+              </template>
 
-              <v-text-field
+              <v-textarea
                 tabindex="2"
-                type="password"
                 :label="$t('addWallet.labelWIF')"
                 v-model="wif"
                 required
@@ -65,6 +67,9 @@
                 spellcheck="false"
                 prepend-icon="mdi-key"
                 counter
+                filled
+                :disabled="addressOrName.length != 0"
+                @click:prepend="showReadOnly=true"
               />
 
               <v-text-field
@@ -79,6 +84,7 @@
                 :type="showpass ? 'text' : 'password'"
                 :append-icon="showpass ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append="showpass = !showpass"
+                :disabled="addressOrName.length != 0"
               />
             </v-form>
             <div style="padding: 10px 20px">
@@ -87,7 +93,7 @@
                 @click="importWallet"
                 :disabled="
                   addressOrName.length == 0 &&
-                    (!(wif.length == 52 || wif.length == 64) ||
+                    (!(wif.length == 52 || wif.length == 64 || wif.split(' ').length == 12 || wif.split(' ').length == 24) ||
                       password.length < 6)
                 "
                 >{{ $t("addWallet.importLong") }}</v-btn
@@ -110,34 +116,8 @@
             </v-btn>
           </v-container>
           <v-container v-if="createStep === 1">
-            <div style="padding: 20px 8px">
-              {{ $t("addWallet.created") }}
-            </div>
-            <v-textarea
-              v-model="newAddress"
-              readonly
-              class="mx-2"
-              style="font-size:12px;"
-              :label="$t('addWallet.labelAddressShort')"
-              rows="2"
-            ></v-textarea>
-            <v-textarea
-              v-model="newWif"
-              readonly
-              class="mx-2"
-              style="font-size:12px;"
-              label="WIF"
-              rows="2"
-            ></v-textarea>
-            <v-textarea
-              v-model="newHex"
-              readonly
-              class="mx-2"
-              style="font-size:12px;"
-              label="HEX"
-              rows="2"
-            ></v-textarea>
-            <v-btn block primary @click="copyWifDialog = true">
+            <SeedWords :words="seedWords" />
+            <v-btn block primary @click="copySeedWordsDialog = true">
               {{ $t("addWallet.importLong") }}
             </v-btn>
             <div class="ma-3 mt-6">
@@ -148,20 +128,13 @@
             </div>
           </v-container>
           <v-container v-if="createStep === 2">
-            <v-textarea
-              ref="refWif"
-              v-if="newAddress.length > 0"
-              v-model="newWif"
-              readonly
-              append-outer-icon="mdi-comment"
-              @click:append-outer="copyWifToClipboard"
-              class="mx-2"
-              label="WIF"
-              rows="3"
-            ></v-textarea>
-          </v-container>
+            <SeedWordsCheck :words="seedWords" @accept="setPassDialog=true"/>
+            <v-btn block primary @click="createStep = 1">
+              {{ "... OR GO BACK" }}
+            </v-btn>
+          </v-container>        
 
-          <v-dialog v-model="copyWifDialog" max-width="290">
+          <v-dialog v-model="copySeedWordsDialog" max-width="290">
             <v-card>
               <v-card-title class="headline">{{
                 $t("addWallet.backup")
@@ -170,27 +143,13 @@
               <v-card-text>
                 <span v-html="i18n.recover"></span>
                 <v-spacer class="ma-3" />
-
-                <v-textarea
-                  ref="refWif"
-                  v-if="newAddress.length > 0"
-                  v-model="newWif"
-                  readonly
-                  class="mx-2"
-                  label="WIF"
-                  rows="3"
-                ></v-textarea>
-                <v-btn block small @click="copyWifToClipboard"
-                  >{{ $t("addWallet.copy") }}
-                  <v-icon right>mdi-content-copy</v-icon></v-btn
-                >
               </v-card-text>
 
               <v-card-actions class="mt-4">
                 <v-btn
                   color="gray darken-1"
                   text
-                  @click="copyWifDialog = false"
+                  @click="copySeedWordsDialog = false"
                 >
                   {{ $t("addWallet.no") }}
                 </v-btn>
@@ -200,8 +159,8 @@
                   color="blue darken-1"
                   text
                   @click="
-                    copyWifDialog = false;
-                    setPassDialog = true;
+                    copySeedWordsDialog = false;
+                    createStep = 2;
                   "
                 >
                   {{ $t("addWallet.backupConfirm") }}
@@ -222,8 +181,9 @@
                 </span>
                 <v-spacer />
 
-                <v-form @keyup.native.enter="doSignTx" @submit.prevent>
+                <v-form @submit.prevent>
                   <v-text-field
+                    class="mt-3"
                     tabindex="1"
                     type="password"
                     :label="$t('addWallet.labelPassword')"
@@ -253,17 +213,67 @@
                   color="blue darken-1"
                   text
                   @click="
-                    wif = newWif;
-                    importWallet();
+                    walletQuantityDialog = true;
+                    setPassDialog = true;
                   "
+                  :disabled="password.length < 6"
                 >
                   {{ $t("addWallet.importLong") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
+
         </v-tab-item>
       </v-tabs>
+
+      <v-dialog v-model="walletQuantityDialog" max-width="290">
+        <v-card>
+          <v-card-title class="headline">{{ $t("addWallet.howMany") }}</v-card-title>
+          <v-card-text>
+            <span>
+              {{ $t("addWallet.howManyWallets")}}
+            </span>
+            <v-spacer />
+
+            <v-form @submit.prevent>
+              <v-text-field
+                tabindex="1"
+                type="number"                    
+                label="Number of wallets"
+                v-model="walletQuantity"
+                required
+                min="1"
+                prepend-inner-icon="mdi-wallet-plus"
+                style="max-width: 150px; margin: 16px auto"
+              />
+            </v-form>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn
+              color="gray darken-1"
+              text
+              @click="
+                password = '';
+                setPassDialog = false;
+              "
+            >
+              {{ $t("addWallet.cancel") }}
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="importWalletsFromSeed"
+              :disabled="password.length < 6"
+            >
+              {{ $t("addWallet.importLong") }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
     </v-main>
 
     <ErrorDialog
@@ -287,12 +297,18 @@ import {
 
 import { state } from "@/popup/PopupState";
 import ErrorDialogVue from "@/components/ErrorDialog.vue";
+import SeedWords from "@/components/SeedWordsShow.vue";
+import SeedWordsCheck from "@/components/SeedWordsCheck.vue";
 
 import WIF from "wif";
+import * as bip39 from 'bip39'
+import { hdkey }from 'ethereumjs-wallet';
 
 @Component({
   components: {
     ErrorDialog: ErrorDialogVue,
+    SeedWords,
+    SeedWordsCheck
   },
 })
 export default class extends Vue {
@@ -305,19 +321,28 @@ export default class extends Vue {
   errorDialog = false;
   errorMessage = "";
 
+  showReadOnly = false
+
   tabIndex = 0;
 
   createStep = 0;
   newWif = "";
   newHex = "";
   newAddress = "";
-  copyWifDialog = false;
+  copySeedWordsDialog = false;
+
+  walletQuantityDialog = false;
+  walletQuantity = 1;
+
+  seed?: Buffer
 
   state = state;
 
   errorMessage1 = "";
   errorMessage2 = "";
   errorMessage3 = "";
+
+  seedWords: string[] = []
 
   get i18n() {
     return {
@@ -331,7 +356,24 @@ export default class extends Vue {
     this.errorMessage1 = this.$i18n.t("addWallet.errorMessage1").toString();
     this.errorMessage2 = this.$i18n.t("addWallet.errorMessage2").toString();
     this.errorMessage3 = this.$i18n.t("addWallet.errorMessage3").toString();
-    if (this.wif.length == 52 && this.password.length >= 6) {
+    const words = this.wif.split(' ').length
+    if (words == 12 || words == 24) {
+      console.log("Using seed words");
+      try {
+        this.seed = bip39.mnemonicToSeedSync(this.wif)
+        const hdWallet = hdkey.fromMasterSeed(this.seed);
+        const root = hdWallet.derivePath(`m/44'/60'/0'/0`);
+        console.log("Derivation is ok");
+      } catch (err) {
+        console.log("Error importing seed words");
+        this.errorMessage = "Error importing seed words";
+        this.errorDialog = true;
+      }
+      this.walletQuantityDialog = true
+      console.log("walletQuantity dialog show");
+      return // continue process
+    }
+    else if (this.wif.length == 52 && this.password.length >= 6) {
       try {
         this.isLoading = true;
         let account = await state.addAccountWithWif(this.wif, this.password);
@@ -382,7 +424,41 @@ export default class extends Vue {
     this.newWif = wif;
     this.newHex = getPrivateKeyFromWif(wif);
     this.newAddress = getAddressFromWif(wif);
+
+
+    const mnemonic = bip39.generateMnemonic()
+    this.seedWords = mnemonic.split(' ')
+    this.seed = bip39.mnemonicToSeedSync(mnemonic)
+    console.log('bip39 nemonic', mnemonic)
+    console.log('seed', this.seed)
+    const hdWallet = hdkey.fromMasterSeed(this.seed);
+    const root = hdWallet.derivePath(`m/44'/60'/0'/0`);
+
     this.createStep = 1;
+  }
+
+  async importWalletsFromSeed() {
+    const numWallets = this.walletQuantity
+    const hdWallet = hdkey.fromMasterSeed(this.seed!);
+    const root = hdWallet.derivePath(`m/44'/60'/0'/0`);
+    for (let i = 0; i < numWallets; i++) {
+      const child = root.deriveChild(i);
+      const wallet = child.getWallet();
+      console.log('new Wallet', wallet, wallet.getAddressString(), wallet.getChecksumAddressString())
+      try {
+        this.isLoading = true;
+        console.log('adding account with', wallet.getPrivateKeyString().substr(2), this.password)
+        let account = await state.addAccountWithHex(wallet.getPrivateKeyString().substr(2), this.password);
+      } catch (err) {
+        console.error(err)
+        this.errorMessage = this.errorMessage2;
+        this.errorDialog = true;
+      }
+    }
+    this.wif = ''
+    this.password = ''
+    this.seed = undefined
+    this.$router.push("/");
   }
 
   copyWifToClipboard() {
@@ -391,4 +467,6 @@ export default class extends Vue {
 }
 </script>
 
-<style></style>
+<style lang="scss">
+
+</style>

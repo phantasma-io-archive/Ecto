@@ -38,10 +38,7 @@
           >
         </v-row>
 
-        <div 
-          class="mt-3"
-          style="padding-right: 30px"
-        >
+        <div class="mt-5" style="padding-right: 30px">
           {{ $t("sign.description") }}
           <strong>{{ currentAccountDescription }}</strong
           >?
@@ -53,8 +50,7 @@
           v-if="needsWif"
           @keyup.native.enter="signtx"
           @submit.prevent
-          style="margin: 0px 28px 10px 15px"
-          class="mt-6"
+          style="margin: 42px 28px 10px 15px"
         >
           <v-text-field
             tabindex="1"
@@ -74,7 +70,7 @@
           v-if="needsPass"
           @keyup.native.enter="signtx"
           @submit.prevent
-          style="margin: 0px 28px 10px 15px"
+          style="margin: 42px 28px 10px 15px"
         >
           <v-text-field
             tabindex="1"
@@ -164,8 +160,8 @@ export default class extends Vue {
 
     this.dapp = state.getDapp(this.$route.params.token);
 
-    this.url = atob(this.$route.params.url);
-    this.faviconUrl = atob(this.$route.params.favicon);
+    this.url = atob(this.$route.params.url.replace(/_/g, "/"));
+    this.faviconUrl = atob(this.$route.params.favicon.replace(/_/g, "/"));
     this.hostname = new URL(this.url).hostname;
     this.domain = new URL(this.url).protocol + "//" + this.hostname;
 
@@ -224,7 +220,9 @@ export default class extends Vue {
     const id = this.$route.params.id;
     const tabid = parseInt(this.$route.params.tabid);
     const sid = this.$route.params.sid;
-    const txdata = JSON.parse(atob(this.$route.params.b64txdata));
+    const txdata = JSON.parse(
+      atob(this.$route.params.b64txdata.replace(/_/g, "/"))
+    );
 
     let hash = null;
 
@@ -258,13 +256,7 @@ export default class extends Vue {
       this.errorDialog = true;
       this.errorMessage = err;
 
-      // notify that something went bad ??
-      chrome.runtime.sendMessage({
-        uid: "plsres",
-        tabid,
-        sid,
-        data: { id, success: false },
-      });
+      // do notify that something went bad, as we allow for retry
     }
     return false;
   }

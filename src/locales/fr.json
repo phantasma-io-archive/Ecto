@@ -42,12 +42,12 @@
     "cancel": "Annuler",
     "copy": "Copier",
     "labelPassword": "Mot de passe",
-    "labelWIF": "WIF ou clé privée au format HEX",
+    "labelWIF": "WIF, clé privée hexadécimale ou mots clés",
     "labelAddress": "Adresse du portefeuille ou nom",
     "labelAddressShort": "Adresse",
     "hintPassword": "Utiliser au moins 6 caractères",
     "descriptionLong": "Tous les <strong>portefeuilles Phantasma</strong> débloquent l'accès à un écosystème riche de nouvelle génération avec des <strong>NFTs Intelligents</strong>, <strong>dApps puissantes</strong>, <strong>transactions ultra rapides</strong> et une expérience utilisateur innovante.<br /><br />La meilleure partie?<br /> C'est pratiquement gratuit pour l'utiliser!",
-    "description1": "Importer un portefeuille avec son adresse ou son nom (lecture seule), ou sa clé WIF(lecture/écriture). Lorsque vous utilisez la clé WIF, vous devez la protéger avec un mot de passe.",
+    "description1": "Importez des portefeuilles à l'aide de mots clés ou de la clé privée au format WIF ou HEX. \nLe mot de passe que vous avez défini vous sera demandé lors de l'utilisation du portefeuille.",
     "description2": "Ou si vous n'en avez pas, vous pouvez",
     "description3": "créer un nouveau",
     "description4": "Ou si vous désirez changer, vous pouvez",
@@ -60,7 +60,12 @@
     "secure": "Ajouter un mot de passe pour sécuriser votre portefeuille. Vous pouvez toujours utiliser votre WIF pour le récupérer.",
     "errorMessage1": "Erreur en important le portefeuille WIF",
     "errorMessage2": "Erreur en important le portefeuille HEX",
-    "errorMessage3": "Erreur en important le portefeuille"
+    "errorMessage3": "Erreur en important le portefeuille",
+    "howManyWallets": "Sélectionnez le nombre de portefeuilles que vous souhaitez créer avec les mots clés.",
+    "writeSeedWords": "Veuillez écrire correctement les mots clés suivants pour continuer.",
+    "howMany": "Combien?",
+    "writeDown": "Veuillez écrire ces mots clés dans un endroit sûr et ne les partagez jamais.",
+    "seedInfo": "Ils permettent à quiconque d'avoir accès aux portefeuilles associés. \nVous pouvez également les utiliser dans Poltergeist ou métamasque."
   },
   "authorize": {
     "description": "veut se connecter à Phantasma Link. Chaque transaction demandera votre permission. Acceptez-vous?",

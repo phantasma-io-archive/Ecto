@@ -1,8 +1,6 @@
 import WIF from "wif";
-import base58 from "bs58";
 import Neon, {
   api,
-  CONST,
   nep5,
   rpc,
   sc,
@@ -10,8 +8,6 @@ import Neon, {
   u,
   wallet,
 } from "@cityofzion/neon-js";
-import { sign } from "crypto";
-import { Transaction } from "ethereumjs-tx";
 import { state } from "@/popup/PopupState";
 
 const tokens = {
@@ -20,13 +16,18 @@ const tokens = {
   GAS: "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
 };
 
-let isPrimaryRpcDead = false;
+let currentNeoRPCIndex = 0;
+
+let neoRpcs = [ 
+    "http://seed8.ngd.network:10332",
+    "http://seed9.ngd.network:10332",
+    "http://seed7.ngd.network:10332",
+    "http://jpc.phantasma.io:10332"
+]
 
 function getNeoRpc(isMainnet: boolean) {
   if (!isMainnet) return "http://mankinighost.phantasma.io:30333";
-  return !isPrimaryRpcDead
-    ? "http://seed.neoeconomy.io:10332"
-    : "http://jpc.phantasma.io:10332";
+  return neoRpcs[currentNeoRPCIndex % neoRpcs.length]
 }
 
 function ab2hexstring(arr: ArrayBuffer | ArrayLike<number>): string {
@@ -65,11 +66,24 @@ export async function getNeoBalances(
   try {
     account = await rpc.Query.getAccountState(neoAddress).execute(neoRpc);
   } catch {
-    isPrimaryRpcDead = true;
+    ++currentNeoRPCIndex;
     console.log("primary neo rpc", neoRpc, "is not working");
     neoRpc = getNeoRpc(isMainnet);
-    console.log("trying secondary neo rpc", neoRpc);
-    account = await rpc.Query.getAccountState(neoAddress).execute(neoRpc);
+    console.log("trying another neo rpc", neoRpc);
+    try {
+      account = await rpc.Query.getAccountState(neoAddress).execute(neoRpc);
+    } catch {
+      ++currentNeoRPCIndex;
+      console.log("secondary neo rpc", neoRpc, "is not working");
+      neoRpc = getNeoRpc(isMainnet);
+      console.log("trying another neo rpc", neoRpc);
+      try {
+        account = await rpc.Query.getAccountState(neoAddress).execute(neoRpc);
+      } catch {
+        console.log("neo rpc", neoRpc, "is not working");
+        ++currentNeoRPCIndex;
+      }
+    }
   }
 
   console.log("neo account", account);

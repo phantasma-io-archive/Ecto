@@ -116,8 +116,8 @@ export default class extends Vue {
     this.authorizeFor = this.$i18n.t("authorize.periodCurrent").toString();
 
     state.accounts.forEach((account) => {
-      this.authorizeAccounts.push(account.address)
-    })
+      this.authorizeAccounts.push(account.address);
+    });
     this.authorizeAccount = state.currentAccount!.address;
 
     this.url = atob(this.$route.params.url);
@@ -187,16 +187,12 @@ export default class extends Vue {
 
   @Watch("authorizeAccount")
   onWatchauthorizeAccount(oldValue: string, newValue: string) {
-
     // const matchAccount = this.state.accounts.filter((a) => a.address == newValue);
     // this.selectAccount(matchAccount[0]);
-
   }
 
   async selectAccount(newValue: WalletAccount) {
-
     await state.selectAccount(newValue);
-
   }
 
   async connect() {
@@ -222,9 +218,10 @@ export default class extends Vue {
     const id = this.$route.params.id;
     const tabid = parseInt(this.$route.params.tabid);
     const sid = this.$route.params.sid;
+    const version = this.$route.params.version;
     const hostname = this.hostname;
 
-    await state.authorizeDapp(dapp, hostname, token, date);
+    await state.authorizeDapp(dapp, hostname, token, date, version);
 
     chrome.runtime.sendMessage({
       uid: "plsres",
