@@ -114,7 +114,7 @@ export class PopupState {
 
   allSwaps: Swap[] = [];
 
-  payload = "4543542d312e332e37";
+  payload = "4543542D312E342E30";
 
   $i18n: any = {
     t: (s: string) => s,
