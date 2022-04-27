@@ -2537,6 +2537,10 @@ export default class extends Vue {
         return false;
       case "gm":
         return false;
+      case "wdnr":
+        return false;
+      case "nktr":
+        return false;
       default:
         return true;
     }

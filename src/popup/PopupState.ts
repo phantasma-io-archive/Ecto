@@ -1185,6 +1185,10 @@ export class PopupState {
         return 18;
       case "GM":
         return 8;
+      case "WNDR":
+        return 8;
+      case "NKTR":
+        return 8;
       default:
         return 0;
     }
