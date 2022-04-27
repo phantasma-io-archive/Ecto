@@ -10,8 +10,8 @@ const contractsTestnet: any = {
 };
 
 const contractsMainnet: any = {
-  SOUL: "1EAfA88a165d361d49Ba8a40930EF0e59392e185",
-  KCAL: "1Bc40B96260451372B34F9CD21d1779b93b60Fb5",
+  SOUL: "298Eff8af1ecEbbB2c034eaA3b9a5d0Cc56c59CD",
+  KCAL: "855EA8048E1852996429A50aBdA60F583909d298",
   BUSD: "e9e7cea3dedca5984780bafc599bd69add087d56",
 };
 
