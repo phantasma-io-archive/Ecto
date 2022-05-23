@@ -81,7 +81,7 @@ export interface NexusData<T> {
 export class PopupState {
   api = new PhantasmaAPI(
     "https://seed.ghostdevs.com:7077/rpc",
-    "https://ghostdevs.com/getpeers.json"
+    "https://peers.phantasma.io/mainnet-getpeers.json"
   );
 
   private _currentAccountIndex = 0;
