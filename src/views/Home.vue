@@ -2541,6 +2541,8 @@ export default class extends Vue {
         return false;
       case "nktr":
         return false;
+      case "wags":
+        return false;
       default:
         return true;
     }
