@@ -350,7 +350,7 @@ export class PhantasmaAPI {
         params: params,
         id: "1",
       }),
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      headers: { "Content-Type": "application/json" },
     });
     let resJson = await res.json();
     console.log("method", method, resJson);
