@@ -79,7 +79,7 @@ export class TransactionNG {
     // const gasTargetBytes = [...base58.decode(this.gasTarget)]
 
     let sb = new ScriptBuilder()
-      .emitVarString('simnet') //this.nexusName)
+      .emitVarString(this.nexusName)
       .emitVarString(this.chainName)
       .emitVarInt(this.version)  // ng      
       .emitVarInt(this.script.length / 2)
