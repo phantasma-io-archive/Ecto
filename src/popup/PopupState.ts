@@ -28,6 +28,7 @@ import {
 import { getBscAddressFromWif, getBscBalances, getBscContract } from "@/bsc";
 import base58 from "bs58";
 import { byteArrayToHex } from "@/phan-js/utils";
+import { TransactionNG } from "@/phan-js/tx/TransactionNG";
 
 export interface ISymbolAmount {
   symbol: string;
@@ -115,6 +116,9 @@ export class PopupState {
   allSwaps: Swap[] = [];
 
   payload = "4543542D312E342E33";
+
+  gasPrice = 100000;
+  gasLimit = 90000;
 
   $i18n: any = {
     t: (s: string) => s,
@@ -371,6 +375,9 @@ export class PopupState {
 
         const numAccounts = items.accounts ? items.accounts.length : 0;
 
+        if (items.gasPrice) this.gasPrice = items.gasPrice;
+        if (items.gasLimit) this.gasLimit = items.gasLimit;
+
         if (items.simnetRpc) this._simnetRpc = items.simnetRpc;
         if (items.testnetRpc) this._testnetRpc = items.testnetRpc;
         if (items.mainnetRpc) this._mainnetRpc = items.mainnetRpc;
@@ -449,6 +456,21 @@ export class PopupState {
         () => resolve()
       );
     });
+  }
+
+  async setGasPriceAndLimit(gasPrice: number, gasLimit: number): Promise<void> {
+    this.gasPrice = gasPrice;
+    this.gasLimit = gasLimit;
+
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(
+        {
+          gasPrice,
+          gasLimit
+        },
+        () => resolve()
+      );
+    });   
   }
 
   async toggleBalance(balanceShown: boolean): Promise<void> {
@@ -934,12 +956,13 @@ export class PopupState {
     const dt = new Date();
     dt.setMinutes(dt.getMinutes() + 5);
     console.log(dt);
-    const tx = new Transaction(
+    const tx = new TransactionNG(
       txdata.nexus && txdata.nexus != '' ?  txdata.nexus : this.nexus,
       txdata.chain,
       txdata.script,
       dt,
-      txdata.payload
+      txdata.payload,
+      account.address, account.address, '', this.gasPrice.toString(), this.gasLimit.toString()
     );
 
     const privateKey = getPrivateKeyFromWif(wif);

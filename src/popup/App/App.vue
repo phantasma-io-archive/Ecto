@@ -2,7 +2,7 @@
   <v-app style="width:320px; min-height:480px; max-height:540px">
     <router-view></router-view>
 
-    <v-dialog v-model="settingsDialog" style="z-index:100">
+    <v-dialog v-model="settingsDialog" style="z-index:10000">
       <v-card style="height:408px">
         <v-card-title>
           <v-img
@@ -13,6 +13,7 @@
           <div class="overline mx-auto">Ecto wallet v{{ version }}</div>
         </v-card-title>
         <v-card-text>
+          <div v-if="!showAdvancedSettings">
           <v-row class="mt-3">
             <v-select
               v-model="currency"
@@ -32,8 +33,18 @@
             >
             </v-select>
           </v-row>
+          </div>
+          <div v-else>
+          <v-row class="mt-3">
+            <v-combobox class="mt-3 px-3 minicombo" label="Phantasma max gas limit" :items="gasLimitItems" v-model="gasLimitValue" dense @change="changeGasSettings">
+            </v-combobox>
+            <v-combobox class="my-3 px-3 minicombo" label="Phantasma gas price" :items="gasPriceItems" v-model="gasPriceValue" dense @change="changeGasSettings">
+            </v-combobox>
+          </v-row>
+          </div>
         </v-card-text>
         <v-card-actions>
+          <v-btn text small color="grey darken-1" @click="showAdvancedSettings = !showAdvancedSettings">{{showAdvancedSettings ? "Back": "Advanced" }}</v-btn>
           <v-spacer />
           <v-btn text color="blue darken-1" @click="settingsDialog = false">{{
             $t("app.closeButton")
@@ -221,6 +232,23 @@ export default class extends Vue {
 
   netIndex = 0;
 
+  
+  showAdvancedSettings = false;
+
+  gasLimitValue: any = { text: '90000 (Default)', value: 90000}
+
+  gasLimitItems = [ 
+    { text: '2100000 (Advanced TXs)', value: 2100000},
+    { text: '90000 (Standard TXs)', value: 90000},
+  ]
+
+  gasPriceValue: any = { text: '100000 (Default)', value: 100000}
+
+  gasPriceItems = [ 
+    { text: '100000 (Default)', value: 100000},
+  ]
+
+
   @Watch("state.mainnetRpcList", { deep: true, immediate: true })
   onRpcListUpdate(old: any, newList: any) {
     if (!state.mainnetRpcList || state.mainnetRpcList.length == 0) return;
@@ -231,6 +259,18 @@ export default class extends Vue {
     ];
   }
 
+  resetGasSettings() {
+    this.gasLimitValue = { text: `${state.gasLimit} (Custom)` , value: state.gasLimit }
+    this.gasPriceValue = { text: `${state.gasPrice} (Custom)` , value: state.gasPrice }
+
+    // set item with proper label, if available
+    const gasLimitItem = this.gasLimitItems.find(i =>  i.value == state.gasLimit)
+    if (gasLimitItem) this.gasLimitValue = gasLimitItem
+
+    const gasPriceItem = this.gasPriceItems.find(i =>  i.value == state.gasPrice)
+    if (gasPriceItem) this.gasPriceValue = gasPriceItem
+  }
+
   async mounted() {
     await state.check(this.$parent.$i18n);
     this.currency = state.currency;
@@ -238,6 +278,8 @@ export default class extends Vue {
     this.balanceShown = state.balanceShown;
 
     this.version = chrome.runtime.getManifest().version;
+
+    this.resetGasSettings();
 
     const nexus = state.nexus;
     if (nexus == "simnet") this.netIndex = 0;
@@ -305,6 +347,17 @@ export default class extends Vue {
       this.$i18n.locale = locale;
       await this.state.setLanguage(this.language);
       this.$root.$emit("changeLanguage");
+    }
+  }
+
+  async changeGasSettings() {
+    const gasPrice = typeof this.gasPriceValue == 'string' ? parseInt(this.gasPriceValue) : this.gasPriceValue.value
+    const gasLimit = typeof this.gasLimitValue == 'string' ? parseInt(this.gasLimitValue) : this.gasLimitValue.value
+    if (gasPrice > 0 && gasLimit > 0) {
+      state.setGasPriceAndLimit(gasPrice, gasLimit)
+    }
+    else {
+      this.resetGasSettings()
     }
   }
 
