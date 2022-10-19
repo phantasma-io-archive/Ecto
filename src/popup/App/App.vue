@@ -239,7 +239,7 @@ export default class extends Vue {
 
   gasLimitItems = [ 
     { text: '2100000 (Advanced TXs)', value: 2100000},
-    { text: '90000 (Standard TXs)', value: 90000},
+    { text: '500000 (Standard TXs)', value: 500000},
   ]
 
   gasPriceValue: any = { text: '100000 (Default)', value: 100000}

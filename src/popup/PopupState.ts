@@ -118,7 +118,7 @@ export class PopupState {
   payload = "4543542D312E342E33";
 
   gasPrice = 100000;
-  gasLimit = 90000;
+  gasLimit = 500000;
 
   $i18n: any = {
     t: (s: string) => s,
