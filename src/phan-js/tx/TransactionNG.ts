@@ -1,5 +1,6 @@
 import base58 from "bs58";
 import { eddsa } from "elliptic";
+import createHash from "create-hash";
 import { ScriptBuilder } from "../vm";
 const curve = new eddsa("ed25519");
 
@@ -50,6 +51,17 @@ export class TransactionNG {
     this.version = 0
     
     this.signatures = [];    
+  }
+
+  public mine(targetDifficulty: number) {
+    if (targetDifficulty <= 0) return
+    let nonce = 0;
+    while (nonce < Number.MAX_SAFE_INTEGER) {
+      this.payload = ("0000000000" + (nonce).toString(16).toUpperCase()).slice(-2*4)
+      if (this.getHashDifficulty() >= targetDifficulty) 
+        return;
+      ++nonce;
+    }
   }
 
   public sign(privateKey: string) {
@@ -120,5 +132,29 @@ export class TransactionNG {
     const sig = curve.sign(msgHashHex, privateKeyBuffer);
 
     return sig.toHex();
+  }
+
+  private getHashDifficulty() {
+    var hexStr = this.toString(false)
+    const hash = createHash("sha256")
+      .update(hexStr, "hex")
+      .digest();
+
+
+    let result = 0;
+    for (let i=0; i<hash.length; i++)
+    {
+        let n = hash[i];
+
+        for (let j=0; j<8; j++)
+        {
+            if ((n & (1 << j)) != 0)
+            {
+                result = 1 + (i << 3) + j;
+            }
+        }
+    }
+
+    return 256 - result;
   }
 }
