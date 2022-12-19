@@ -956,13 +956,12 @@ export class PopupState {
     const dt = new Date();
     dt.setMinutes(dt.getMinutes() + 5);
     console.log(dt);
-    const tx = new TransactionNG(
+    const tx = new Transaction(
       txdata.nexus && txdata.nexus != '' ?  txdata.nexus : this.nexus,
       txdata.chain,
       txdata.script,
       dt,
       txdata.payload,
-      account.address, account.address, '', this.gasPrice.toString(), this.gasLimit.toString()
     );
 
     const privateKey = getPrivateKeyFromWif(wif);

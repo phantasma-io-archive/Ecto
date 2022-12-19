@@ -10,6 +10,15 @@ import { getBscBalances } from "@/bsc";
 
 Vue.use(VueI18n);
 
+const powValues = {
+  None : 0,
+  Minimal : 5,
+  Moderate : 15,
+  Hard : 19,
+  Heavy : 24,
+  Extreme : 30
+}
+
 const i18n = new VueI18n({
   messages,
   locale: defaultLocale,
@@ -406,6 +415,7 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
           let script = "";
           let platform = "phantasma";
           let signature = "Ed25519";
+          let pow = "None";
 
           if (version == "1") {
             nexus = args[1];
@@ -418,6 +428,9 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
             payload = args[3];
             signature = args[4];
             platform = args[5];
+            if (args.length > 6+2) pow = args[6]
+
+            console.log('pow', pow)
           }
 
           payload = payload == null || payload == "" ? state.payload : payload;
@@ -528,6 +541,26 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
           });
 
         }
+        break;
+
+      case "getPeer":
+        await state.check(undefined);
+
+        chrome.tabs.sendMessage(msg.tabid, {
+          uid: "plsres",
+          sid: msg.sid,
+          data: { result: state.api.host, id, success: true},
+        });
+        break;
+
+      case "getNexus":
+        await state.check(undefined);
+
+        chrome.tabs.sendMessage(msg.tabid, {
+          uid: "plsres",
+          sid: msg.sid,
+          data: { result: state.nexus, id, success: true},
+        });
         break;
     }
   }
