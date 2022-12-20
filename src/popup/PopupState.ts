@@ -115,7 +115,7 @@ export class PopupState {
 
   allSwaps: Swap[] = [];
 
-  payload = "4543542d312e352e30";
+  payload = "4543542d312e352e31";
 
   gasPrice = 100000;
   gasLimit = 500000;
