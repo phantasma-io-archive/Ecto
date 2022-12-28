@@ -110,6 +110,7 @@ export interface TransactionData {
   events: Array<Event>; //List of events that triggered in the transaction
   result: string; //Result of the transaction, if any. Serialized, in hexadecimal format
   fee: string; //Fee of the transaction, in KCAL, fixed point
+  state: 'Fault' | 'Running' | 'Break' | 'Halt'
 }
 
 export interface AccountTransactions {

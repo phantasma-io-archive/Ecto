@@ -421,8 +421,18 @@ export class PopupState {
   async checkTxError(tx: string): Promise<string | null> {
     const txdata = await this.api.getTransaction(tx);
     console.log("checkTx", txdata);
+    if ((txdata as any).error) return 'pending'
     if (!txdata) return null;
-    return (txdata as any).error;
+    if (txdata.state == 'Fault') {
+      if (txdata.events) {
+        const errEv = txdata.events.find(e => e.kind == 'ExecutionFailure')
+        if (errEv)
+          return `Execution failure in ${errEv.contract} contract`
+      }
+      return 'Unknown error'
+    }
+    if (txdata.state == 'Running') return 'pending'
+    return null
   }
 
   clearAll() {

@@ -495,6 +495,14 @@ export default class extends Vue {
       });
     }
 
+    if (this.tx.state == 'Fault') {
+      res = [{
+        icon: "mdi-alert",
+        iconColor: "red",
+        text: 'Error in transaction',
+      }];      
+    }
+
     const numEvents = res.length;
 
     if (res.length > 100) {
