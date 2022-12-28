@@ -426,8 +426,13 @@ export class PopupState {
     if (txdata.state == 'Fault') {
       if (txdata.events) {
         const errEv = txdata.events.find(e => e.kind == 'ExecutionFailure')
-        if (errEv)
-          return `Execution failure in ${errEv.contract} contract`
+        if (errEv) {
+          let errMsg = `Execution failure in ${errEv.contract} contract`
+          if (errEv?.contract == 'stake') {
+            errMsg += '. (Note: there is a 24h cooldown period after staking or claiming KCAL)'
+          }
+          return errMsg
+        }
       }
       return 'Unknown error'
     }
