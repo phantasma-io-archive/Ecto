@@ -289,7 +289,7 @@ export class PhantasmaAPI {
       var started = new Date().getTime();
       var http = new XMLHttpRequest();
 
-      http.open("GET", host + "/rpc", true);
+      http.open("GET", host + "/api/v1/GetNexus?extended=false", true);
       http.timeout = 4500;
       http.onreadystatechange = function () {
         if (http.readyState == 4 && http.status == 200) {

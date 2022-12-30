@@ -81,7 +81,7 @@ export interface NexusData<T> {
 
 export class PopupState {
   api = new PhantasmaAPI(
-    "https://pha1-nodes.ghostmarket.io:7077/rpc",
+    "http://pharpc1.phantasma.io:7077/rpc",
     "https://peers.phantasma.io/mainnet-getpeers.json"
   );
 

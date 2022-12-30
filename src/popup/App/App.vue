@@ -306,22 +306,16 @@ export default class extends Vue {
     );
 
     this.$root.$on("checkTx", (tx: string) => {
+      this.checkTx(tx, 0)
+    });
+  }
+
+  checkTx(tx: string, retry: number) {
       setTimeout(async () => {
         if (tx && tx !== "") {
           const error = await state.checkTxError(tx);
-          if (error === "pending") {
-            // retry because tx is pending
-            setTimeout(async () => {
-              const error = await state.checkTxError(tx);
-              if (error) {
-                let shortError =
-                  error.length > 120 ? error.substring(0, 120) + "..." : error;
-                this.$root.$emit("errorMessage", {
-                  msg: this.$t("app.errorMessage"),
-                  details: shortError,
-                });
-              }
-            }, 2500);
+          if (error === "pending" && retry < 6) {
+            this.checkTx(tx, retry + 1)
           } else if (error) {
             let shortError =
               error.length > 120 ? error.substring(0, 120) + "..." : error;
@@ -331,8 +325,8 @@ export default class extends Vue {
             });
           }
         }
-      }, 2500);
-    });
+      }, 2000);
+
   }
 
   async changeCurrency() {
