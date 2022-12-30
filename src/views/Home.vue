@@ -2478,7 +2478,7 @@ export default class extends Vue {
         ? "http://testnet.phantasma.io/tx/"
         : state.nexus == "simnet"
         ? "https://localhost:7088/"
-        : "https://explorer.phantasma.io/tx/") + hash
+        : "https://ngexplorer.phantasma.io/en/transaction?id=") + hash
     );
   }
 
