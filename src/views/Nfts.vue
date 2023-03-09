@@ -705,9 +705,9 @@ export default class extends Vue {
           .map(
             (i: any) =>
               '<v-avatar><img src="assets/' +
-              i.Key.toLowerCase() +
+              (i.key ?? i.Key ?? '').toLowerCase() +
               '.png" style="height: 1.5rem;vertical-align: middle;margin-right: 0.25rem;"/></v-avatar>' +
-              state.formatBalance(i.Key, i.Value)
+              state.formatBalance(i.key ?? i.Key ?? '', i.value ?? i.Value ?? '')
           )
           .join("<br/>")
       : "";

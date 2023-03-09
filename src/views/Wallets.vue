@@ -17,6 +17,8 @@
         <v-list-item
           v-for="acc in state.accounts"
           v-bind:key="acc.address"
+          :active="acc.address == curAccountAddress"
+          :style="{ fontWeight: acc.address == curAccountAddress ? 600 : ''}"
           link
           @click="gotoAccount(acc)"
         >
@@ -185,6 +187,8 @@ export default class extends Vue {
 
   errorDialog = false;
   errorMessage = "";
+
+  get curAccountAddress() { return this.state.currentAccount?.address ?? '-' }
 
   async mounted() {
     await this.state.check(this.$parent.$i18n);

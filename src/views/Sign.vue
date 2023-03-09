@@ -182,6 +182,32 @@ export default class extends Vue {
     return account && account.type == "encKey";
   }
 
+  get accountLabel() {
+    const account = state.currentAccount;
+    if (!account) return "";
+    const address = account.address;
+    if (!account.data.name)
+      return (
+        address.substring(0, 8) +
+        "..." +
+        address.substring(address.length - 6, address.length)
+      );
+
+    return account.data.name;
+  }
+
+  get accountAddress() {
+    const account = state.currentAccount;
+    if (!account) return "";
+    const address = account.address;
+    return (
+      address.substring(0, 8) +
+      "..." +
+      address.substring(address.length - 6, address.length)
+    );
+  }
+
+
   get currentAccountDescription() {
     const account = state.currentAccount;
 

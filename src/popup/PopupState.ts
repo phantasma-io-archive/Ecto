@@ -425,9 +425,20 @@ export class PopupState {
     if (!txdata) return null;
     if (txdata.state == 'Fault') {
       if (txdata.events) {
-        const errEv = txdata.events.find(e => e.kind == 'ExecutionFailure')
+        const errEv = txdata.events.find(e => e.kind == 'ExecutionFailure')        
         if (errEv) {
+
           let errMsg = `Execution failure in ${errEv.contract} contract`
+          const data = errEv.data
+          if (data) {
+            try {
+              var hex = data.substring(2);
+              var str = '';
+              for (var i = 0; i < hex.length; i += 2)
+                  str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+              errMsg = str
+            } catch {}
+          }
           if (errEv?.contract == 'stake') {
             errMsg += '. (Note: there is a 24h cooldown period after staking or claiming KCAL)'
           }
@@ -763,7 +774,9 @@ export class PopupState {
         console.log("neoBals", this.neoBalances);
         let neoSwaps = await this.api.getSwapsForAddress(neoAddress, 'neo');
         console.log("neoSwaps", neoSwaps);
-        neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
+        if (neoSwaps) {
+          neoSwaps = neoSwaps.filter((s) => s.destinationHash === "pending");
+        }
         console.log("neoSwaps", neoSwaps);
         if (!(neoSwaps as any).error) this.allSwaps = neoSwaps;
       } catch (err) {
@@ -777,12 +790,14 @@ export class PopupState {
         console.log("ethBals", this.ethBalances);
         let ethSwaps = await this.api.getSwapsForAddress(ethAddress, 'ethereum');
         console.log("ethSwaps", ethSwaps);
-        ethSwaps = ethSwaps.filter(
-          (s) =>
-            s.destinationHash === "pending" &&
-            (s.sourcePlatform === "ethereum" ||
-              s.destinationPlatform === "ethereum")
-        );
+        if (ethSwaps) {
+          ethSwaps = ethSwaps.filter(
+            (s) =>
+              s.destinationHash === "pending" &&
+              (s.sourcePlatform === "ethereum" ||
+                s.destinationPlatform === "ethereum")
+          );
+        }
         console.log("ethSwaps", ethSwaps);
         if (!(ethSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(ethSwaps);
@@ -797,11 +812,13 @@ export class PopupState {
         console.log("bscBals", this.bscBalances);
         let bscSwaps = await this.api.getSwapsForAddress(bscAddress, 'bsc');
         console.log("bscSwaps", bscSwaps);
-        bscSwaps = bscSwaps.filter(
-          (s) =>
-            s.destinationHash === "pending" &&
-            (s.sourcePlatform === "bsc" || s.destinationPlatform === "bsc")
-        );
+        if (bscSwaps) {
+          bscSwaps = bscSwaps.filter(
+            (s) =>
+              s.destinationHash === "pending" &&
+              (s.sourcePlatform === "bsc" || s.destinationPlatform === "bsc")
+          );
+        }
         console.log("bscSwaps", bscSwaps);
         if (!(bscSwaps as any).error)
           this.allSwaps = this.allSwaps.concat(bscSwaps);
@@ -813,7 +830,7 @@ export class PopupState {
     try {
       let phaSwaps = await this.api.getSwapsForAddress(this.currentAccount!.address, 'phantasma');
       console.log("phaSwaps", phaSwaps);
-      phaSwaps = phaSwaps.filter(
+      phaSwaps = phaSwaps?.filter(
         (s) =>
           s.destinationHash === "pending" &&
           this.allSwaps.findIndex(
@@ -956,6 +973,7 @@ export class PopupState {
     if (!this.isWifValidForAccount(wif))
       throw new Error(this.$i18n.t("error.noPasswordMatch").toString());
 
+    console.log('wif', wif, 'account', account.address, 'txdata', txdata)
     return await this.signTx(txdata, wif);
   }
 
@@ -967,6 +985,7 @@ export class PopupState {
       throw new Error(this.$i18n.t("error.noAccountMatch").toString());
 
     const address = account.address;
+    console.log('address', address, 'wif', wif)
 
     const dt = new Date();
     dt.setMinutes(dt.getMinutes() + 5);
@@ -1281,12 +1300,14 @@ export class PopupState {
 
   async queryNfts(ids: string[], token: string) {
     const allNftsToQuery = [];
+    console.log('ids', ids, 'token', token)
 
     for (let k = 0; k < ids.length; ++k) {
       const id = ids[k];
       const lookupId = token + "@" + id;
       const nft = this.nfts[lookupId];
-      if (!nft || nft.img.startsWith("placeholder-")) {
+      console.log('nft', nft)
+      if (!nft || !nft.img || nft.img.startsWith("placeholder-")) {
         // search for it
         allNftsToQuery.push(id);
       }
@@ -1336,17 +1357,18 @@ export class PopupState {
         console.log("Got nft", nft);
 
         const imgUrlUnformated = nft.properties.find(
-          (kv) => kv.Key == "ImageURL"
-        )?.Value;
+          (kv) => kv.key == "ImageURL"
+        )?.value;
 
         let nftDef = {
           id: nftId,
           mint: nft.mint,
           img: imgUrlUnformated,
-          type: nft.properties.find((kv) => kv.Key == "Type")?.Value,
-          name: nft.properties.find((kv) => kv.Key == "Name")?.Value,
+          type: nft.properties.find((kv) => kv.key == "Type")?.value,
+          name: nft.properties.find((kv) => kv.key == "Name")?.value,
           infusion: nft.infusion,
         };
+        console.log('')
         nftDict[token + "@" + nftId] = nftDef;
       }
       Object.assign(this.nfts, nftDict);

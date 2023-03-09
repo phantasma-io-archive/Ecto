@@ -291,6 +291,7 @@
                 >
                   {{ $t("home.crossChain") }}
                 </div>
+                <div class="pa-3"><v-icon color="red" class="mr-2">mdi-alert</v-icon>Warning: cross-chain swaps are NOT enabled.</div>
                 <div v-if="state.allSwaps.length > 0" class="pa-4">
                   <div
                     style="text-transform:uppercase;margin-bottom:0.5rem;color:#17b1e8"
@@ -338,7 +339,7 @@
                 }}</a>
               </div>-->
                 </div>
-                <v-expansion-panel>
+                <v-expansion-panel class="swap-disabled">
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
@@ -450,7 +451,7 @@
                     </div>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel>
+                <v-expansion-panel class="swap-disabled">
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
@@ -579,7 +580,7 @@
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <!--- TRANSFER FROM BSC -->
-                <v-expansion-panel>
+                <v-expansion-panel class="swap-disabled">
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
@@ -708,7 +709,7 @@
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <!--- TRANSFER TO NEO -->
-                <v-expansion-panel>
+                <v-expansion-panel class="swap-disabled">
                   <v-expansion-panel-header>
                     <v-row style="vertical-align:middle">
                       <v-col class="mt-2"> {{ $t("home.swapTo") }} NEO </v-col>
@@ -746,7 +747,7 @@
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <!--- TRANSFER TO ETH -->
-                <v-expansion-panel>
+                <v-expansion-panel class="swap-disabled">
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2">
@@ -798,7 +799,7 @@
                   </v-expansion-panel-content>
                 </v-expansion-panel>
                 <!--- TRANSFER TO BSC -->
-                <v-expansion-panel>
+                <v-expansion-panel class="swap-disabled">
                   <v-expansion-panel-header>
                     <v-row>
                       <v-col class="mt-2"> {{ $t("home.swapTo") }} BSC </v-col>
@@ -4381,6 +4382,10 @@ export default class extends Vue {
 </script>
 
 <style>
+
+.swap-disabled {
+  opacity: 0.5;
+}
 .v-tab {
   font-size: 12px;
 }

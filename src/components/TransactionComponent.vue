@@ -183,6 +183,7 @@ export default class extends Vue {
     }
 
     const events = this.tx.events;
+    let numInfusionCrownEvents = 0
     for (let i = 0; i < events.length; ++i) {
       const ev = events[i];
       switch (ev.kind) {
@@ -457,6 +458,9 @@ export default class extends Vue {
           const data = getInfusionEventData(ev.data);
           // if (ev.address == this.address) {
           {
+            if (data.baseSymbol == "CROWN")
+              ++numInfusionCrownEvents;
+
             const nftId = data.TokenID;
             if (state.isNFT(data.InfusedSymbol)) {
               res.push({
@@ -501,6 +505,14 @@ export default class extends Vue {
         iconColor: "red",
         text: 'Error in transaction',
       }];      
+    }
+
+    if (numInfusionCrownEvents > 50) {
+      res = [{
+        icon: "mdi-crown",
+        iconColor: "green",
+        text: "CROWN distribution"
+      }];
     }
 
     const numEvents = res.length;
@@ -556,7 +568,7 @@ export default class extends Vue {
     const item = nfts[symbol + "@" + nftId];
     if (item && item.infusion) {
       return item.infusion
-        .map((i: any) => state.formatBalance(i.Key, i.Value))
+        .map((i: any) => state.formatBalance(i.key ?? i.Key ?? '', i.value ?? i.Value ?? ''))
         .join("<br/>");
     }
     return "";

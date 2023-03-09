@@ -261,8 +261,8 @@ export interface Swap {
 }
 
 export interface KeyValue {
-  Key: string;
-  Value: string;
+  key: string;
+  value: string;
 }
 
 export interface NFT {
@@ -670,7 +670,9 @@ export class PhantasmaAPI {
   //Returns platform swaps for a specific address.
   async getSwapsForAddress(account: string, platform: string): Promise<Swap[]> {
     let params: Array<any> = [account, platform, false];
-    return (await this.JSONRPC("getSwapsForAddress", params)) as Swap[];
+    const res = (await this.JSONRPC("getSwapsForAddress", params));
+    if (res.error) return [];
+    return res as Swap[]
   }
 
 
