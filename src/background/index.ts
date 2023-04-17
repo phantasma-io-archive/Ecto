@@ -310,11 +310,12 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
               decimals: 8,
             });
 
-          let balances = account.balances.map((x) => {
+          let balances:any = account.balances.map((x) => {
             return {
               value: x.amount,
               decimals: x.decimals,
               symbol: x.symbol,
+              ids: x.ids
             };
           });
 
