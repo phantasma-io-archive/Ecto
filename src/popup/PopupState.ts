@@ -81,7 +81,7 @@ export interface NexusData<T> {
 
 export class PopupState {
   api = new PhantasmaAPI(
-    "http://pharpc1.phantasma.io:7077/rpc",
+    "https://pharpc1.phantasma.info/rpc",
     "https://peers.phantasma.io/mainnet-getpeers.json"
   );
 
@@ -115,7 +115,7 @@ export class PopupState {
 
   allSwaps: Swap[] = [];
 
-  payload = "4543542d312e352e34";
+  payload = "4543542d312e352e35";
 
   gasPrice = 100000;
   gasLimit = 500000;
